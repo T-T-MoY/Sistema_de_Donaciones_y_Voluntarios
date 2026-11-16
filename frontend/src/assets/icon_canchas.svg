@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 3000">
+  <defs>
+    <style>
+      .field {
+        fill: none;
+        stroke: #f0e9d9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 150px;
+      }
+    </style>
+    <linearGradient id="logo-grad" x1="193.16" y1="193.16" x2="2806.84" y2="2806.84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2f5c54"/>
+      <stop offset="1" stop-color="#10211e"/>
+    </linearGradient>
+  </defs>
+  <rect fill="url(#logo-grad)" x="5.03" y="4.85" width="2989.94" height="2990.31" rx="640.74" ry="640.74"/>
+  <rect class="field" x="600" y="900" width="1800" height="1200" rx="100" ry="100"/>
+  <line class="field" x1="1500" y1="900" x2="1500" y2="2100"/>
+  <circle class="field" cx="1500" cy="1500" r="250"/>
+</svg>

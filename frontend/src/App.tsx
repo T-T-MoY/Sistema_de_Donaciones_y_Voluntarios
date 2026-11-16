@@ -1,0 +1,64 @@
+/**
+ * ============================================================================
+ * ARCHIVO: App.tsx
+ * PROPÓSITO: Configuración central de rutas del Sistema de Donaciones y
+ *            Voluntariado.
+ * ============================================================================
+ */
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+// Layouts
+import PublicLayout from './components/layout/PublicLayout';
+import AppLayout from './components/layout/AppLayout';
+
+// Guards de rutas privadas
+import RutasProtegidas from './components/RutasProtegidas';
+import RutasAdmin from './components/RutasAdmin';
+
+// Páginas
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import UsuariosPage from './pages/UsuariosPage';
+import Perfil from './pages/Perfil';
+import Dashboard from './pages/Dashboard';
+import SolicitarRecuperacion from './pages/SolicitarRecuperacion';
+import ResetPassword from './pages/ResetPassword';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* 1. PÚBLICO (LandingNavbar + Footer) */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+        </Route>
+
+        {/* 2. AUTH (pantalla completa, sin chrome) */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/solicitar-recuperacion" element={<SolicitarRecuperacion />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* 3. PRIVADO (Navbar sidebar + Header) */}
+        <Route element={<RutasProtegidas />}>
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/perfil" element={<Perfil />} />
+
+            {/* Solo administradores */}
+            <Route element={<RutasAdmin />}>
+              <Route path="/usuarios" element={<UsuariosPage />} />
+            </Route>
+          </Route>
+        </Route>
+
+        {/* 4. Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
