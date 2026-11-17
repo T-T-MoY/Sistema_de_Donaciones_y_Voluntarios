@@ -29,16 +29,16 @@ type CampoLogin = 'correo' | 'contraseña';
 // ESTILOS DE CAMPO (sobre vidrio oscuro)
 // =====================================================
 const campoBase =
-    'w-full rounded-xl border bg-white/[0.06] py-3 pl-11 pr-4 text-[15px] text-arena-ivory placeholder:text-arena-ivory/30 outline-none transition-[border-color,box-shadow,background-color] duration-200 focus:bg-white/[0.09] focus:ring-2';
+    'w-full rounded-xl border bg-white/[0.07] py-3 pl-11 pr-4 text-[15px] text-arena-ivory placeholder:text-arena-ivory/45 outline-none transition-[border-color,box-shadow,background-color] duration-200 focus:bg-white/[0.1] focus:ring-2';
 
 const claseCampo = (conError: boolean, conPasswordToggle = false) =>
     `${campoBase} ${conPasswordToggle ? 'pr-12' : ''} ${conError
-        ? 'border-red-400/60 focus:border-red-400 focus:ring-red-400/20'
-        : 'border-white/12 hover:border-white/25 focus:border-arena-accent/60 focus:ring-arena-accent/15'
+        ? 'border-red-400/70 focus:border-red-400 focus:ring-red-400/25'
+        : 'border-white/15 hover:border-white/30 focus:border-arena-accent/70 focus:ring-arena-accent/20'
     }`;
 
 const etiquetaCampo =
-    'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-arena-ivory/45';
+    'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-arena-ivory/65';
 
 // =====================================================
 // COMPONENTE
@@ -137,7 +137,7 @@ const Login = () => {
 
             {/* =====================================================
                 FONDO CONTINUO — una sola imagen a pantalla completa,
-                sin panel partido a la mitad.
+                sin panel dividido a la mitad.
                 ===================================================== */}
             <img
                 src="/images/auth-complex.jpg"
@@ -147,11 +147,11 @@ const Login = () => {
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-[linear-gradient(100deg,rgba(21,45,39,0.94)_0%,rgba(21,45,39,0.82)_32%,rgba(28,59,52,0.5)_64%,rgba(28,59,52,0.22)_100%)] dark:bg-[linear-gradient(100deg,rgba(16,16,16,0.92)_0%,rgba(16,16,16,0.78)_32%,rgba(16,16,16,0.46)_64%,rgba(16,16,16,0.2)_100%)]"
+                className="absolute inset-0 bg-linear-to-r from-arena-night/95 via-arena-night/80 to-arena-base/30"
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-arena-deep/85 via-arena-deep/10 to-arena-deep/45 dark:from-arena-night/85 dark:via-arena-night/10 dark:to-arena-night/45"
+                className="absolute inset-0 bg-linear-to-t from-arena-base/90 via-transparent to-arena-night/60"
             />
             <div aria-hidden="true" className="pitch-lines pointer-events-none absolute inset-0 opacity-25" />
             <div
@@ -180,7 +180,7 @@ const Login = () => {
                             <span className="text-[14px] font-extrabold uppercase tracking-[0.16em]">
                                 Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
                             </span>
-                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/40">
+                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/55">
                                 Plataforma de Gestión
                             </span>
                         </span>
@@ -206,7 +206,7 @@ const Login = () => {
                         COLUMNA IZQUIERDA: marca + propuesta de valor
                         ===================================================== */}
                     <div className="hidden lg:block">
-                        <span className="anim-rise inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/55">
+                        <span className="anim-rise inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/70">
                             <span className="h-px w-10 bg-arena-accent-soft" />
                             Acceso a la plataforma
                         </span>
@@ -219,7 +219,7 @@ const Login = () => {
                             <span className="text-arena-accent-soft">Es tu momento.</span>
                         </h1>
 
-                        <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-arena-ivory/60 [animation-delay:120ms]">
+                        <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-arena-ivory/75 [animation-delay:120ms]">
                             Tus donaciones, voluntariados y solicitudes en un solo lugar.
                             Conexión directa y seguimiento transparente.
                         </p>
@@ -230,7 +230,7 @@ const Login = () => {
                                 'Registro ágil de voluntarios y beneficiarios',
                                 'Coordinación de campañas en tiempo real',
                             ].map((item) => (
-                                <li key={item} className="flex items-center gap-3 text-sm text-arena-ivory/65">
+                                <li key={item} className="flex items-center gap-3 text-sm text-arena-ivory/80">
                                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-arena-accent text-arena-ink">
                                         <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
@@ -241,11 +241,11 @@ const Login = () => {
                             ))}
                         </ul>
 
-                        <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.18em] text-arena-ivory/30 [animation-delay:240ms]">
+                        <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.18em] text-arena-ivory/50 [animation-delay:240ms]">
                             <span>Comunidad Activa</span>
-                            <span className="h-1 w-1 rounded-full bg-white/25" />
+                            <span className="h-1 w-1 rounded-full bg-arena-ivory/30" />
                             <span>4 roles</span>
-                            <span className="h-1 w-1 rounded-full bg-white/25" />
+                            <span className="h-1 w-1 rounded-full bg-arena-ivory/30" />
                             <span>Sede La Paz</span>
                         </div>
                     </div>
@@ -254,9 +254,13 @@ const Login = () => {
                         COLUMNA DERECHA: formulario de vidrio
                         ===================================================== */}
                     <div className="mx-auto w-full max-w-[460px]">
-                        <div className="anim-rise rounded-3xl border border-white/12 bg-arena-deep/90 dark:bg-arena-panel/90 p-6 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:p-8">
+                        <div className="anim-rise relative overflow-hidden rounded-[2rem] border border-white/15 bg-arena-deep/95 p-6 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:p-8 dark:bg-arena-panel/95">
+                            <span
+                                aria-hidden="true"
+                                className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-arena-accent via-arena-accent/40 to-transparent"
+                            />
 
-                            <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-arena-ivory/45">
+                            <span className="inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.05] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-arena-ivory/65">
                                 <span className="h-1.5 w-1.5 rounded-full bg-arena-accent" />
                                 Acceso Seguro
                             </span>
@@ -264,7 +268,7 @@ const Login = () => {
                             <h2 className="mt-5 text-[1.7rem] font-extrabold uppercase leading-none tracking-tight text-arena-ivory">
                                 Iniciar sesión
                             </h2>
-                            <p className="mt-2 text-sm text-arena-ivory/50">
+                            <p className="mt-2 text-sm text-arena-ivory/70">
                                 Ingresá con tu cuenta para acceder a la plataforma.
                             </p>
 
@@ -376,8 +380,8 @@ const Login = () => {
                                     disabled={cargando}
                                     className={`press mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-[13px] font-extrabold uppercase tracking-[0.14em]
                                         ${cargando
-                                            ? 'cursor-wait bg-white/15 text-arena-ivory/60'
-                                            : 'bg-arena-accent text-arena-ink hover:bg-arena-accent-hover'
+                                            ? 'cursor-wait bg-white/15 text-arena-ivory/70'
+                                            : 'bg-arena-accent text-arena-ink shadow-[0_18px_36px_-18px_rgba(245,178,103,0.7)] hover:bg-arena-accent-hover'
                                         }`}
                                 >
                                     {cargando && (
@@ -388,7 +392,7 @@ const Login = () => {
 
                             </form>
 
-                            <p className="mt-6 border-t border-white/10 pt-5 text-center text-[13px] text-arena-ivory/45">
+                            <p className="mt-6 border-t border-white/10 pt-5 text-center text-[13px] text-arena-ivory/65">
                                 ¿Todavía no tenés cuenta?{' '}
                                 <Link
                                     to="/registro"
@@ -399,13 +403,13 @@ const Login = () => {
                             </p>
                         </div>
 
-                        <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-arena-ivory/25">
+                        <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-arena-ivory/45">
                             Conexión segura · Donaciones y Voluntariados
                         </p>
                     </div>
                 </main>
 
-                <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-arena-ivory/25">
+                <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-arena-ivory/45">
                     <span>© {new Date().getFullYear()} Donaciones y Voluntariados</span>
                     <span>Plataforma Solidaria</span>
                 </footer>

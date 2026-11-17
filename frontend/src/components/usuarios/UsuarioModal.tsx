@@ -2,7 +2,7 @@
  * ============================================================================
  * ARCHIVO: UsuarioModal.tsx
  * COMPONENTE: Modal para crear / editar usuarios.
- * - Valida por rol (Cliente, Empleado, Admin).
+ * - Valida por rol (Donante, Voluntario, Admin).
  * - Carga datos si recibe `usuarioId`.
  * - Renderiza en portal.
  * ============================================================================
@@ -19,6 +19,7 @@ import {
     calcularEdad
 } from '../../utils/validaciones';                          // ← +1 ../
 import type { Rol, UsuarioFormData } from '../../types/usuario.types';
+import { getRolDisplay } from '../../types/usuario.types';
 
 // =====================================================
 // TIPOS LOCALES (auxiliares del modal)
@@ -94,6 +95,20 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             document.body.style.overflow = '';
         };
     }, [isOpen]);
+
+    // =====================================================
+    // CERRAR CON ESC
+    // =====================================================
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (event: KeyboardEvent): void => {
+            if (event.key === 'Escape') onClose();
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     // =====================================================
     // CARGAR DATOS SI ES EDICIÓN
@@ -270,18 +285,46 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // RENDER (portal)
     // =====================================================
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="w-full max-w-2xl bg-claro-tarjeta dark:bg-oscuro-tarjeta rounded-2xl shadow-xl overflow-hidden border border-claro-borde dark:border-oscuro-borde max-h-[90vh] flex flex-col">
+        <div
+            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-arena-night/70 p-4 backdrop-blur-sm"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="titulo-modal-usuario"
+                className="animate-modal-in flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta shadow-lift dark:border-oscuro-borde dark:bg-oscuro-tarjeta"
+            >
 
                 {/* Cabecera */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-claro-borde dark:border-oscuro-borde shrink-0">
-                    <h2 className="text-xl font-semibold text-claro-texto dark:text-oscuro-texto">
-                        {modoEdicion ? 'Editar usuario' : 'Nuevo usuario'}
-                    </h2>
+                <div className="flex shrink-0 items-center justify-between border-b border-claro-borde px-6 py-4 dark:border-oscuro-borde">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario">
+                            <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </span>
+                        <div>
+                            <h2
+                                id="titulo-modal-usuario"
+                                className="text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto"
+                            >
+                                {modoEdicion ? 'Editar usuario' : 'Nuevo usuario'}
+                            </h2>
+                            <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">
+                                {modoEdicion
+                                    ? 'Actualizá los datos del perfil seleccionado.'
+                                    : 'Completá los datos para registrar una nueva cuenta.'}
+                            </p>
+                        </div>
+                    </div>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-claro-texto2 hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:text-oscuro-texto"
+                        aria-label="Cerrar"
+                        className="press rounded-xl p-2 text-claro-texto2 hover:bg-claro-tinte hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-tinte dark:hover:text-oscuro-texto"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -293,11 +336,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 <form
                     id="form-usuario"
                     onSubmit={handleSubmit}
-                    className="p-6 space-y-3 overflow-y-auto flex-1"
+                    className="flex-1 space-y-3 overflow-y-auto p-6"
                     noValidate
                 >
                     {/* === DATOS BÁSICOS === */}
-                    <h3 className="text-sm font-semibold text-claro-primario dark:text-oscuro-primario uppercase tracking-wide">
+                    <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em]">
                         Datos básicos
                     </h3>
 
@@ -365,11 +408,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 name="rol"
                                 value={formData.rol}
                                 onChange={handleRolChange}
-                                className="w-full px-3 py-2.5 border border-claro-borde dark:border-oscuro-borde rounded-xl bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto focus:outline-none focus:ring-2 focus:ring-claro-primario"
+                                className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
                             >
-                                <option value="Cliente">Cliente</option>
-                                <option value="Empleado">Empleado</option>
-                                <option value="Admin">Administrador</option>
+                                <option value="Cliente">{getRolDisplay('Cliente')}</option>
+                                <option value="Empleado">{getRolDisplay('Empleado')}</option>
+                                <option value="Admin">{getRolDisplay('Admin')}</option>
                             </select>
                         </div>
                         <div>
@@ -378,7 +421,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 name="estado"
                                 value={formData.estado}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2.5 border border-claro-borde dark:border-oscuro-borde rounded-xl bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto focus:outline-none focus:ring-2 focus:ring-claro-primario"
+                                className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
                             >
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
@@ -415,7 +458,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === DATOS PERSONALES (SOLO CLIENTE) === */}
                     {esCliente && (
                         <>
-                            <h3 className="text-sm font-semibold text-claro-primario dark:text-oscuro-primario uppercase tracking-wide pt-2">
+                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
                                 Datos personales
                             </h3>
 
@@ -490,13 +533,13 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === CAMPOS EMPLEADO === */}
                     {esEmpleado && (
                         <>
-                            <h3 className="text-sm font-semibold text-claro-primario dark:text-oscuro-primario uppercase tracking-wide pt-2">
-                                Datos laborales
+                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
+                                Datos de voluntariado
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Fecha de contratación *</label>
+                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Fecha de incorporación *</label>
                                     <input
                                         type="date" name="fecha_contratacion"
                                         value={formData.fecha_contratacion} onChange={handleChange} onBlur={handleBlur}
@@ -509,7 +552,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <input
                                         type="text" name="cargo"
                                         value={formData.cargo} onChange={handleChange} onBlur={handleBlur}
-                                        placeholder="Ej: Recepcionista"
+                                        placeholder="Ej: Coordinador de voluntariado"
                                         maxLength={100}
                                         className={claseInput(errores.cargo, touched.cargo)}
                                     />
@@ -521,7 +564,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                         name="turno"
                                         value={formData.turno}
                                         onChange={handleChange}
-                                        className="w-full px-3 py-2.5 border border-claro-borde dark:border-oscuro-borde rounded-xl bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto focus:outline-none focus:ring-2 focus:ring-claro-primario"
+                                        className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
                                     >
                                         <option value="Mañana">Mañana</option>
                                         <option value="Tarde">Tarde</option>
@@ -535,7 +578,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === CAMPOS ADMIN === */}
                     {esAdmin && (
                         <>
-                            <h3 className="text-sm font-semibold text-claro-primario dark:text-oscuro-primario uppercase tracking-wide pt-2">
+                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
                                 Datos del administrador
                             </h3>
                             <div>
@@ -556,18 +599,18 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     )}
 
                     {error && (
-                        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium">
+                        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700 dark:border-red-800/70 dark:bg-red-900/25 dark:text-red-300">
                             {error}
                         </div>
                     )}
                 </form>
 
                 {/* Pie con botones */}
-                <div className="flex justify-end gap-3 px-6 py-4 border-t border-claro-borde dark:border-oscuro-borde shrink-0">
+                <div className="flex shrink-0 justify-end gap-3 border-t border-claro-borde px-6 py-4 dark:border-oscuro-borde">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-5 py-2 text-sm font-medium text-claro-texto dark:text-oscuro-texto hover:bg-claro-tinte dark:hover:bg-oscuro-tinte rounded-lg transition-all"
+                        className="press rounded-xl px-5 py-2 text-sm font-semibold text-claro-texto2 hover:bg-claro-tinte hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-tinte dark:hover:text-oscuro-texto"
                     >
                         Cancelar
                     </button>
@@ -575,10 +618,10 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         type="submit"
                         form="form-usuario"
                         disabled={cargando}
-                        className={`px-5 py-2 text-sm font-medium rounded-lg shadow-sm transition-all
+                        className={`press rounded-xl px-5 py-2 text-sm font-semibold shadow-soft
                             ${cargando
-                                ? 'bg-gray-400 cursor-not-allowed text-white'
-                                : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover text-white'}`}
+                                ? 'bg-claro-borde text-claro-texto2 dark:bg-oscuro-borde dark:text-oscuro-texto2 cursor-not-allowed'
+                                : 'bg-claro-primario text-white hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover'}`}
                     >
                         {cargando ? 'Guardando...' : 'Guardar'}
                     </button>

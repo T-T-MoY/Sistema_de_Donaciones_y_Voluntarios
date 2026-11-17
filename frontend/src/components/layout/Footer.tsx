@@ -9,15 +9,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const linkClass =
-  'text-sm text-arena-ivory/50 transition-colors duration-200 hover:text-arena-accent-soft';
+  'text-sm text-arena-ivory/65 transition-colors duration-200 hover:text-arena-accent-soft';
 
 const tituloColumna =
-  'mb-4 text-[10px] font-bold uppercase tracking-[0.24em] text-arena-ivory/35';
+  'mb-4 text-[10px] font-bold uppercase tracking-[0.24em] text-arena-ivory/50';
 
 export const Footer: React.FC = () => {
   return (
     <footer id="contacto" className="relative mt-auto overflow-hidden bg-arena-night text-arena-ivory">
-      <div aria-hidden="true" className="h-px w-full bg-gradient-to-r from-transparent via-arena-accent/40 to-transparent" />
+      <div aria-hidden="true" className="h-px w-full bg-linear-to-r from-transparent via-arena-accent/40 to-transparent" />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-32 right-[-5%] h-[380px] w-[380px] rounded-full bg-arena-accent/[0.07] blur-[110px]"
@@ -39,11 +39,11 @@ export const Footer: React.FC = () => {
               </span>
             </div>
 
-            <p className="mt-4 max-w-[300px] text-sm leading-relaxed text-arena-ivory/45">
+            <p className="mt-4 max-w-[300px] text-sm leading-relaxed text-arena-ivory/60">
               Plataforma para coordinar y canalizar donaciones solidarias y actividades de voluntariado con total transparencia e impacto comunitario.
             </p>
 
-            <p className="mt-5 flex items-center gap-2 text-sm text-arena-ivory/40">
+            <p className="mt-5 flex items-center gap-2 text-sm text-arena-ivory/55">
               <svg className="h-4 w-4 text-arena-accent-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -77,7 +77,7 @@ export const Footer: React.FC = () => {
           {/* Contacto */}
           <div>
             <h4 className={tituloColumna}>Contacto</h4>
-            <ul className="flex flex-col gap-3 text-sm text-arena-ivory/50">
+            <ul className="flex flex-col gap-3 text-sm text-arena-ivory/65">
               <li className="flex items-center gap-2.5">
                 <svg className="h-4 w-4 shrink-0 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h2.5a1 1 0 011 .8l1 3.5a1 1 0 01-.4 1L7.5 9.5a12 12 0 007 7l1.2-1.6a1 1 0 011-.4l3.5 1a1 1 0 01.8 1V19a2 2 0 01-2 2A16 16 0 013 5z" />
@@ -117,7 +117,7 @@ export const Footer: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] font-medium uppercase tracking-[0.14em] text-arena-ivory/25">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] font-medium uppercase tracking-[0.14em] text-arena-ivory/45">
           <p>© {new Date().getFullYear()} Donaciones y Voluntariados · Todos los derechos reservados</p>
           <p>Proyecto Análisis y Diseño de Datos — UMSA</p>
         </div>

@@ -43,7 +43,7 @@ export const HowItWorks: React.FC = () => {
       <div aria-hidden="true" className="pitch-lines pointer-events-none absolute inset-0 opacity-50" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-arena-accent/[0.09] blur-[120px]"
+        className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-arena-accent/[0.10] blur-[120px]"
       />
 
       <div className="relative z-10 mx-auto max-w-[1240px]">
@@ -56,13 +56,13 @@ export const HowItWorks: React.FC = () => {
             <h2 className="mt-4 text-3xl font-extrabold uppercase leading-[0.98] tracking-tight text-balance sm:text-4xl lg:text-[2.9rem]">
               Ayudar es así de simple
             </h2>
-            <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/55">
+            <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/70">
               Tres pasos transparentes para conectar voluntades y recursos donde más se necesitan.
             </p>
           </div>
 
-          <div className="hidden shrink-0 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 md:flex">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/40">Plataforma</span>
+          <div className="hidden shrink-0 items-center gap-3 rounded-2xl border border-white/12 bg-white/[0.04] px-4 py-3 md:flex">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/55">Plataforma</span>
             <span className="font-mono text-lg font-bold text-arena-accent-soft">100% Solidaria</span>
           </div>
         </div>
@@ -71,7 +71,7 @@ export const HowItWorks: React.FC = () => {
           {STEPS.map((step, i) => (
             <div
               key={step.number}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-[transform,border-color,background-color] duration-300 ease-out-soft hover:border-arena-accent/40 hover:bg-white/[0.055] motion-safe:hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-3xl border border-white/12 bg-white/[0.04] p-7 transition-[transform,border-color,background-color,box-shadow] duration-300 ease-out-soft hover:border-arena-accent/40 hover:bg-white/[0.065] hover:shadow-[0_24px_60px_-36px_rgba(0,0,0,0.9)] motion-safe:hover:-translate-y-1"
             >
               <span
                 aria-hidden="true"
@@ -79,10 +79,10 @@ export const HowItWorks: React.FC = () => {
               />
 
               <div className="mb-7 flex items-center justify-between">
-                <span className="font-mono text-[2.6rem] font-black leading-none tracking-tighter text-arena-ivory/12 transition-colors duration-300 group-hover:text-arena-accent-soft/70">
+                <span className="font-mono text-[2.6rem] font-black leading-none tracking-tighter text-arena-ivory/15 transition-colors duration-300 group-hover:text-arena-accent-soft/80">
                   {step.number}
                 </span>
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-arena-accent-soft transition-colors duration-300 group-hover:border-arena-accent/30 group-hover:bg-arena-accent/10">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/12 bg-white/[0.05] text-arena-accent-soft transition-colors duration-300 group-hover:border-arena-accent/35 group-hover:bg-arena-accent/10">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     {step.icon}
                   </svg>
@@ -90,9 +90,9 @@ export const HowItWorks: React.FC = () => {
               </div>
 
               <h3 className="text-base font-extrabold uppercase tracking-[0.06em] text-arena-ivory">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-arena-ivory/55">{step.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-arena-ivory/70">{step.description}</p>
 
-              <span className="mt-6 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/25">
+              <span className="mt-6 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/45">
                 Paso {i + 1} de 3
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M5 12h14m-6-6l6 6-6 6" />

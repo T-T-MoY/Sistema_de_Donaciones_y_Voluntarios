@@ -1,290 +1,382 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* =========================================================
-   MOTION TOKENS
-   Curvas fuertes (no las genéricas de CSS). Las easings
-   nativas son demasiado débiles y hacen que la UI se sienta
-   lenta aunque la duración sea corta.
+   TEMA OSCURO POR CLASE
+   Tailwind v4 usa prefers-color-scheme por defecto. La app
+   alterna `.dark` en <html> desde ThemeContext, así que el
+   variant tiene que mirar esa clase.
    ========================================================= */
-:root {
-    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================
+   TOKENS DE DISEÑO — TAILWIND v4
+   Los nombres se mantienen (claro-*, oscuro-*, arena-*)
+   para no reescribir los componentes, pero los valores
+   responden a la paleta ONG: teal profundo + ámbar cálido.
+   ========================================================= */
+@theme {
+  /* ---------- Marca "Arena" (superficies oscuras) ---------- */
+  --color-arena-base: #0b3b3a;        /* teal profundo */
+  --color-arena-deep: #082c2b;        /* teal profundo -1 */
+  --color-arena-night: #071f24;       /* noche azulada */
+  --color-arena-panel: #0c2a2c;       /* panel oscuro */
+  --color-arena-line: #1c4442;        /* borde sobre teal */
+  --color-arena-accent: #f5b267;      /* ámbar cálido: acción */
+  --color-arena-accent-hover: #ffc482;
+  --color-arena-accent-soft: #ffd9a8; /* ámbar para texto sobre oscuro */
+  --color-arena-ivory: #f6f3ea;       /* marfil cálido */
+  --color-arena-sand: #e8dfc9;
+  --color-arena-wine: #d97757;        /* terracota de apoyo */
+  --color-arena-ink: #0a2322;         /* texto sobre ámbar */
+  --color-arena-ink2: #3d5a55;
+
+  /* ---------- Modo claro ---------- */
+  --color-claro-primario: #0e6e6d;    /* teal AA sobre blanco (6.0:1) */
+  --color-claro-hover: #0a5a59;
+  --color-claro-tinte: #d9efec;       /* menta suave */
+  --color-claro-acento: #b4491f;      /* terracota AA para texto/bordes */
+  --color-claro-fondo: #fafbf6;       /* superficie de página */
+  --color-claro-tarjeta: #ffffff;
+  --color-claro-borde: #e1e7e2;
+  --color-claro-texto: #152847;       /* azul tinta (13.5:1) */
+  --color-claro-texto2: #51607a;      /* secundario (6.2:1) */
+
+  /* ---------- Modo oscuro ---------- */
+  --color-oscuro-primario: #5ed0cb;   /* teal luminoso */
+  --color-oscuro-hover: #7fe0dc;
+  --color-oscuro-tinte: #14353a;
+  --color-oscuro-acento: #ff9b85;     /* coral desaturado */
+  --color-oscuro-fondo: #0f2233;
+  --color-oscuro-tarjeta: #132b3b;
+  --color-oscuro-borde: #26404f;
+  --color-oscuro-texto: #f5f7fa;
+  --color-oscuro-texto2: #a8b8c4;
+
+  /* ---------- Compatibilidad con la paleta anterior ---------- */
+  --color-palette-wine: #7a3a2e;
+  --color-palette-petroleum: #0b3b3a;
+  --color-palette-ivory: #f6f3ea;
+  --color-palette-dark: #071f24;
+
+  /* ---------- Tokens semánticos (se invierten en .dark) ---------- */
+  --color-primary: #0e6e6d;
+  --color-accent: #b4491f;
+  --color-surface: #ffffff;
+  --color-text: #152847;
+  --color-muted: #eef4f1;
+
+  /* ---------- Curvas de movimiento ---------- */
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* ---------- Elevación ---------- */
+  --shadow-soft: 0 1px 2px rgb(21 40 71 / 0.05), 0 12px 32px -18px rgb(21 40 71 / 0.28);
+  --shadow-lift: 0 2px 6px rgb(21 40 71 / 0.06), 0 26px 48px -22px rgb(21 40 71 / 0.35);
+
+  /* ---------- Animaciones ---------- */
+  --animate-marquee: marquee 34s linear infinite;
+  --animate-pulse-dot: pulse-dot 2s var(--ease-in-out-soft) infinite;
+  --animate-float-orb-1: float-orb-1 16s ease-in-out infinite alternate;
+  --animate-float-orb-2: float-orb-2 20s ease-in-out infinite alternate;
+  --animate-modal-in: modal-in 220ms var(--ease-out-soft) both;
+  --animate-overlay-in: overlay-in 200ms ease-out both;
+  --animate-slide-up: slide-up 320ms var(--ease-out-soft) both;
 }
 
+/* =========================================================
+   KEYFRAMES
+   Solo transform y opacity: se ejecutan en el compositor.
+   ========================================================= */
 @keyframes rise-in {
-    from {
-        opacity: 0;
-        transform: translateY(14px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes soft-fade {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes marquee {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
-@layer utilities {
-    /* Entrada escalonada: aplicar junto con style={{ animationDelay }} */
-    .anim-rise {
-        animation: rise-in 560ms var(--ease-out) both;
-    }
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgb(245 178 103 / 0.55);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgb(245 178 103 / 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgb(245 178 103 / 0);
+  }
+}
 
-    .anim-fade {
-        animation: soft-fade 320ms var(--ease-out) both;
-    }
+@keyframes float-orb-1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(45px, 35px) scale(1.12);
+  }
+  100% {
+    transform: translate(-35px, 55px) scale(0.95);
+  }
+}
 
-    /* Feedback de presión: todo lo presionable responde */
-    .press {
-        transition:
-            transform 140ms var(--ease-out),
-            background-color 200ms ease,
-            border-color 200ms ease,
-            color 200ms ease,
-            box-shadow 240ms var(--ease-out),
-            opacity 200ms ease;
-    }
-
-    .press:active {
-        transform: scale(0.97);
-    }
-
-    /* Geometría de cancha: rejilla fina para fondos de estadio */
-    .pitch-lines {
-        background-image:
-            linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-        background-size: 72px 72px;
-    }
-
-    .pitch-lines-ink {
-        background-image:
-            linear-gradient(to right, rgba(10, 21, 25, 0.055) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(10, 21, 25, 0.055) 1px, transparent 1px);
-        background-size: 72px 72px;
-    }
-
-    /* Cinta de disciplinas: se duplica el contenido y se desplaza -50% */
-    .marquee-track {
-        animation: marquee 34s linear infinite;
-        will-change: transform;
-    }
-
-    .marquee-mask {
-        mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-        -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-    }
+@keyframes float-orb-2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-55px, -25px) scale(1.18);
+  }
+  100% {
+    transform: translate(35px, -45px) scale(0.92);
+  }
 }
 
 /* =========================================================
-   BASE (antes vivía en styles/canchas-landing.css)
-   Solo reglas estructurales, sin colores hardcodeados:
-   los colores ahora vienen siempre de las clases
-   claro-x y oscuro-x definidas en tailwind.config.js.
+   BASE
    ========================================================= */
-html {
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* Tokens semánticos en modo claro */
+    --color-primary: #0e6e6d;
+    --color-accent: #b4491f;
+    --color-surface: #ffffff;
+    --color-text: #152847;
+    --color-muted: #eef4f1;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Tokens semánticos en modo oscuro */
+    --color-primary: #5ed0cb;
+    --color-accent: #ff9b85;
+    --color-surface: #132b3b;
+    --color-text: #f5f7fa;
+    --color-muted: #1b3546;
+  }
+
+  html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
-}
+  }
 
-body {
-    /* 100dvh evita el salto de la barra de URL en móvil */
+  body {
     min-height: 100dvh;
     line-height: 1.6;
     overflow-x: hidden;
+    background-color: var(--color-claro-fondo);
+    color: var(--color-claro-texto);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-}
+  }
 
-/* En touch, el flash azul del tap delata que es una web */
-a,
-button,
-[role='button'],
-input,
-select,
-textarea {
+  .dark body {
+    background-color: var(--color-oscuro-fondo);
+    color: var(--color-oscuro-texto);
+  }
+
+  /* Tailwind v4 usa currentColor como borde por defecto. La app
+     espera un borde neutro cuando no se declara color. */
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-claro-borde);
+  }
+
+  .dark *,
+  .dark ::before,
+  .dark ::after {
+    border-color: var(--color-oscuro-borde);
+  }
+
+  /* En touch, el flash azul del tap delata que es una web */
+  a,
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea {
     -webkit-tap-highlight-color: transparent;
-}
+  }
 
-button,
-[role='button'] {
+  button,
+  [role='button'] {
     touch-action: manipulation;
-}
+  }
 
-/* Foco visible solo para teclado (no en cada click de mouse) */
-:focus-visible {
-    outline: 2px solid theme('colors.claro.primario');
+  /* Foco visible solo para teclado */
+  :focus-visible {
+    outline: 2px solid var(--color-claro-primario);
     outline-offset: 2px;
     border-radius: 6px;
+  }
+
+  .dark :focus-visible {
+    outline-color: var(--color-oscuro-primario);
+  }
 }
 
-.dark :focus-visible {
-    outline-color: theme('colors.oscuro.primario');
+/* =========================================================
+   UTILIDADES PROPIAS
+   ========================================================= */
+@utility anim-rise {
+  animation: rise-in 560ms var(--ease-out-soft) both;
 }
 
-/* iOS hace zoom en el viewport si el input tiene menos de 16px */
-@media (max-width: 767px) {
-    input,
-    select,
-    textarea {
-        font-size: 16px;
-    }
+@utility anim-fade {
+  animation: soft-fade 320ms var(--ease-out-soft) both;
+}
+
+/* Feedback de presión: todo lo presionable responde */
+@utility press {
+  transition:
+    transform 150ms var(--ease-out-soft),
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    box-shadow 240ms var(--ease-out-soft),
+    opacity 200ms ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Rejilla fina para fondos de sección */
+@utility pitch-lines {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+@utility pitch-lines-ink {
+  background-image:
+    linear-gradient(to right, rgb(10 35 34 / 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(10 35 34 / 0.055) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Cinta de áreas de impacto: contenido duplicado, desplazado -50% */
+@utility marquee-track {
+  animation: marquee 34s linear infinite;
+  will-change: transform;
+}
+
+@utility marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+/* Imagen de apoyo para Login y Registro (evita style inline) */
+@utility auth-photo {
+  background-image: url('/images/auth-complex.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 /* =========================================================
    ACCESIBILIDAD: MOVIMIENTO REDUCIDO
-   Menos movimiento, no cero: se conservan los cambios de
-   opacidad/color que ayudan a entender el estado.
+   Menos movimiento, no cero: se conservan opacidad y color.
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
+  html {
+    scroll-behavior: auto;
+  }
 
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 
-    /* El spinner de carga debe seguir girando */
-    .animate-spin {
-        animation-duration: 1s !important;
-        animation-iteration-count: infinite !important;
-    }
+  /* El spinner de carga debe seguir girando */
+  .animate-spin {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
+  }
 
-    .anim-rise,
-    .anim-fade {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-    }
+  .anim-rise,
+  .anim-fade {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 
-    /* La cinta de disciplinas se queda quieta y legible */
-    .marquee-track {
-        animation: none !important;
-        transform: none !important;
-    }
+  /* La cinta se queda quieta y legible */
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
-/* =========================================================
-   RESPONSIVE: TABLAS EN MÓVIL
-   Convierte las tablas en tarjetas apiladas
-   ========================================================= */
-
-@media (max-width: 768px) {
-    /* Ocultar la cabecera de la tabla */
-    table thead {
-        display: none;
-    }
-
-    /* Convertir cada fila en una tarjeta */
-    table tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        border-radius: 0.75rem;
-        padding: 1rem;
-        background-color: rgba(255, 255, 255, 0.02);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Modo oscuro: borde más visible */
-    .dark table tr {
-        border-color: rgba(255, 255, 255, 0.1);
-        background-color: rgba(255, 255, 255, 0.03);
-    }
-
-    /* Cada celda se convierte en un bloque */
-    table td {
-        display: block;
-        text-align: left;
-        padding: 0.5rem 0 !important;
-        border: none;
-        position: relative;
-    }
-
-    /* Mostrar la etiqueta de cada celda (data-label) */
-    table td::before {
-        content: attr(data-label);
-        display: block;
-        font-weight: 600;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: rgba(107, 114, 128, 1);
-        margin-bottom: 0.35rem;
-    }
-
-    /* Modo oscuro: color de la etiqueta */
-    .dark table td::before {
-        color: rgba(156, 163, 175, 1);
-    }
-
-    /* La celda de acciones ocupa todo el ancho */
-    table td[data-label="Acciones"] {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: 0.75rem;
-        padding-top: 0.75rem !important;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .dark table td[data-label="Acciones"] {
-        border-top-color: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Los botones dentro de acciones ocupan el ancho disponible */
-    table td[data-label="Acciones"] button {
-        flex: 1;
-        min-width: 110px;
-        justify-content: center;
-    }
-
-    /* Reducir padding del contenedor en móvil */
-    .p-6 {
-        padding: 1rem !important;
-    }
-
-    /* Títulos más pequeños en móvil */
-    h1 {
-        font-size: 1.25rem !important;
-    }
-
-    /* El header con el botón se apila en móvil */
-    .flex.justify-between.items-center.mb-6 {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch !important;
-    }
-
-    .flex.justify-between.items-center.mb-6 button {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+/* iOS hace zoom en el viewport si el input tiene menos de 16px */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }

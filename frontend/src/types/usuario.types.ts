@@ -110,6 +110,20 @@ export const getEstado = (u: Usuario): string => {
   return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
 };
 
+/**
+ * Etiqueta visible del rol.
+ * El backend mapea cliente → Donante y empleado → Voluntario,
+ * pero el tipo `Rol` sigue usando los identificadores originales.
+ * Este helper solo traduce para el render; no modifica el dato.
+ */
+export const getRolDisplay = (rol?: string | null): string => {
+  const lower = (rol || '').toLowerCase().trim();
+  if (lower === 'cliente' || lower === 'donante') return 'Donante';
+  if (lower === 'empleado' || lower === 'voluntario') return 'Voluntario';
+  if (lower === 'admin' || lower === 'administrador') return 'Administrador';
+  return rol?.trim() || '';
+};
+
 export const esActivo = (u: Usuario): boolean => {
   const est = getEstadoRaw(u).toLowerCase();
   return est === 'activo' || est === 'active' || est === 'habilitado';

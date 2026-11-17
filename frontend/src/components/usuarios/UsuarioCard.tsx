@@ -12,6 +12,7 @@ import {
   getIniciales,
   getEstado,
   esActivo,
+  getRolDisplay,
 } from '../../types/usuario.types';
 
 interface UsuarioCardProps {
@@ -20,16 +21,42 @@ interface UsuarioCardProps {
   onDelete: (id: number) => void;
 }
 
+/**
+ * Color del badge de rol (solo presentación).
+ */
+const getRolBadgeClass = (rol?: string): string => {
+  const r = (rol || '').toLowerCase();
+
+  if (r === 'admin' || r === 'administrador') {
+    return 'bg-claro-primario/10 text-claro-primario border-claro-primario/25 dark:bg-oscuro-primario/15 dark:text-oscuro-primario dark:border-oscuro-primario/30';
+  }
+  if (r === 'donante' || r === 'cliente') {
+    return 'bg-claro-acento/10 text-claro-acento border-claro-acento/25 dark:bg-oscuro-acento/15 dark:text-oscuro-acento dark:border-oscuro-acento/30';
+  }
+  if (r === 'empleado' || r === 'voluntario') {
+    return 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-400/30';
+  }
+  if (r === 'beneficiario') {
+    return 'bg-sky-500/10 text-sky-800 border-sky-500/25 dark:bg-sky-500/15 dark:text-sky-200 dark:border-sky-400/30';
+  }
+  return 'bg-claro-tinte text-claro-primario border-claro-borde dark:bg-oscuro-tinte dark:text-oscuro-primario dark:border-oscuro-borde';
+};
+
 export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => {
   const estado = getEstado(usuario);
   const activo = esActivo(usuario);
   const id = obtenerId(usuario);
 
   return (
-    <div className="bg-claro-tarjeta dark:bg-oscuro-tarjeta border border-claro-borde dark:border-oscuro-borde rounded-2xl p-5 hover:shadow-lg transition-shadow">
+    <div className="group relative overflow-hidden rounded-2xl border border-claro-borde bg-claro-tarjeta p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-claro-primario/30 hover:shadow-lift motion-safe:hover:-translate-y-0.5 dark:border-oscuro-borde dark:bg-oscuro-tarjeta dark:hover:border-oscuro-primario/40">
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-[2px] w-0 bg-claro-primario transition-[width] duration-300 ease-out-soft group-hover:w-full dark:bg-oscuro-primario"
+      />
+
       {/* Cabecera: avatar + nombre + correo */}
-      <div className="flex items-start gap-3 mb-4">
-        <div className="w-11 h-11 rounded-full bg-claro-tinte dark:bg-oscuro-tinte text-claro-primario dark:text-oscuro-primario flex items-center justify-center font-bold text-sm shrink-0">
+      <div className="mb-4 flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-claro-tinte text-sm font-bold text-claro-primario ring-1 ring-claro-primario/15 dark:bg-oscuro-tinte dark:text-oscuro-primario dark:ring-oscuro-primario/25">
           {getIniciales(usuario)}
         </div>
         <div className="min-w-0 flex-1">
@@ -49,32 +76,32 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
       </div>
 
       {/* Rol + Estado */}
-      <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 text-xs">
         <div className="min-w-0">
-          <p className="text-claro-texto2 dark:text-oscuro-texto2 uppercase tracking-wide mb-1">
+          <p className="mb-1 font-bold uppercase tracking-[0.12em] text-claro-texto2 dark:text-oscuro-texto2">
             Rol
           </p>
-          <p
-            className="font-medium text-claro-texto dark:text-oscuro-texto truncate"
-            title={usuario.rol}
+          <span
+            className={`inline-flex max-w-full items-center truncate rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getRolBadgeClass(usuario.rol)}`}
+            title={getRolDisplay(usuario.rol)}
           >
-            {usuario.rol || '—'}
-          </p>
+            {getRolDisplay(usuario.rol) || '—'}
+          </span>
         </div>
         <div>
-          <p className="text-claro-texto2 dark:text-oscuro-texto2 uppercase tracking-wide mb-1">
+          <p className="mb-1 font-bold uppercase tracking-[0.12em] text-claro-texto2 dark:text-oscuro-texto2">
             Estado
           </p>
           <span
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
               activo
-                ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-                : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+                ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-400/30'
+                : 'bg-red-500/10 text-red-700 border-red-500/25 dark:bg-red-500/15 dark:text-red-300 dark:border-red-400/30'
             }`}
           >
             <span
               className={`w-1.5 h-1.5 rounded-full ${
-                activo ? 'bg-green-500' : 'bg-red-500'
+                activo ? 'bg-emerald-500' : 'bg-red-500'
               }`}
             />
             {estado}
@@ -87,14 +114,14 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
         <button
           type="button"
           onClick={() => onEdit(usuario)}
-          className="flex-1 py-2 text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 bg-claro-fondo dark:bg-oscuro-fondo border border-claro-borde dark:border-oscuro-borde rounded-lg hover:text-claro-primario dark:hover:text-oscuro-primario transition-colors"
+          className="press flex-1 rounded-xl border border-claro-borde bg-claro-fondo py-2 text-sm font-semibold text-claro-texto2 hover:border-claro-primario/40 hover:text-claro-primario dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto2 dark:hover:border-oscuro-primario/40 dark:hover:text-oscuro-primario"
         >
           Editar
         </button>
         <button
           type="button"
           onClick={() => id !== undefined && onDelete(Number(id))}
-          className="flex-1 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-claro-fondo dark:bg-oscuro-fondo border border-claro-borde dark:border-oscuro-borde rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          className="press flex-1 rounded-xl border border-claro-borde bg-claro-fondo py-2 text-sm font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-900/20"
         >
           Eliminar
         </button>

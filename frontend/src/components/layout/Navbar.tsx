@@ -98,16 +98,16 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
             {/* Overlay oscuro en móvil */}
             {abierto && (
                 <div 
-                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    className="anim-fade fixed inset-0 z-40 bg-arena-night/60 backdrop-blur-sm md:hidden"
                     onClick={onCerrar}
+                    aria-hidden="true"
                 />
             )}
 
             <aside className={`
-                w-64 h-screen fixed left-0 top-0 
-                bg-claro-tarjeta dark:bg-oscuro-tarjeta 
-                border-r border-claro-borde dark:border-oscuro-borde 
-                flex flex-col transition-transform duration-300 z-50
+                fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
+                border-r border-claro-borde bg-claro-tarjeta
+                transition-transform duration-300 ease-drawer dark:border-oscuro-borde dark:bg-oscuro-tarjeta
                 ${abierto ? 'translate-x-0' : '-translate-x-full'} 
                 md:translate-x-0
             `}>
@@ -133,7 +133,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                         item.enDesarrollo ? (
                             <span
                                 key={item.path}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-claro-texto2/40 dark:text-oscuro-texto2/40 opacity-50 cursor-not-allowed select-none"
+                                className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-4 py-3 font-medium text-claro-texto2/55 opacity-70 dark:text-oscuro-texto2/55"
                                 aria-disabled="true"
                                 title="Módulo en desarrollo"
                             >
@@ -148,10 +148,10 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                                 to={item.path} 
                                 onClick={onCerrar}   
                                 className={({ isActive }) => `
-                                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 
+                                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-[background-color,color,box-shadow] duration-200
                                     ${isActive 
-                                        ? 'bg-claro-tinte text-claro-primario dark:bg-oscuro-tinte dark:text-oscuro-primario font-semibold shadow-sm' 
-                                        : 'text-claro-texto2 hover:bg-gray-50 hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-fondo dark:hover:text-oscuro-texto'
+                                        ? 'bg-claro-tinte text-claro-primario dark:bg-oscuro-tinte dark:text-oscuro-primario font-semibold shadow-soft ring-1 ring-claro-primario/10 dark:ring-oscuro-primario/20' 
+                                        : 'text-claro-texto2 hover:bg-claro-fondo hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-fondo dark:hover:text-oscuro-texto'
                                     }
                                 `}
                             >
@@ -169,7 +169,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                     <Link
                         to="/"
                         onClick={onCerrar}
-                        className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-claro-primario dark:text-oscuro-primario bg-claro-tinte/60 hover:bg-claro-tinte dark:bg-oscuro-tinte/60 dark:hover:bg-oscuro-tinte border border-claro-borde dark:border-oscuro-borde transition-all"
+                        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-claro-borde bg-claro-tinte/60 px-4 py-2.5 text-sm font-semibold text-claro-primario hover:bg-claro-tinte dark:border-oscuro-borde dark:bg-oscuro-tinte/60 dark:text-oscuro-primario dark:hover:bg-oscuro-tinte"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

@@ -365,20 +365,20 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
  * Usa la paleta del sistema (EMERALD para OK, BURGUNDY para error).
  */
 export const claseInput = (tieneError: boolean | string | undefined, touched: boolean | undefined = true): string => {
-    const base = 'w-full px-4 py-2.5 rounded-xl border bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto focus:outline-none focus:ring-2 transition-all';
+    const base = 'w-full px-4 py-2.5 rounded-xl border bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto placeholder:text-claro-texto2/60 dark:placeholder:text-oscuro-texto2/60 focus:outline-none focus:ring-2 transition-[border-color,box-shadow,background-color] duration-200';
 
     if (!touched) {
         // Neutro: borde normal de la paleta
-        return `${base} border-claro-borde dark:border-oscuro-borde focus:ring-claro-primario dark:focus:ring-oscuro-primario`;
+        return `${base} border-claro-borde dark:border-oscuro-borde focus:ring-claro-primario/35 dark:focus:ring-oscuro-primario/35`;
     }
 
     if (tieneError) {
-        // ❌ Error: BURGUNDY (acento)
-        return `${base} border-claro-acento dark:border-oscuro-acento focus:ring-claro-acento dark:focus:ring-oscuro-acento`;
+        // ❌ Error: terracota (acento)
+        return `${base} border-claro-acento dark:border-oscuro-acento focus:ring-claro-acento/35 dark:focus:ring-oscuro-acento/35`;
     }
 
-    // ✅ OK: EMERALD (primario) — no verde brillante
-    return `${base} border-claro-primario dark:border-oscuro-primario focus:ring-claro-primario dark:focus:ring-oscuro-primario`;
+    // ✅ OK: teal de marca
+    return `${base} border-claro-primario/60 dark:border-oscuro-primario/60 focus:ring-claro-primario/35 dark:focus:ring-oscuro-primario/35`;
 };
 
 /**
@@ -412,9 +412,9 @@ export const textoFuerza = (nivel: number): string => {
  */
 export const colorFuerza = (nivel: number): string => {
     switch (nivel) {
-        case 1: return 'bg-claro-acento dark:bg-oscuro-acento';           // BURGUNDY suave
-        case 2: return 'bg-yellow-500 dark:bg-yellow-400';                // Intermedio (mantenemos amarillo)
-        case 3: return 'bg-claro-primario dark:bg-oscuro-primario';        // EMERALD
-        default: return 'bg-gray-200 dark:bg-gray-700';
+        case 1: return 'bg-claro-acento dark:bg-oscuro-acento';           // Terracota: débil
+        case 2: return 'bg-amber-500 dark:bg-amber-400';                 // Ámbar: intermedia
+        case 3: return 'bg-claro-primario dark:bg-oscuro-primario';      // Teal: segura
+        default: return 'bg-claro-borde dark:bg-oscuro-borde';
     }
 };

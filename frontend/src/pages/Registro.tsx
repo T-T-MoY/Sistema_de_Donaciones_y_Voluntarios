@@ -153,26 +153,29 @@ const Registro = () => {
         <div className="flex h-screen w-full bg-claro-fondo dark:bg-oscuro-fondo transition-colors duration-300 overflow-hidden">
             
             {/* Columna Izquierda: Imagen */}
-            <div 
-                className="hidden md:flex md:w-1/2 lg:w-7/12 relative bg-cover bg-center h-full"
-                style={{ 
-                    backgroundImage: "url('/images/auth-complex.jpg')" 
-                }}
-            >
-                <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-claro-primario/90 dark:to-oscuro-fondo transition-colors duration-300"></div>
+            <div className="auth-photo relative hidden h-full md:flex md:w-1/2 lg:w-7/12">
+                <div className="absolute inset-0 bg-linear-to-b from-arena-night/80 via-arena-night/45 to-arena-base/95"></div>
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-1/4 right-0 h-72 w-72 rounded-full bg-arena-accent/15 blur-[110px]"
+                />
                 
                 <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-between w-full h-full">
                     <div>
-                        <Link to="/" className="inline-block transition-transform hover:scale-105" title="Ir al inicio">
+                        <Link to="/" className="inline-block transition-transform duration-300 ease-out-soft motion-safe:hover:scale-105" title="Ir al inicio">
                             <IconLogo className="w-10 h-10" />
                         </Link>
                     </div>
                     <div className="mb-8">
-                        <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
-                            Una cuenta, todas las canchas.
+                        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/70">
+                            <span className="h-px w-8 bg-arena-accent" />
+                            Red solidaria
+                        </span>
+                        <h1 className="mt-4 text-4xl lg:text-5xl font-bold text-arena-ivory mb-4 leading-tight drop-shadow-md">
+                            Una cuenta, todo el impacto.
                         </h1>
-                        <p className="text-gray-200 text-lg max-w-md drop-shadow-sm font-medium">
-                            Guardá tus favoritas, repetí reservas anteriores y recibí recordatorios antes del partido.
+                        <p className="text-arena-ivory/80 text-lg max-w-md drop-shadow-sm font-medium">
+                            Registrá tu perfil, seguí tus donaciones y coordiná voluntariados desde un solo lugar.
                         </p>
                     </div>
                 </div>
@@ -180,7 +183,11 @@ const Registro = () => {
 
             {/* Columna Derecha: Formulario */}
             <div className="w-full md:w-1/2 lg:w-5/12 h-full flex flex-col items-center p-6 sm:p-8 lg:p-12 overflow-y-auto">
-                <div className="w-full max-w-lg bg-claro-tarjeta dark:bg-oscuro-tarjeta p-8 sm:p-10 rounded-2xl shadow-xl border border-claro-borde dark:border-oscuro-borde my-auto">
+                <div className="w-full max-w-lg bg-claro-tarjeta dark:bg-oscuro-tarjeta p-8 sm:p-10 rounded-3xl shadow-lift border border-claro-borde dark:border-oscuro-borde my-auto relative overflow-hidden">
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-claro-primario via-claro-primario/40 to-transparent dark:from-oscuro-primario dark:via-oscuro-primario/40"
+                    />
                     
                     <div className="flex items-center justify-between mb-4">
                         <Link 
@@ -200,7 +207,7 @@ const Registro = () => {
                     </h2>
 
                     <p className="text-claro-texto2 dark:text-oscuro-texto2 mb-6">
-                        Completá tus datos para empezar a reservar.
+                        Completá tus datos para empezar a participar.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-1" noValidate>
@@ -437,9 +444,9 @@ const Registro = () => {
                                     {formData.contraseña && (
                                         <div className="flex items-center gap-2 mt-1">
                                             <div className="flex gap-1 flex-1">
-                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 1 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
-                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 2 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
-                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 3 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
+                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 1 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
+                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 2 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
+                                                <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 3 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
                                             </div>
                                             <span className="text-xs text-claro-texto2 dark:text-oscuro-texto2">
                                                 {textoFuerza(nivelFuerza)}
@@ -451,7 +458,7 @@ const Registro = () => {
                         </div>
 
                         {error && (
-                            <p className="text-red-500 text-sm font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800">
+                            <p className="text-red-600 dark:text-red-300 text-sm font-medium bg-red-50 dark:bg-red-900/25 p-3 rounded-xl border border-red-200 dark:border-red-800/70">
                                 {error}
                             </p>
                         )}
@@ -473,10 +480,10 @@ const Registro = () => {
                         <button 
                             type="submit" 
                             disabled={cargando}
-                            className={`w-full py-3 mt-4 rounded-xl font-medium text-white shadow-md transition-all
+                            className={`press w-full py-3 mt-4 rounded-xl font-semibold text-white shadow-[0_18px_36px_-20px_rgba(14,110,109,0.7)] transition-[transform,background-color,box-shadow] duration-200
                                 ${cargando 
                                     ? 'bg-gray-400 cursor-not-allowed' 
-                                    : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover hover:-translate-y-0.5'
+                                    : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover motion-safe:hover:-translate-y-0.5'
                                 }`}
                         >
                             {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
@@ -485,7 +492,7 @@ const Registro = () => {
 
                     <p className="text-center text-sm text-claro-texto2 dark:text-oscuro-texto2 mt-6">
                         ¿Ya tenés cuenta?{' '}
-                        <Link to="/login" className="text-claro-primario dark:text-oscuro-primario font-bold hover:underline">
+                        <Link to="/login" className="text-claro-primario dark:text-oscuro-primario font-bold hover:underline underline-offset-4">
                             Iniciá sesión
                         </Link>
                     </p>

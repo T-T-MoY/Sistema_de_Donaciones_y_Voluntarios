@@ -39,8 +39,6 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const titulosPorRuta: Record<string, string> = {
     '/dashboard': 'Inicio',
     '/usuarios': 'Gestión de Usuarios',
-    '/canchas': 'En desarrollo',
-    '/reservas': 'En desarrollo',
     '/reportes': 'Reportes y Estadísticas',
     '/perfil': 'Mi Perfil',
   };
@@ -48,13 +46,13 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
 
   return (
-    <header className="h-20 bg-claro-tarjeta dark:bg-oscuro-tarjeta border-b border-claro-borde dark:border-oscuro-borde flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 transition-colors duration-300">
+    <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-claro-borde bg-claro-tarjeta/95 px-4 backdrop-blur-md transition-colors duration-300 dark:border-oscuro-borde dark:bg-oscuro-tarjeta/95 md:px-8">
 
       {/* Izquierda: hamburguesa + título */}
       <div className="flex items-center gap-3">
         <button
           onClick={onAbrirMenu}
-          className="md:hidden p-2 rounded-xl hover:bg-claro-tinte dark:hover:bg-oscuro-tinte text-claro-texto dark:text-oscuro-texto transition-colors"
+          className="press rounded-xl p-2 text-claro-texto hover:bg-claro-tinte dark:text-oscuro-texto dark:hover:bg-oscuro-tinte md:hidden"
           aria-label="Abrir menú"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,7 +60,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
           </svg>
         </button>
 
-        <h1 className="text-lg md:text-xl font-bold text-claro-texto dark:text-oscuro-texto">
+        <h1 className="text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto md:text-xl">
           {tituloActual}
         </h1>
       </div>
@@ -70,7 +68,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
       {/* Derecha: bienvenida + home + theme + avatar */}
       <div className="flex items-center gap-2 md:gap-4">
 
-        <div className="text-right hidden sm:block border-r border-claro-borde dark:border-oscuro-borde pr-4 mr-2">
+        <div className="mr-2 hidden border-r border-claro-borde pr-4 text-right dark:border-oscuro-borde sm:block">
           <p className="text-sm font-semibold text-claro-texto dark:text-oscuro-texto">
             ¡Bienvenido, {rolActual}!
           </p>
@@ -79,7 +77,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
         <Link
           to="/"
           title="Ir al Home (Sitio Web público)"
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs md:text-sm font-medium bg-claro-fondo hover:bg-claro-tinte text-claro-primario dark:bg-oscuro-fondo dark:hover:bg-oscuro-tinte dark:text-oscuro-primario border border-claro-borde dark:border-oscuro-borde transition-all hover:scale-105"
+          className="press flex items-center gap-1.5 rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2 text-xs font-semibold text-claro-primario hover:bg-claro-tinte dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-primario dark:hover:bg-oscuro-tinte md:text-sm"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -92,9 +90,9 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
         <div className="relative ml-1 md:ml-2" ref={menuRef}>
           <div
             onClick={() => setMenuAbierto(!menuAbierto)}
-            className="flex items-center gap-2 md:gap-3 cursor-pointer hover:bg-claro-tinte dark:hover:bg-oscuro-tinte p-1.5 md:p-2 rounded-xl transition-colors"
+            className="press flex cursor-pointer items-center gap-2 rounded-xl p-1.5 hover:bg-claro-tinte dark:hover:bg-oscuro-tinte md:gap-3 md:p-2"
           >
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-claro-primario dark:bg-oscuro-primario flex items-center justify-center text-white dark:text-oscuro-fondo font-bold text-base md:text-lg shadow-sm border-2 border-white dark:border-oscuro-tarjeta overflow-hidden">
+            <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-claro-primario text-base font-bold text-white shadow-soft ring-1 ring-claro-primario/20 dark:border-oscuro-tarjeta dark:bg-oscuro-primario dark:text-oscuro-fondo dark:ring-oscuro-primario/25 md:h-10 md:w-10 md:text-lg">
               {fotoUrl ? (
                 <img src={fotoUrl} alt="Perfil" className="w-full h-full object-cover" />
               ) : (
@@ -112,7 +110,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
           </div>
 
           {menuAbierto && (
-            <div className="absolute right-0 mt-2 w-48 bg-claro-tarjeta dark:bg-oscuro-tarjeta border border-claro-borde dark:border-oscuro-borde rounded-xl shadow-lg py-2 z-50 overflow-hidden">
+            <div className="animate-modal-in absolute right-0 z-50 mt-2 w-52 origin-top-right overflow-hidden rounded-2xl border border-claro-borde bg-claro-tarjeta py-2 shadow-lift dark:border-oscuro-borde dark:bg-oscuro-tarjeta">
               <Link
                 to="/"
                 onClick={() => setMenuAbierto(false)}

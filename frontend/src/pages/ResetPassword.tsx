@@ -164,28 +164,31 @@ const ResetPassword = () => {
     const nivelFuerza = fuerzaContraseña(formData.nuevaContraseña);
 
     return (
-        <div className="flex h-screen w-full bg-claro-fondo dark:bg-oscuro-fondo transition-colors duration-300 overflow-hidden">
+        <div className="flex h-screen w-full overflow-hidden bg-claro-fondo transition-colors duration-300 dark:bg-oscuro-fondo">
             
             {/* Columna Izquierda: Imagen */}
-            <div 
-                className="hidden md:flex md:w-1/2 lg:w-7/12 relative bg-cover bg-center h-full"
-                style={{ 
-                    backgroundImage: "url('/images/auth-complex.jpg')" 
-                }}
-            >
-                <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-claro-primario/90 dark:to-oscuro-fondo transition-colors duration-300"></div>
+            <div className="auth-photo relative hidden h-full md:flex md:w-1/2 lg:w-7/12">
+                <div className="absolute inset-0 bg-linear-to-b from-arena-night/80 via-arena-night/45 to-arena-base/95"></div>
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-1/4 right-0 h-72 w-72 rounded-full bg-arena-accent/15 blur-[110px]"
+                />
                 
-                <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-between w-full h-full">
+                <div className="relative z-10 flex h-full w-full flex-col justify-between p-10 lg:p-16">
                     <div>
-                        <Link to="/" className="inline-block transition-transform hover:scale-105" title="Ir al inicio">
+                        <Link to="/" className="inline-block transition-transform duration-300 ease-out-soft motion-safe:hover:scale-105" title="Ir al inicio">
                             <IconLogo className="w-10 h-10" />
                         </Link>
                     </div>
                     <div className="mb-8">
-                        <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-md">
+                        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/70">
+                            <span className="h-px w-8 bg-arena-accent" />
+                            Red solidaria
+                        </span>
+                        <h1 className="mb-4 mt-4 text-4xl font-bold leading-tight text-arena-ivory drop-shadow-md lg:text-5xl">
                             Nueva contraseña.
                         </h1>
-                        <p className="text-gray-200 text-lg max-w-md drop-shadow-sm font-medium">
+                        <p className="max-w-md text-lg font-medium text-arena-ivory/80 drop-shadow-sm">
                             Elegí una contraseña segura que puedas recordar.
                         </p>
                     </div>
@@ -193,13 +196,17 @@ const ResetPassword = () => {
             </div>
 
             {/* Columna Derecha: Formulario */}
-            <div className="w-full md:w-1/2 lg:w-5/12 h-full flex flex-col items-center p-6 sm:p-8 lg:p-12 overflow-y-auto">
-                <div className="w-full max-w-md bg-claro-tarjeta dark:bg-oscuro-tarjeta p-8 sm:p-10 rounded-2xl shadow-xl border border-claro-borde dark:border-oscuro-borde my-auto">
+            <div className="flex h-full w-full flex-col items-center overflow-y-auto p-6 sm:p-8 md:w-1/2 lg:w-5/12 lg:p-12">
+                <div className="relative my-auto w-full max-w-md overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta p-8 shadow-lift dark:border-oscuro-borde dark:bg-oscuro-tarjeta sm:p-10">
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-claro-primario via-claro-primario/40 to-transparent dark:from-oscuro-primario dark:via-oscuro-primario/40"
+                    />
                     
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                         <Link 
                             to="/" 
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-claro-texto2 hover:text-claro-primario dark:text-oscuro-texto2 dark:hover:text-oscuro-primario transition-colors"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-claro-texto2 transition-colors hover:text-claro-primario dark:text-oscuro-texto2 dark:hover:text-oscuro-primario"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -209,7 +216,7 @@ const ResetPassword = () => {
                         <ThemeToggle />
                     </div>
 
-                    <h2 className="text-2xl font-bold text-claro-texto dark:text-oscuro-texto mb-2">
+                    <h2 className="mb-2 text-2xl font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
                         Resetear contraseña
                     </h2>
 
@@ -266,7 +273,7 @@ const ResetPassword = () => {
                             </div>
                             <Link 
                                 to="/solicitar-recuperacion" 
-                                className="block w-full py-3 text-center rounded-xl font-medium text-white bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover shadow-md transition-all"
+                                className="press block w-full rounded-xl bg-claro-primario py-3 text-center font-semibold text-white shadow-[0_18px_36px_-20px_rgba(14,110,109,0.7)] hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover"
                             >
                                 Solicitar nuevo enlace
                             </Link>
@@ -290,7 +297,7 @@ const ResetPassword = () => {
                                 
                                 {/* NUEVA CONTRASEÑA */}
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">
+                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">
                                         Nueva contraseña
                                     </label>
                                     <div className="relative">
@@ -317,7 +324,7 @@ const ResetPassword = () => {
 
                                 {/* CONFIRMAR */}
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">
+                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">
                                         Confirmar contraseña
                                     </label>
                                     <input 
@@ -337,9 +344,9 @@ const ResetPassword = () => {
                                 {formData.nuevaContraseña && (
                                     <div className="flex items-center gap-2 mt-1">
                                         <div className="flex gap-1 flex-1">
-                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 1 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
-                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 2 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
-                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 3 ? colorFuerza(nivelFuerza) : 'bg-gray-200 dark:bg-gray-700'}`}></div>
+                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 1 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
+                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 2 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
+                                            <div className={`h-1 flex-1 rounded-full ${nivelFuerza >= 3 ? colorFuerza(nivelFuerza) : 'bg-claro-borde dark:bg-oscuro-borde'}`}></div>
                                         </div>
                                         <span className="text-xs text-claro-texto2 dark:text-oscuro-texto2">
                                             {textoFuerza(nivelFuerza)}
@@ -348,7 +355,7 @@ const ResetPassword = () => {
                                 )}
 
                                 {error && (
-                                    <p className="text-red-500 text-sm font-medium bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-100 dark:border-red-800 mt-3">
+                                    <p className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700 dark:border-red-800/70 dark:bg-red-900/25 dark:text-red-300">
                                         {error}
                                     </p>
                                 )}
@@ -356,10 +363,10 @@ const ResetPassword = () => {
                                 <button 
                                     type="submit" 
                                     disabled={cargando}
-                                    className={`w-full py-3 mt-4 rounded-xl font-medium text-white shadow-md transition-all
+                                    className={`press mt-4 w-full rounded-xl py-3 font-semibold text-white shadow-[0_18px_36px_-20px_rgba(14,110,109,0.7)]
                                         ${cargando 
-                                            ? 'bg-gray-400 cursor-not-allowed' 
-                                            : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover hover:-translate-y-0.5'
+                                            ? 'bg-claro-borde text-claro-texto2 dark:bg-oscuro-borde dark:text-oscuro-texto2 cursor-not-allowed' 
+                                            : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover motion-safe:hover:-translate-y-0.5'
                                         }`}
                                 >
                                     {cargando ? 'Actualizando...' : 'Cambiar contraseña'}

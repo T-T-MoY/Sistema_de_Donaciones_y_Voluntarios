@@ -60,7 +60,7 @@ export const LandingNavbar = () => {
   // ESTILOS COMPARTIDOS
   // =====================================================
   const enlaceNav =
-    'group relative text-[11px] font-bold uppercase tracking-[0.18em] text-arena-ivory/55 transition-colors duration-200 hover:text-arena-ivory';
+    'group relative text-[11px] font-bold uppercase tracking-[0.18em] text-arena-ivory/70 transition-colors duration-200 hover:text-arena-ivory';
 
   const ctaLima =
     'press inline-flex items-center justify-center gap-2 rounded-xl bg-arena-accent px-5 py-2.5 text-[12px] font-extrabold uppercase tracking-[0.14em] text-arena-ink hover:bg-arena-accent-hover';
@@ -71,7 +71,7 @@ export const LandingNavbar = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-arena-deep/95 backdrop-blur-xl dark:bg-arena-night/90">
       {/* Filo de acento */}
-      <div aria-hidden="true" className="h-[2px] w-full bg-gradient-to-r from-arena-accent via-arena-accent/70 to-transparent" />
+      <div aria-hidden="true" className="h-[2px] w-full bg-linear-to-r from-arena-accent via-arena-accent/70 to-transparent" />
 
       <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 md:px-6">
 
@@ -87,7 +87,7 @@ export const LandingNavbar = () => {
             <span className="text-[14px] font-extrabold uppercase tracking-[0.16em] text-arena-ivory">
               Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
             </span>
-            <span className="mt-1.5 text-[8.5px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/40">
+            <span className="mt-1.5 text-[8.5px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/55">
               Plataforma de Gestión
             </span>
           </div>
@@ -99,7 +99,7 @@ export const LandingNavbar = () => {
             enlace.enDesarrollo ? (
               <span
                 key={enlace.label}
-                className="text-[11px] font-bold uppercase tracking-[0.18em] text-arena-ivory/30 opacity-50 cursor-not-allowed select-none"
+                className="text-[11px] font-bold uppercase tracking-[0.18em] text-arena-ivory/45 opacity-70 cursor-not-allowed select-none"
                 aria-disabled="true"
               >
                 {enlace.label}
@@ -163,7 +163,7 @@ export const LandingNavbar = () => {
                     role="menu"
                     className="anim-fade absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-white/10 bg-arena-deep/95 p-1.5 dark:bg-arena-panel/95 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] backdrop-blur-xl"
                   >
-                    <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/35">
+                    <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/50">
                       {usuario?.rol || 'Sesión'}
                     </p>
 
@@ -252,7 +252,7 @@ export const LandingNavbar = () => {
               enlace.enDesarrollo ? (
                 <span
                   key={enlace.label}
-                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/30 opacity-50 cursor-not-allowed select-none"
+                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/45 opacity-70 cursor-not-allowed select-none"
                   aria-disabled="true"
                 >
                   {enlace.label}
@@ -262,7 +262,7 @@ export const LandingNavbar = () => {
                   key={enlace.href}
                   href={enlace.href}
                   onClick={() => setMenuMovil(false)}
-                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/70 transition-colors hover:text-arena-ivory"
+                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/80 transition-colors hover:text-arena-ivory"
                 >
                   {enlace.label}
                   <svg className="h-4 w-4 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">

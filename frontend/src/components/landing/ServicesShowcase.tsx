@@ -58,7 +58,7 @@ export const ServicesShowcase: React.FC = () => {
       id="servicios"
       className="relative isolate overflow-hidden bg-arena-deep px-6 py-20 dark:bg-arena-night sm:py-24"
     >
-      <div aria-hidden="true" className="pitch-lines-ink pointer-events-none absolute inset-0 opacity-40 dark:hidden" />
+      <div aria-hidden="true" className="pitch-lines-ink pointer-events-none absolute inset-0 opacity-30 dark:hidden" />
 
       <div className="relative z-10 mx-auto max-w-[1240px]">
         <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -66,19 +66,19 @@ export const ServicesShowcase: React.FC = () => {
             <span className="inline-flex items-center gap-2 rounded-md bg-arena-ink px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-arena-accent-soft dark:bg-arena-accent dark:text-arena-ink">
               Ecosistema Solidario
             </span>
-            <h2 className="mt-4 text-3xl font-extrabold uppercase leading-[0.98] tracking-tight text-arena-ivory text-balance dark:text-arena-ivory sm:text-4xl lg:text-[2.9rem]">
+            <h2 className="mt-4 text-3xl font-extrabold uppercase leading-[0.98] tracking-tight text-arena-ivory text-balance sm:text-4xl lg:text-[2.9rem]">
               Roles y Participación
             </h2>
-            <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/60 dark:text-arena-ivory/55">
+            <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/70 dark:text-arena-ivory/65">
               Una estructura organizada donde cada actor cumple un rol fundamental para transformar realidades.
             </p>
           </div>
 
           <div className="hidden items-center gap-4 md:flex">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/40 dark:text-arena-ivory/35">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/55 dark:text-arena-ivory/50">
               4 roles principales
             </span>
-            <span className="h-px w-16 bg-arena-ivory/15 dark:bg-white/15" />
+            <span className="h-px w-16 bg-arena-ivory/20 dark:bg-white/20" />
           </div>
         </div>
 
@@ -86,14 +86,14 @@ export const ServicesShowcase: React.FC = () => {
           {SERVICES.map((service) => (
             <div
               key={service.title}
-              className="group relative overflow-hidden rounded-2xl border border-arena-ink/10 bg-arena-ivory p-7 transition-[transform,border-color,box-shadow] duration-300 ease-out-soft hover:border-arena-accent/60 hover:shadow-lift motion-safe:hover:-translate-y-1 dark:border-white/10 dark:bg-white/[0.035] dark:hover:border-arena-accent/40"
+              className="group relative overflow-hidden rounded-3xl border border-arena-ink/10 bg-arena-ivory p-7 shadow-[0_18px_40px_-30px_rgba(0,0,0,0.55)] transition-[transform,border-color,box-shadow] duration-300 ease-out-soft hover:border-arena-accent/60 hover:shadow-[0_28px_60px_-30px_rgba(0,0,0,0.65)] motion-safe:hover:-translate-y-1 dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-arena-accent/40"
             >
               <span
                 aria-hidden="true"
                 className="absolute inset-x-0 top-0 h-[2px] w-0 bg-arena-base transition-[width] duration-300 ease-out-soft group-hover:w-full dark:bg-arena-accent"
               />
 
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-arena-ink/10 bg-arena-ink/[0.04] text-arena-ink transition-colors duration-300 group-hover:border-arena-ink/20 group-hover:bg-arena-ink group-hover:text-arena-accent dark:border-white/10 dark:bg-white/[0.04] dark:text-arena-accent dark:group-hover:border-arena-accent/30 dark:group-hover:bg-arena-accent/10">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-arena-ink/10 bg-arena-ink/[0.04] text-arena-ink transition-colors duration-300 group-hover:border-arena-ink/20 group-hover:bg-arena-ink group-hover:text-arena-accent-soft dark:border-white/10 dark:bg-white/[0.05] dark:text-arena-accent dark:group-hover:border-arena-accent/30 dark:group-hover:bg-arena-accent/10">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   {service.icon}
                 </svg>
@@ -102,7 +102,7 @@ export const ServicesShowcase: React.FC = () => {
               <h3 className="mt-5 text-base font-extrabold uppercase tracking-[0.05em] text-arena-ink dark:text-arena-ivory">
                 {service.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-arena-ink2 dark:text-arena-ivory/55">
+              <p className="mt-2 text-sm leading-relaxed text-arena-ink2 dark:text-arena-ivory/65">
                 {service.description}
               </p>
             </div>

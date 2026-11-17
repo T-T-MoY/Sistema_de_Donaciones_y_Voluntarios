@@ -13,13 +13,13 @@ const ThemeToggle = ({ variant = 'default' }: ThemeToggleProps) => {
     const { theme, toggleTheme } = useTheme();
 
     const estilos = variant === 'dark'
-        ? 'border border-white/15 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white'
-        : 'bg-claro-tinte dark:bg-oscuro-tinte text-claro-primario dark:text-oscuro-primario hover:opacity-90 shadow-sm';
+        ? 'border border-white/20 bg-white/[0.07] text-arena-ivory/85 hover:border-white/30 hover:bg-white/[0.12] hover:text-arena-ivory'
+        : 'border border-claro-borde bg-claro-tinte text-claro-primario hover:bg-claro-tinte/70 dark:border-oscuro-borde dark:bg-oscuro-tinte dark:text-oscuro-primario dark:hover:bg-oscuro-tinte/70 shadow-soft';
 
     return (
         <button
             onClick={toggleTheme}
-            className={`press p-2.5 rounded-xl ${estilos}`}
+            className={`press rounded-xl p-2.5 ${estilos}`}
             aria-label={theme === 'light' ? 'Activar tema oscuro' : 'Activar tema claro'}
             title={theme === 'light' ? 'Activar tema oscuro' : 'Activar tema claro'}
         >

@@ -1,14 +1,15 @@
 <div align="center">
 
-# 🏟️ Sistema de Reservas — Complejo Deportivo
+# 🤝 Sistema de Donaciones y Voluntariados
 
-**Aplicación web para administrar un complejo deportivo:** reserva de canchas, pagos con comprobante, eventos con inscripción de cupo limitado y reportes para administración.
+**Plataforma para conectar donantes, voluntarios y beneficiarios:** gestión de usuarios por rol, donaciones en especie, campañas solidarias y trazabilidad de la ayuda con una interfaz accesible en modo claro y oscuro.
 
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![React](https://img.shields.io/badge/React-18-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 </div>
@@ -18,13 +19,13 @@
 ## 📚 Tabla de Contenidos
 
 - 🧱 [Stack Tecnológico](#-stack-tecnológico)
+- 🎨 [Sistema de Diseño](#-sistema-de-diseño)
+- 🖥️ [Pantallas](#️-pantallas)
 - 📁 [Estructura del Proyecto](#-estructura-del-proyecto)
 - 🚀 [Puesta en Marcha](#-puesta-en-marcha)
-- 🔑 [Usuarios de Prueba](#-usuarios-de-prueba)
-- 🧩 [Servicios Implementados](#-servicios-implementados)
-- 🔄 [Arquitectura y Flujo de Comunicación](#-arquitectura-y-flujo-de-comunicación)
-- 🛠️ [Comandos Útiles](#-comandos-útiles)
-- 📌 [Notas y Pendientes Conocidos](#-notas-y-pendientes-conocidos)
+- 🧩 [Endpoints](#-endpoints)
+- 🛠️ [Comandos Útiles](#️-comandos-útiles)
+- 📌 [Notas y Pendientes](#-notas-y-pendientes)
 
 ---
 
@@ -35,62 +36,134 @@
 | **Backend** | Node.js 20 · Express 4 · TypeScript |
 | **Base de datos** | PostgreSQL 15 vía `pg` (SQL puro, sin ORM) |
 | **Autenticación** | JWT (`jsonwebtoken`) + `bcrypt` |
-| **Archivos** | `multer` (fotos de perfil y comprobantes) |
-| **Correo** | `nodemailer` (Gmail SMTP) |
-| **Frontend** | React 18 · Vite · TypeScript |
+| **Archivos** | `multer` (fotos de perfil) |
+| **Correo** | `nodemailer` (recuperación de contraseña) |
+| **Frontend** | React 18 · Vite 8 · TypeScript |
 | **Ruteo** | React Router 7 |
 | **Cliente HTTP** | Axios |
-| **Estilos** | Tailwind CSS |
-| **Gráficas** | `@nivo/heatmap` · `@nivo/pie` |
-| **Exportación** | `jsPDF` · `html2canvas` · `xlsx` |
-| **Infraestructura** | Docker Compose · pgAdmin 4 |
+| **Estilos** | **Tailwind CSS 4.3** (plugin `@tailwindcss/vite`, sin PostCSS) |
+| **Animación** | CSS puro: `@keyframes`, `@utility` y tokens de easing |
+| **Infraestructura** | Docker Compose |
+
+### Tailwind CSS v4
+
+- La configuración vive **solo** en `frontend/src/index.css`: `@import "tailwindcss"`, `@custom-variant dark` y `@theme`.
+- Ya **no existen** `tailwind.config.js` ni `postcss.config.js`; el plugin `@tailwindcss/vite` hace el trabajo.
+- El modo oscuro se activa con la clase `.dark` en `<html>` (`ThemeContext`).
+- Los tokens de color, sombras, easings y animaciones están declarados como variables CSS dentro de `@theme`, por lo que se consumen como utilidades normales (`bg-claro-primario`, `shadow-lift`, `ease-out-soft`, `animate-modal-in`).
+
+---
+
+## 🎨 Sistema de Diseño
+
+### Paleta ONG
+
+La identidad combina un **teal profundo** (confianza, transparencia, trabajo comunitario) con un **ámbar cálido** (calidez, cercanía, acción solidaria) y un **terracota** de apoyo para alertas y acentos. Todos los pares texto/fondo cumplen **WCAG AA**.
+
+| Token | Claro | Uso | Contraste |
+|---|---|---|---|
+| `claro-primario` | `#0E6E6D` | Acciones primarias, enlaces, foco | 6.0:1 sobre blanco |
+| `claro-hover` | `#0A5A59` | Hover de acciones primarias | 7.8:1 sobre blanco |
+| `claro-acento` | `#B4491F` | Errores, énfasis, terracota | 5.1:1 sobre blanco |
+| `claro-fondo` | `#FAFBF6` | Superficie de página | — |
+| `claro-tarjeta` | `#FFFFFF` | Tarjetas y paneles | — |
+| `claro-borde` | `#E1E7E2` | Bordes neutros | — |
+| `claro-texto` | `#152847` | Texto principal | 13.5:1 sobre blanco |
+| `claro-texto2` | `#51607A` | Texto secundario | 6.2:1 sobre blanco |
+
+| Token | Oscuro | Uso |
+|---|---|---|
+| `oscuro-primario` | `#5ED0CB` | Acciones primarias (teal luminoso) |
+| `oscuro-acento` | `#FF9B85` | Acentos y alertas (coral) |
+| `oscuro-fondo` | `#0F2233` | Fondo de página |
+| `oscuro-tarjeta` | `#132B3B` | Tarjetas y paneles |
+| `oscuro-borde` | `#26404F` | Bordes |
+| `oscuro-texto` | `#F5F7FA` | Texto principal |
+| `oscuro-texto2` | `#A8B8C4` | Texto secundario |
+
+**Marca "Arena"** (landing y pantallas de acceso): `arena-base #0B3B3A`, `arena-deep #082C2B`, `arena-night #071F24`, `arena-accent #F5B267`, `arena-accent-soft #FFD9A8`, `arena-ivory #F6F3EA`, `arena-ink #0A2322`.
+
+> **Justificación:** el teal profundo transmite confianza institucional y rinde AA con texto blanco; el ámbar funciona como color de acción sobre superficies oscuras sin competir con el teal; el terracota aporta un acento humano y mantiene legibilidad en errores y estados de riesgo.
+
+### Movimiento
+
+Principios aplicados (skills de Emil Kowalski: `animate`, `emil-design-eng`, `review-animations`, `remove-animations`, `find-animation-opportunities`, `improve-animations`, `apple-design`, `gestures`):
+
+- Entradas con **ease-out** fuerte (`cubic-bezier(0.23, 1, 0.32, 1)`), **150–300 ms**; modales hasta 500 ms.
+- Solo se animan **`transform`** y **`opacity`** (compositor, sin reflow).
+- Sin `scale(0)`: los orígenes parten de `scale(0.985)` para no convertirse en "pop".
+- Sin `transition: all`: cada transición declara sus propiedades.
+- Hover gateado por `@media (hover: hover)` en Tailwind v4 y transformaciones con `motion-safe:`.
+- `prefers-reduced-motion` conserva el cambio de color pero elimina desplazamientos.
+- Feedback de presión unificado con la utilidad `press` (`scale(0.97)` en `:active`).
+
+### Utilidades propias
+
+`anim-rise`, `anim-fade`, `press`, `pitch-lines`, `pitch-lines-ink`, `marquee-track`, `marquee-mask`, `auth-photo`.
+
+---
+
+## 🖥️ Pantallas
+
+| Ruta | Pantalla | Rediseño |
+|---|---|---|
+| `/` | Landing | Hero con panel de impacto, pasos, roles y cinta animada |
+| `/login` | Inicio de sesión | Split screen, panel con barra de acento, CTA ámbar |
+| `/registro` | Registro | Card elevada, medidor de contraseña, mensajes AA |
+| `/dashboard` | Panel | KPIs, módulos, header con degradado de marca |
+| `/usuarios` | Gestión de usuarios (admin) | KPIs laterales, filtros, tabla y cards móviles |
+| `/perfil` | Perfil | Tarjeta de avatar, formulario por secciones, feedback AA |
+| `/solicitar-recuperacion` · `/reset-password` | Recuperación | Mismo lenguaje visual que Login/Registro |
+
+Rutas en desarrollo: campañas, donaciones, voluntariados, reportes y demás módulos muestran el estado "En desarrollo"; no se eliminó ningún componente ni se alteró la lógica de datos.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```text
-Sistema de Reservas Complejo deportivo/
+Sistema de Donaciones y Voluntariados/
 ├── compose.yaml
+├── .env                     # No versionado — se crea localmente
 ├── database/
 │   ├── 01_schema.sql        # Tablas, relaciones y restricciones
-│   └── 02_inserts.sql       # Datos de prueba (seeders)
+│   └── 02_inserts.sql       # Datos de prueba
 ├── backend/
-│   ├── .env                 # No incluido — se crea localmente
 │   ├── Dockerfile
-│   ├── uploads/
-│   │   ├── perfiles/        # Fotos de perfil
-│   │   └── comprobantes/    # Comprobantes de pago
 │   └── src/
-│       ├── server.ts        # Punto de entrada
-│       ├── app.ts           # Configuración de Express y rutas
+│       ├── server.ts / app.ts
 │       ├── config/          # Conexión a PostgreSQL
-│       ├── controllers/     # req/res de cada endpoint
-│       ├── services/        # Lógica de negocio (canchas, reservas)
+│       ├── controllers/     # req/res por endpoint
+│       ├── services/        # Lógica de negocio
+│       ├── repositories/    # Acceso a datos
 │       ├── models/          # Consultas SQL
-│       ├── routes/          # Endpoints de la API
-│       ├── middlewares/     # Verificación de JWT y de rol
-│       ├── types/ utils/    # Interfaces y validaciones
-│       └── documents/       # Peticiones de prueba (REST Client)
+│       ├── routes/          # authRoutes, userRoutes
+│       ├── middlewares/     # JWT y roles
+│       ├── validators/ utils/ types/
 └── frontend/
-    ├── Dockerfile
-    ├── vite.config.ts
+    ├── vite.config.ts       # react + tailwindcss + svgr
     └── src/
-        ├── App.tsx / main.tsx   # Rutas y entrada
-        ├── context/             # AuthContext (sesión), ThemeContext
-        ├── services/api.ts      # Cliente Axios con interceptores
-        ├── components/          # canchas/ reservas/ pagos/ eventos/
-        │                        # usuarios/ reportes/ layout/ landing/
-        └── pages/               # Login, Dashboard, Reportes, etc.
+        ├── index.css        # @theme, keyframes, utilidades, base
+        ├── App.tsx / main.tsx
+        ├── api/             # Cliente Axios e interceptores
+        ├── context/         # AuthContext, ThemeContext
+        ├── hooks/
+        ├── components/
+        │   ├── landing/     # Hero, HowItWorks, ServicesShowcase
+        │   ├── layout/      # PublicLayout, AppLayout, Navbar, Header, Footer
+        │   ├── usuarios/    # UsuarioList, UsuarioCard, UsuarioModal
+        │   ├── guards/      # RutasProtegidas, RutasAdmin
+        │   └── ui/          # FieldError, ThemeToggle
+        ├── pages/
+        ├── types/
+        └── utils/
 ```
-
-> Cada módulo del backend sigue el mismo patrón: `routes → controllers → (services) → models`. Solo **canchas** y **reservas** tienen una capa `services` explícita; el resto llama al modelo directamente desde el controlador.
 
 ---
 
 ## 🚀 Puesta en Marcha
 
-### Requisitos previos
+### Requisitos
 
 | Herramienta | Versión |
 |---|---|
@@ -98,121 +171,74 @@ Sistema de Reservas Complejo deportivo/
 | Docker Desktop | última estable |
 | Git | cualquiera |
 
-### 1️⃣ Clonar el repositorio
+### 1️⃣ Clonar
 
 ```bash
-git clone https://github.com/Roberto-Carlos01/Sistema-de-Reservas---Complejo-deportivo-.git
-cd Sistema-de-Reservas---Complejo-deportivo-
+git clone https://github.com/T-T-MoY/Sistema_de_Donaciones_y_Voluntarios.git
+cd Sistema_de_Donaciones_y_Voluntarios
 ```
 
-### 2️⃣ Crear las variables de entorno
+### 2️⃣ Variables de entorno
 
 > [!IMPORTANT]
-> El archivo `backend/.env` **no viene incluido en el repositorio** — debes crearlo tú mismo dentro de `backend/`. Los valores de la base de datos ya sirven como ejemplo para Docker; completa tu propio `JWT_SECRET` y tus credenciales de Gmail para el correo de recuperación de contraseñas.
-
-> [!IMPORTANT]
-> La cuenta de Gmail que uses para el correo de recuperación **debe tener sí o sí la verificación en dos pasos activada**, y usar la **contraseña de aplicación** (no tu contraseña normal de Gmail — son diferentes).
+> `.env` no se versiona. Creá uno en la raíz (lo usa `compose.yaml`) y otro en `backend/` con los mismos valores de base de datos.
 
 ```env
 PORT=4000
 
-DB_USER=limber
-DB_PASSWORD=123456
+DB_USER=<usuario>
+DB_PASSWORD=<contraseña>
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=bdcomplejodeportivo
+DB_NAME=<base_de_datos>
 
-JWT_SECRET=<definir un secreto propio>
+JWT_SECRET=<secreto_propio>
 
-EMAIL_USER=<correo Gmail remitente>
-EMAIL_PASS=<contraseña de aplicación de Gmail>
+EMAIL_USER=<correo_remitente>
+EMAIL_PASS=<contraseña_de_aplicación>
 FRONTEND_URL=http://localhost:5173
 ```
 
 ### 3️⃣ Levantar el proyecto
 
-<details>
-<summary><b>Opción A — Todo con Docker</b></summary>
-
 ```bash
+# Todo con Docker
 docker compose up -d --build
 ```
 
-Levanta los 4 contenedores. La base de datos se siembra sola con `database/01_schema.sql` y `02_inserts.sql`, pero **solo la primera vez** que se crea el volumen (`docker compose down -v` para reiniciarla desde cero).
-
-</details>
-
-<details>
-<summary><b>Opción B — Modo desarrollo</b> (recomendado para programar)</summary>
-
 ```bash
-# Solo la base de datos
+# Modo desarrollo: solo la base de datos
 docker compose up -d db
 
-# Base de datos + pgAdmin (interfaz web)
-docker compose up -d db pgadmin
-```
+# Backend
+cd backend && npm install && npm run dev
 
-```bash
-# Backend (nueva terminal)
-cd backend
-npm install
-npm run dev
-```
-
-```bash
 # Frontend (otra terminal)
-cd frontend
-npm install
-npm run dev
+cd frontend && npm install && npm run dev
 ```
-
-</details>
 
 | Servicio | URL |
 |---|---|
 | Frontend | http://localhost:5173 |
-| Backend API | http://localhost:4000 |
+| API | http://localhost:4000/api |
 | Health check | http://localhost:4000/api/health |
-| pgAdmin | http://localhost:5050 |
+
+### 4️⃣ Validar el frontend
+
+```bash
+cd frontend
+npx tsc --noEmit    # tipos
+npm run build       # tsc + vite build
+```
 
 ---
 
-## 🔑 Usuarios de Prueba
-
-| Email                           | Contraseña | Rol           |
-| ------------------------------- | ---------- | ------------- |
-| `carla.mamani@canchasbo.com`    | `Passw123` | Administrador |
-| `jorge.fernandez@canchasbo.com` | `Passw123` | Administrador |
-| `ana.torrez@canchasbo.com`      | `Passw123` | Empleado      |
-| `maria.lopez@gmail.com`         | `Passw123` | Cliente       |
-
----
-
-## 🧩 Servicios Implementados
+## 🧩 Endpoints
 
 | Módulo | Endpoint | Descripción |
 |---|---|---|
-| 🔐 Autenticación | `/api/auth` | Registro público de clientes, login con JWT (expira en 15 min) y recuperación de contraseña por correo con token temporal. |
-| 👤 Usuarios | `/api/usuarios` | Perfil propio (con foto) y, desde el panel admin, listado, creación, edición, cambio de estado y eliminación de usuarios. |
-| 🏟️ Canchas | `/api/canchas` | CRUD de canchas (crear/editar/eliminar restringido a administradores) y consulta de reservas por cancha para calcular disponibilidad. |
-| 📅 Reservas | `/api/reservas` | Valida que el horario no se solape. Reservas en línea quedan `pendiente`; presenciales, `confirmada`. El cliente cancela solo con +24h de anticipación; solo un admin modifica. |
-| 💳 Pagos | `/api/pagos` | Presencial, tarjeta de débito, crédito o QR. Monto = precio por hora × horas. Métodos virtuales exigen comprobante y quedan `pendiente_verificacion` hasta ser aprobados o rechazados. |
-| 🎉 Eventos | `/api/eventos` | Admin y empleados crean, editan, reprograman y cancelan eventos. Los clientes se inscriben respetando el cupo, con transacciones SQL. |
-| 📊 Reportes | `/api/reportes` | Solo administradores. Pagos por estado/método, mapa de calor de ocupación, horas ocupadas, mayor demanda, rentabilidad de servicios y comportamiento de usuarios. |
-
----
-
-## 🔄 Arquitectura y Flujo de Comunicación
-
-```mermaid
-flowchart TD
-    A[Navegador] --> B[Frontend<br/>React + Vite :5173]
-    B -->|Axios · Bearer token| C[Backend<br/>Express :4000]
-    C -->|routes → controllers → services → models| D[(PostgreSQL<br/>Docker :5432)]
-```
-
-La sesión se guarda como JWT en `localStorage`. El frontend cierra sesión automáticamente a los 15 minutos de inactividad, y también ante cualquier respuesta `401`/`403` del backend.
+| 🔐 Autenticación | `/api/auth` | Registro público, login con JWT y recuperación de contraseña por correo. |
+| 👤 Usuarios | `/api/usuarios` | Perfil propio y, desde el panel admin, listado, creación, edición, estado y eliminación. |
 
 ---
 
@@ -220,33 +246,30 @@ La sesión se guarda como JWT en `localStorage`. El frontend cierra sesión auto
 
 ```bash
 # Logs de la base de datos
-docker logs postgres-db-complejo-deportivo
+docker logs postgres-db-donaciones_y_voluntariado
 
-# Reiniciar todo
+# Reiniciar servicios
 docker compose down
 docker compose up -d
 
-# Reconstruir el backend tras cambiar dependencias
+# Reconstruir backend tras cambiar dependencias
 docker compose up -d --build backend
 ```
 
 ---
 
-## 📌 Notas y Pendientes Conocidos
+## 📌 Notas y Pendientes
 
-> [!WARNING]
-> Puntos a revisar antes de llevar el proyecto a producción.
-
-- **Permisos en `/api/usuarios`:** listar, crear, editar, cambiar estado y eliminar usuarios solo exigen un token válido; falta el middleware `esAdmin` para restringirlos a administradores.
-- **`modo_demo` en pagos:** `POST /api/pagos/procesar` acepta un flag `modo_demo` que marca el pago como `pagado` sin comprobante. Solo se desactiva si `NODE_ENV=production`, variable que hoy no está definida ni en `compose.yaml` ni en ningún `.env`.
-- **Extras de reserva** (balón, arbitraje, iluminación) se guardan solo en el `localStorage` del navegador; las tablas `utilidad` y `reserva_utilidad` existen en el esquema pero el backend todavía no las usa.
-- **Secretos versionados:** `credenciales.txt` y cualquier `.env` que llegues a subir por error pueden incluir credenciales reales, entre ellas una contraseña de aplicación de Gmail. Si el repositorio es público, conviene rotarlas.
-- `manual_inicio.md` describe una versión anterior del proyecto (Postgres 16, credenciales `admin/admin1234`, carpeta `frontend/src/iteraciones/`) que ya no coincide con el código actual.
+- Los módulos de campañas, donaciones, voluntariados y reportes están marcados como **"En desarrollo"** en la navegación.
+- `frontend/src/App.css` quedó sin uso tras la migración a Tailwind v4; se puede eliminar en una limpieza futura.
+- La utilidad `pitch-lines` conserva un nombre heredado del proyecto anterior: hoy dibuja una retícula, no líneas de cancha.
+- Verificá que `/api/usuarios` restrinja las operaciones de escritura a administradores antes de producción.
+- `frontend/REBRAND_NOTES.md` documenta el cambio de textos y de identidad de la plataforma.
 
 ---
 
 <div align="center">
 
-⬆️ [Volver arriba](#-sistema-de-reservas--complejo-deportivo)
+⬆️ [Volver arriba](#-sistema-de-donaciones-y-voluntariados)
 
 </div>
