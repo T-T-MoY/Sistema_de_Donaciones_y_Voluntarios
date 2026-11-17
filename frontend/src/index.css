@@ -2,96 +2,234 @@
 
 /* =========================================================
    TEMA OSCURO POR CLASE
-   Tailwind v4 usa prefers-color-scheme por defecto. La app
-   alterna `.dark` en <html> desde ThemeContext, así que el
-   variant tiene que mirar esa clase.
+   ThemeContext alterna `.dark` en <html>. El variant debe
+   mirar esa clase, no prefers-color-scheme.
    ========================================================= */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =========================================================
    TOKENS DE DISEÑO — TAILWIND v4
-   Los nombres se mantienen (claro-*, oscuro-*, arena-*)
-   para no reescribir los componentes, pero los valores
-   responden a la paleta ONG: teal profundo + ámbar cálido.
+   Paleta "Solidaridad nocturna": azul marino profundo,
+   dorado cálido y crema. Los nombres son semánticos: el
+   mismo token cambia de valor entre claro y oscuro.
+
+   FIX aplicado:
+   - En dark mode, surfaces pasan de navy a charcoal neutro
+     para que el Hero navy DESTAQUE del body.
+   - En dark mode, primary pasa de dorado a azul cielo
+     luminoso para que se diferencie del accent dorado.
    ========================================================= */
 @theme {
-  /* ---------- Marca "Arena" (superficies oscuras) ---------- */
-  --color-arena-base: #0b3b3a;        /* teal profundo */
-  --color-arena-deep: #082c2b;        /* teal profundo -1 */
-  --color-arena-night: #071f24;       /* noche azulada */
-  --color-arena-panel: #0c2a2c;       /* panel oscuro */
-  --color-arena-line: #1c4442;        /* borde sobre teal */
-  --color-arena-accent: #f5b267;      /* ámbar cálido: acción */
-  --color-arena-accent-hover: #ffc482;
-  --color-arena-accent-soft: #ffd9a8; /* ámbar para texto sobre oscuro */
-  --color-arena-ivory: #f6f3ea;       /* marfil cálido */
-  --color-arena-sand: #e8dfc9;
-  --color-arena-wine: #d97757;        /* terracota de apoyo */
-  --color-arena-ink: #0a2322;         /* texto sobre ámbar */
-  --color-arena-ink2: #3d5a55;
+  /* ---------- Tipografía ---------- */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sora", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
-  /* ---------- Modo claro ---------- */
-  --color-claro-primario: #0e6e6d;    /* teal AA sobre blanco (6.0:1) */
-  --color-claro-hover: #0a5a59;
-  --color-claro-tinte: #d9efec;       /* menta suave */
-  --color-claro-acento: #b4491f;      /* terracota AA para texto/bordes */
-  --color-claro-fondo: #fafbf6;       /* superficie de página */
-  --color-claro-tarjeta: #ffffff;
-  --color-claro-borde: #e1e7e2;
-  --color-claro-texto: #152847;       /* azul tinta (13.5:1) */
-  --color-claro-texto2: #51607a;      /* secundario (6.2:1) */
+  /* ---------- Colores semánticos (resuelven a --brand-*) ---------- */
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-active: var(--brand-primary-active);
+  --color-primary-soft: var(--brand-primary-soft);
+  --color-on-primary: var(--brand-on-primary);
 
-  /* ---------- Modo oscuro ---------- */
-  --color-oscuro-primario: #5ed0cb;   /* teal luminoso */
-  --color-oscuro-hover: #7fe0dc;
-  --color-oscuro-tinte: #14353a;
-  --color-oscuro-acento: #ff9b85;     /* coral desaturado */
-  --color-oscuro-fondo: #0f2233;
-  --color-oscuro-tarjeta: #132b3b;
-  --color-oscuro-borde: #26404f;
-  --color-oscuro-texto: #f5f7fa;
-  --color-oscuro-texto2: #a8b8c4;
+  --color-accent: var(--brand-accent);
+  --color-accent-hover: var(--brand-accent-hover);
+  --color-accent-soft: var(--brand-accent-soft);
+  --color-on-accent: var(--brand-on-accent);
+  --color-accent-text: var(--brand-accent-text);
 
-  /* ---------- Compatibilidad con la paleta anterior ---------- */
-  --color-palette-wine: #7a3a2e;
-  --color-palette-petroleum: #0b3b3a;
-  --color-palette-ivory: #f6f3ea;
-  --color-palette-dark: #071f24;
+  --color-surface: var(--brand-surface);
+  --color-surface-elevated: var(--brand-surface-elevated);
+  --color-surface-sunken: var(--brand-surface-sunken);
+  --color-surface-inset: var(--brand-surface-inset);
 
-  /* ---------- Tokens semánticos (se invierten en .dark) ---------- */
-  --color-primary: #0e6e6d;
-  --color-accent: #b4491f;
-  --color-surface: #ffffff;
-  --color-text: #152847;
-  --color-muted: #eef4f1;
+  --color-border: var(--brand-border);
+  --color-border-strong: var(--brand-border-strong);
+  --color-ring: var(--brand-ring);
+
+  --color-text: var(--brand-text);
+  --color-text-muted: var(--brand-text-muted);
+  --color-text-subtle: var(--brand-text-subtle);
+
+  --color-success: var(--brand-success);
+  --color-success-soft: var(--brand-success-soft);
+  --color-error: var(--brand-error);
+  --color-error-soft: var(--brand-error-soft);
+  --color-warning: var(--brand-warning);
+  --color-warning-soft: var(--brand-warning-soft);
+  --color-info: var(--brand-info);
+  --color-info-soft: var(--brand-info-soft);
+
+  /* ---------- Marca fija (superficies nocturnas) ---------- */
+  --color-night: #0b1730;
+  --color-night-2: #0f1e3d;
+  --color-night-3: #16294f;
+  --color-night-line: #26385c;
+  --color-cream: #f7f3ea;
+  --color-gold: #d4a24c;
+  --color-gold-bright: #e8b960;
+
+  /* ---------- Radios ---------- */
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+
+  /* ---------- Elevación multicapa ---------- */
+  --shadow-soft: var(--elev-soft);
+  --shadow-lift: var(--elev-lift);
+  --shadow-deep: var(--elev-deep);
+  --shadow-glow: var(--elev-glow);
 
   /* ---------- Curvas de movimiento ---------- */
-  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 
-  /* ---------- Elevación ---------- */
-  --shadow-soft: 0 1px 2px rgb(21 40 71 / 0.05), 0 12px 32px -18px rgb(21 40 71 / 0.28);
-  --shadow-lift: 0 2px 6px rgb(21 40 71 / 0.06), 0 26px 48px -22px rgb(21 40 71 / 0.35);
-
-  /* ---------- Animaciones ---------- */
-  --animate-marquee: marquee 34s linear infinite;
-  --animate-pulse-dot: pulse-dot 2s var(--ease-in-out-soft) infinite;
-  --animate-float-orb-1: float-orb-1 16s ease-in-out infinite alternate;
-  --animate-float-orb-2: float-orb-2 20s ease-in-out infinite alternate;
-  --animate-modal-in: modal-in 220ms var(--ease-out-soft) both;
+  /* ---------- Animaciones nombradas ---------- */
+  --animate-rise: rise-in 620ms var(--ease-out-soft) both;
+  --animate-fade: soft-fade 340ms var(--ease-out-soft) both;
+  --animate-modal-in: modal-in 280ms var(--ease-out-soft) both;
   --animate-overlay-in: overlay-in 200ms ease-out both;
-  --animate-slide-up: slide-up 320ms var(--ease-out-soft) both;
+  --animate-float-slow: float-slow 16s ease-in-out infinite alternate;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
 }
 
 /* =========================================================
-   KEYFRAMES
-   Solo transform y opacity: se ejecutan en el compositor.
+   VALORES DE LA PALETA — MODO CLARO
+   Se definen como --brand-* para que los tokens de @theme
+   puedan cambiar de valor bajo .dark sin perder las clases.
+   ========================================================= */
+:root {
+  color-scheme: light;
+
+  --brand-primary: #16294f;
+  --brand-primary-hover: #0f1e3d;
+  --brand-primary-active: #0a1630;
+  --brand-primary-soft: #e8ecf6;
+  --brand-on-primary: #fbf7ee;
+
+  --brand-accent: #d4a24c;
+  --brand-accent-hover: #c08f36;
+  --brand-accent-soft: #f7ead1;
+  --brand-on-accent: #1a1206;
+  --brand-accent-text: #7e5a12;
+
+  --brand-surface: #fffdf8;
+  --brand-surface-elevated: #ffffff;
+  --brand-surface-sunken: #f7f3ea;
+  --brand-surface-inset: #f1ebde;
+
+  --brand-border: #e2dac9;
+  --brand-border-strong: #cdc2aa;
+  --brand-ring: #b08a3e;
+
+  --brand-text: #0a1428;
+  --brand-text-muted: #4c5871;
+  --brand-text-subtle: #697389;
+
+  --brand-success: #26704f;
+  --brand-success-soft: #e3f2e9;
+  --brand-error: #b23a2e;
+  --brand-error-soft: #fbe7e4;
+  --brand-warning: #96660c;
+  --brand-warning-soft: #fbf0d6;
+  --brand-info: #2e5b9a;
+  --brand-info-soft: #e6eef9;
+
+  --elev-soft:
+    0 1px 2px rgb(10 20 40 / 0.05),
+    0 4px 10px -4px rgb(10 20 40 / 0.08),
+    0 12px 24px -16px rgb(10 20 40 / 0.16);
+  --elev-lift:
+    0 1px 2px rgb(10 20 40 / 0.04),
+    0 10px 22px -10px rgb(10 20 40 / 0.12),
+    0 32px 56px -28px rgb(10 20 40 / 0.24);
+  --elev-deep:
+    0 2px 6px rgb(10 20 40 / 0.06),
+    0 24px 48px -20px rgb(10 20 40 / 0.22),
+    0 60px 100px -48px rgb(10 20 40 / 0.4);
+  --elev-glow:
+    0 1px 1px rgb(10 20 40 / 0.04),
+    0 16px 38px -16px rgb(212 162 76 / 0.55);
+}
+
+/* =========================================================
+   VALORES DE LA PALETA — MODO OSCURO
+   FIX aplicado: charcoal en lugar de navy para las surfaces,
+   y azul cielo para el primary (distinto del accent dorado).
+   ========================================================= */
+.dark {
+  color-scheme: dark;
+
+  /* Botones principales: Dorado */
+  --brand-primary: #e8b960;
+  --brand-primary-hover: #f2ca7e;
+  --brand-primary-active: #dcad57;
+  --brand-primary-soft: #2e2616;
+  --brand-on-primary: #0a1120;
+
+  /* Acentos: Dorado */
+  --brand-accent: #e8b960;
+  --brand-accent-hover: #f2ca7e;
+  --brand-accent-soft: #2e2616;
+  --brand-on-accent: #0a1120;
+  --brand-accent-text: #f2d394;
+
+  /* Superficies: Azul Noche Profundo (Adiós al gris) */
+  --brand-surface: #0f1a2e;          /* Fondo de las tarjetas (Navy) */
+  --brand-surface-elevated: #162544; /* Tarjetas que flotan (Navy claro) */
+  --brand-surface-sunken: #080e1a;   /* Fondo de la página e inputs */
+  --brand-surface-inset: #1c2d4a;    /* Inputs enfocados o botones deshabilitados */
+
+  /* Bordes y anillos */
+  --brand-border: #253655;
+  --brand-border-strong: #354a70;
+  --brand-ring: #e8b960;
+
+  /* Textos */
+  --brand-text: #f6f7fb;
+  --brand-text-muted: #a8b6ce;
+  --brand-text-subtle: #7a8ba8;
+
+  /* Semánticos */
+  --brand-success: #5cc79a;
+  --brand-success-soft: #122e25;
+  --brand-error: #f08a7e;
+  --brand-error-soft: #331b1a;
+  --brand-warning: #efc06a;
+  --brand-warning-soft: #2f2513;
+  --brand-info: #8fb8f5;
+  --brand-info-soft: #16243c;
+
+  /* Sombras (se mantienen igual) */
+  --elev-soft:
+    0 1px 2px rgb(0 0 0 / 0.28),
+    0 6px 16px -8px rgb(0 0 0 / 0.38),
+    0 16px 32px -20px rgb(0 0 0 / 0.5);
+  --elev-lift:
+    0 1px 2px rgb(0 0 0 / 0.3),
+    0 14px 28px -12px rgb(0 0 0 / 0.46),
+    0 40px 64px -32px rgb(0 0 0 / 0.6);
+  --elev-deep:
+    0 2px 8px rgb(0 0 0 / 0.35),
+    0 30px 60px -24px rgb(0 0 0 / 0.55),
+    0 70px 120px -56px rgb(0 0 0 / 0.7);
+  --elev-glow:
+    0 1px 1px rgb(0 0 0 / 0.25),
+    0 18px 44px -18px rgb(232 185 96 / 0.35);
+}
+
+/* =========================================================
+   KEYFRAMES — solo transform y opacity
    ========================================================= */
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -108,14 +246,14 @@
   }
 }
 
-@keyframes slide-up {
+@keyframes modal-in {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(14px) scale(0.975);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -128,17 +266,6 @@
   }
 }
 
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -148,42 +275,27 @@
   }
 }
 
+@keyframes float-slow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(18px, -22px, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(-16px, 14px, 0) scale(0.97);
+  }
+}
+
 @keyframes pulse-dot {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgb(245 178 103 / 0.55);
-  }
-  70% {
+  0%,
+  100% {
+    opacity: 1;
     transform: scale(1);
-    box-shadow: 0 0 0 8px rgb(245 178 103 / 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgb(245 178 103 / 0);
-  }
-}
-
-@keyframes float-orb-1 {
-  0% {
-    transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(45px, 35px) scale(1.12);
-  }
-  100% {
-    transform: translate(-35px, 55px) scale(0.95);
-  }
-}
-
-@keyframes float-orb-2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-55px, -25px) scale(1.18);
-  }
-  100% {
-    transform: translate(35px, -45px) scale(0.92);
+    opacity: 0.55;
+    transform: scale(0.82);
   }
 }
 
@@ -191,26 +303,10 @@
    BASE
    ========================================================= */
 @layer base {
-  :root {
-    color-scheme: light;
-
-    /* Tokens semánticos en modo claro */
-    --color-primary: #0e6e6d;
-    --color-accent: #b4491f;
-    --color-surface: #ffffff;
-    --color-text: #152847;
-    --color-muted: #eef4f1;
-  }
-
-  .dark {
-    color-scheme: dark;
-
-    /* Tokens semánticos en modo oscuro */
-    --color-primary: #5ed0cb;
-    --color-accent: #ff9b85;
-    --color-surface: #132b3b;
-    --color-text: #f5f7fa;
-    --color-muted: #1b3546;
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
   }
 
   html {
@@ -220,35 +316,29 @@
 
   body {
     min-height: 100dvh;
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text);
+    font-family: var(--font-sans);
     line-height: 1.6;
     overflow-x: hidden;
-    background-color: var(--color-claro-fondo);
-    color: var(--color-claro-texto);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  .dark body {
-    background-color: var(--color-oscuro-fondo);
-    color: var(--color-oscuro-texto);
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
   }
 
-  /* Tailwind v4 usa currentColor como borde por defecto. La app
-     espera un borde neutro cuando no se declara color. */
-  *,
-  ::before,
-  ::after {
-    border-color: var(--color-claro-borde);
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
-  .dark *,
-  .dark ::before,
-  .dark ::after {
-    border-color: var(--color-oscuro-borde);
-  }
-
-  /* En touch, el flash azul del tap delata que es una web */
   a,
   button,
   [role='button'],
@@ -263,62 +353,142 @@
     touch-action: manipulation;
   }
 
-  /* Foco visible solo para teclado */
   :focus-visible {
-    outline: 2px solid var(--color-claro-primario);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
-    border-radius: 6px;
   }
 
-  .dark :focus-visible {
-    outline-color: var(--color-oscuro-primario);
+  input,
+  select,
+  textarea {
+    color-scheme: light;
+  }
+
+  .dark input,
+  .dark select,
+  .dark textarea {
+    color-scheme: dark;
+  }
+
+  /* Scrollbar discreta y coherente con la paleta */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 
 /* =========================================================
-   UTILIDADES PROPIAS
+   UTILIDADES DE MOVIMIENTO
    ========================================================= */
 @utility anim-rise {
-  animation: rise-in 560ms var(--ease-out-soft) both;
+  animation: rise-in 620ms var(--ease-out-soft) both;
 }
 
 @utility anim-fade {
-  animation: soft-fade 320ms var(--ease-out-soft) both;
+  animation: soft-fade 340ms var(--ease-out-soft) both;
 }
 
-/* Feedback de presión: todo lo presionable responde */
+@utility anim-scale {
+  animation: modal-in 280ms var(--ease-out-soft) both;
+}
+
+/* Feedback de presión en todo lo presionable */
 @utility press {
   transition:
     transform 150ms var(--ease-out-soft),
-    background-color 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
     box-shadow 240ms var(--ease-out-soft),
-    opacity 200ms ease;
+    opacity 180ms ease;
 
   &:active {
     transform: scale(0.97);
   }
 }
 
-/* Rejilla fina para fondos de sección */
-@utility pitch-lines {
-  background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.055) 1px, transparent 1px);
-  background-size: 72px 72px;
+/* Elevación al pasar el cursor */
+@utility lift {
+  transition:
+    transform 260ms var(--ease-out-soft),
+    box-shadow 260ms var(--ease-out-soft),
+    border-color 200ms ease,
+    background-color 200ms ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
 }
 
-@utility pitch-lines-ink {
+/* =========================================================
+   UTILIDADES DE SUPERFICIE
+   ========================================================= */
+
+/* Rejilla fina para secciones claras */
+@utility grid-paper {
   background-image:
-    linear-gradient(to right, rgb(10 35 34 / 0.055) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(10 35 34 / 0.055) 1px, transparent 1px);
-  background-size: 72px 72px;
+    linear-gradient(to right, rgb(10 20 40 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(10 20 40 / 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Rejilla fina para secciones nocturnas */
+@utility grid-paper-light {
+  background-image:
+    linear-gradient(to right, rgb(247 243 234 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(247 243 234 / 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Puntos para tarjetas destacadas */
+@utility dot-grid {
+  background-image: radial-gradient(rgb(247 243 234 / 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Superficie de vidrio sobre azul marino */
+@utility glass-night {
+  background-color: rgb(247 243 234 / 0.055);
+  border: 1px solid rgb(247 243 234 / 0.12);
+  backdrop-filter: blur(14px);
+}
+
+/* Degradado dorado para titulares */
+@utility text-gold-gradient {
+  background-image: linear-gradient(100deg, #f2d394 0%, #e8b960 45%, #d4a24c 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Foto de apoyo para las pantallas de acceso */
+@utility auth-photo {
+  background-image: url('/images/auth-complex.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 /* Cinta de áreas de impacto: contenido duplicado, desplazado -50% */
 @utility marquee-track {
-  animation: marquee 34s linear infinite;
+  animation: marquee 38s linear infinite;
   will-change: transform;
 }
 
@@ -327,11 +497,42 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 
-/* Imagen de apoyo para Login y Registro (evita style inline) */
-@utility auth-photo {
-  background-image: url('/images/auth-complex.jpg');
-  background-size: cover;
-  background-position: center;
+/* =========================================================
+   SCROLL REVEAL
+   Lo activa el componente <Reveal /> con IntersectionObserver.
+   Transición (no keyframe) para que sea interrumpible.
+   ========================================================= */
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 560ms var(--ease-out-soft),
+      transform 560ms var(--ease-out-soft);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-d1 {
+    --reveal-delay: 80ms;
+  }
+  .reveal-d2 {
+    --reveal-delay: 160ms;
+  }
+  .reveal-d3 {
+    --reveal-delay: 240ms;
+  }
+  .reveal-d4 {
+    --reveal-delay: 320ms;
+  }
+  .reveal-d5 {
+    --reveal-delay: 400ms;
+  }
 }
 
 /* =========================================================
@@ -359,20 +560,32 @@
   }
 
   .anim-rise,
-  .anim-fade {
+  .anim-fade,
+  .anim-scale {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
 
-  /* La cinta se queda quieta y legible */
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
   .marquee-track {
     animation: none !important;
     transform: none !important;
   }
+
+  .press:active,
+  .lift:hover {
+    transform: none !important;
+  }
 }
 
-/* iOS hace zoom en el viewport si el input tiene menos de 16px */
+/* iOS hace zoom si el input tiene menos de 16px */
 @media (max-width: 767px) {
   input,
   select,

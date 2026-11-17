@@ -6,6 +6,14 @@ import FieldError from '../components/ui/FieldError';
 import { esCorreoValido, claseInput } from '../utils/validaciones';
 import IconLogo from '../assets/logo.svg?react';
 
+const etiquetaCampo =
+    'mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.16em] text-text-muted';
+
+const PASOS = [
+    'Ingresá el correo de tu cuenta',
+    'Revisá la bandeja de entrada',
+    'Definí una nueva contraseña',
+];
 
 const SolicitarRecuperacion = () => {
     const [correo, setCorreo] = useState<string>('');
@@ -63,145 +71,250 @@ const SolicitarRecuperacion = () => {
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-claro-fondo transition-colors duration-300 dark:bg-oscuro-fondo">
-            
-            {/* Columna Izquierda: Imagen */}
-            <div className="auth-photo relative hidden h-full md:flex md:w-1/2 lg:w-7/12">
-                <div className="absolute inset-0 bg-linear-to-b from-arena-night/80 via-arena-night/45 to-arena-base/95"></div>
-                <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute bottom-1/4 right-0 h-72 w-72 rounded-full bg-arena-accent/15 blur-[110px]"
-                />
-                
-                <div className="relative z-10 flex h-full w-full flex-col justify-between p-10 lg:p-16">
-                    <div>
-                        <Link to="/" className="inline-block transition-transform duration-300 ease-out-soft motion-safe:hover:scale-105" title="Ir al inicio">
-                            <IconLogo className="w-10 h-10" />
-                        </Link>
-                    </div>
-                    <div className="mb-8">
-                        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/70">
-                            <span className="h-px w-8 bg-arena-accent" />
-                            Red solidaria
+        <div className="relative min-h-screen w-full overflow-hidden bg-night text-cream">
+
+            {/* Fondo con foto */}
+            <img
+                src="/images/auth-complex.jpg"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover object-center opacity-70"
+            />
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-linear-to-r from-night via-night/92 to-night/45"
+            />
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-linear-to-t from-night via-night/30 to-night/70"
+            />
+            <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
+            <div
+                aria-hidden="true"
+                className="motion-safe:animate-float-slow pointer-events-none absolute -top-40 right-[12%] h-[520px] w-[520px] rounded-full bg-gold/[0.12] blur-[140px]"
+            />
+
+            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-5 py-6 sm:px-8 lg:px-10">
+
+                {/* Barra superior */}
+                <header className="flex items-center justify-between">
+                    <Link
+                        to="/"
+                        className="group flex items-center gap-3 rounded-xl"
+                        title="Ir al inicio"
+                    >
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cream/10 bg-cream/[0.05] transition-colors duration-300 group-hover:border-gold/40">
+                            <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
                         </span>
-                        <h1 className="mb-4 mt-4 text-4xl font-bold leading-tight text-arena-ivory drop-shadow-md lg:text-5xl">
-                            Recuperá tu acceso.
+                        <span className="flex flex-col leading-none">
+                            <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-cream">
+                                Donaciones <span className="text-gold">&amp; Voluntariados</span>
+                            </span>
+                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-cream/45">
+                                Plataforma de gestión
+                            </span>
+                        </span>
+                    </Link>
+
+                    <Link
+                        to="/"
+                        className="press inline-flex items-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.03] px-3.5 py-2 text-[10.5px] font-bold uppercase tracking-[0.14em] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.07] hover:text-cream"
+                    >
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Volver
+                    </Link>
+                </header>
+
+                <main className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:py-14">
+
+                    {/* Columna izquierda: mensaje */}
+                    <div className="hidden lg:block">
+                        <span className="anim-rise inline-flex items-center gap-3 text-[9.5px] font-bold uppercase tracking-[0.28em] text-cream/60">
+                            <span className="h-px w-10 bg-gold" />
+                            Recuperar acceso
+                        </span>
+
+                        <h1 className="anim-rise mt-6 font-display text-5xl font-extrabold leading-[0.94] tracking-[-0.035em] text-balance text-cream xl:text-[3.9rem] [animation-delay:60ms]">
+                            Volvé a tu
+                            <br />
+                            red solidaria.
+                            <br />
+                            <span className="text-gold-gradient">En dos pasos.</span>
                         </h1>
-                        <p className="max-w-md text-lg font-medium text-arena-ivory/80 drop-shadow-sm">
-                            Te ayudamos a recuperar el acceso a tu cuenta en un par de pasos.
+
+                        <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-cream/70 [animation-delay:120ms]">
+                            Te enviamos un enlace seguro para restablecer tu contraseña.
+                            El enlace expira en una hora por seguridad.
+                        </p>
+
+                        <ol className="anim-rise mt-8 space-y-3.5 [animation-delay:180ms]">
+                            {PASOS.map((paso, i) => (
+                                <li key={paso} className="flex items-center gap-3 text-sm text-cream/75">
+                                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/40 bg-gold/10 font-display text-[10px] font-bold text-gold-bright">
+                                        {i + 1}
+                                    </span>
+                                    {paso}
+                                </li>
+                            ))}
+                        </ol>
+
+                        <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/40 [animation-delay:240ms]">
+                            <span>Enlace de un solo uso</span>
+                            <span className="h-1 w-1 rounded-full bg-cream/25" />
+                            <span>Expira en 60 min</span>
+                            <span className="h-1 w-1 rounded-full bg-cream/25" />
+                            <span>Sede La Paz</span>
+                        </div>
+                    </div>
+
+                    {/* Columna derecha: tarjeta */}
+                    <div className="mx-auto w-full max-w-[460px]">
+                        <div className="anim-rise relative overflow-hidden rounded-[1.75rem] border border-border bg-surface-elevated p-6 shadow-deep sm:p-8">
+                            <span
+                                aria-hidden="true"
+                                className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-accent via-accent/40 to-transparent"
+                            />
+
+                            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-text-muted">
+                                <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                                Acceso seguro
+                            </span>
+
+                            {/* Título + toggle de tema dentro de la tarjeta */}
+                            <div className="mt-5 flex items-start justify-between gap-4">
+                                <h2 className="font-display text-[1.6rem] font-extrabold leading-none tracking-[-0.03em] text-text">
+                                    {exito ? 'Revisá tu correo' : 'Recuperar contraseña'}
+                                </h2>
+                                <ThemeToggle />
+                            </div>
+
+                            {!exito ? (
+                                <>
+                                    <p className="mt-2.5 text-sm leading-relaxed text-text-muted">
+                                        Ingresá tu correo y te enviaremos un enlace para restablecer
+                                        tu contraseña.
+                                    </p>
+
+                                    <form onSubmit={handleSubmit} className="mt-6 space-y-1" noValidate>
+
+                                        <div>
+                                            <label htmlFor="recuperacion-correo" className={etiquetaCampo}>
+                                                Correo electrónico
+                                            </label>
+                                            <div className="group relative">
+                                                <svg
+                                                    aria-hidden="true"
+                                                    className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-text-subtle transition-colors duration-200 group-focus-within:text-accent-text"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                                <input 
+                                                    id="recuperacion-correo"
+                                                    type="email" 
+                                                    value={correo}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    placeholder="nombre@correo.com"
+                                                    autoComplete="email"
+                                                    inputMode="email"
+                                                    autoFocus
+                                                    maxLength={150}
+                                                    className={`${claseInput(errorCampo, touched)} pl-11`}
+                                                />
+                                            </div>
+                                            <FieldError error={errorCampo} touched={touched} />
+                                        </div>
+
+                                        {error && (
+                                            <div
+                                                role="alert"
+                                                className="anim-fade mt-2 flex items-start gap-2.5 rounded-xl border border-error/30 bg-error-soft p-3 text-sm font-medium text-error"
+                                            >
+                                                <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                                </svg>
+                                                <span>{error}</span>
+                                            </div>
+                                        )}
+
+                                        <button 
+                                            type="submit" 
+                                            disabled={cargando}
+                                            className={`press mt-4 flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-[12.5px] font-bold uppercase tracking-[0.14em] shadow-soft
+                                                ${cargando 
+                                                    ? 'cursor-wait bg-surface-inset text-text-subtle' 
+                                                    : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'
+                                                }`}
+                                        >
+                                            {cargando && (
+                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
+                                            )}
+                                            {cargando ? 'Enviando…' : 'Enviar instrucciones'}
+                                        </button>
+
+                                    </form>
+
+                                    <p className="mt-6 border-t border-border pt-5 text-center text-[13px] text-text-muted">
+                                        <Link 
+                                            to="/login" 
+                                            className="rounded font-bold text-primary underline-offset-4 hover:text-accent-text hover:underline"
+                                        >
+                                            ← Volver al inicio de sesión
+                                        </Link>
+                                    </p>
+                                </>
+                            ) : (
+                                <div className="anim-fade mt-6 space-y-5">
+                                    <div className="flex flex-col items-center gap-3 rounded-2xl border border-success/25 bg-success-soft px-5 py-7 text-center">
+                                        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-success/15 text-success">
+                                            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                        </span>
+                                        <p className="text-sm leading-relaxed text-text-muted">
+                                            Si el correo{' '}
+                                            <strong className="break-all font-bold text-text">{correo}</strong>{' '}
+                                            está registrado, te enviamos un enlace para restablecer tu
+                                            contraseña.
+                                        </p>
+                                    </div>
+
+                                    <div className="rounded-xl border border-border bg-surface px-4 py-3.5">
+                                        <p className="flex items-start gap-2.5 text-[11.5px] leading-relaxed text-text-muted">
+                                            <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>
+                                                Si no lo ves, revisá la carpeta de{' '}
+                                                <strong className="font-semibold text-text">Spam</strong>.
+                                                El enlace expira en 1 hora.
+                                            </span>
+                                        </p>
+                                    </div>
+
+                                    <Link 
+                                        to="/login" 
+                                        className="press flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-[12.5px] font-bold uppercase tracking-[0.14em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift"
+                                    >
+                                        Volver al inicio de sesión
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        <p className="mt-4 text-center text-[9.5px] font-semibold uppercase tracking-[0.18em] text-cream/40">
+                            Conexión segura · Donaciones y Voluntariados
                         </p>
                     </div>
-                </div>
-            </div>
+                </main>
 
-            {/* Columna Derecha: Formulario */}
-            <div className="flex h-full w-full flex-col items-center overflow-y-auto p-6 sm:p-8 md:w-1/2 lg:w-5/12 lg:p-12">
-                <div className="relative my-auto w-full max-w-md overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta p-8 shadow-lift dark:border-oscuro-borde dark:bg-oscuro-tarjeta sm:p-10">
-                    <span
-                        aria-hidden="true"
-                        className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-claro-primario via-claro-primario/40 to-transparent dark:from-oscuro-primario dark:via-oscuro-primario/40"
-                    />
-                    
-                    <div className="mb-4 flex items-center justify-between">
-                        <Link 
-                            to="/" 
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-claro-texto2 transition-colors hover:text-claro-primario dark:text-oscuro-texto2 dark:hover:text-oscuro-primario"
-                        >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Volver al inicio
-                        </Link>
-                        <ThemeToggle />
-                    </div>
-
-                    <h2 className="mb-2 text-2xl font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
-                        Recuperar contraseña
-                    </h2>
-
-                    {!exito ? (
-                        <>
-                            <p className="text-claro-texto2 dark:text-oscuro-texto2 mb-4">
-                                Ingresá tu correo y te enviaremos un enlace para restablecer tu contraseña.
-                            </p>
-
-                            <form onSubmit={handleSubmit} className="space-y-1" noValidate>
-                                
-                                <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">
-                                        Correo electrónico
-                                    </label>
-                                    <input 
-                                        type="email" 
-                                        value={correo}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        placeholder="nombre@correo.com"
-                                        maxLength={150}
-                                        className={claseInput(errorCampo, touched)}
-                                    />
-                                    <FieldError error={errorCampo} touched={touched} />
-                                </div>
-
-                                {error && (
-                                    <p className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700 dark:border-red-800/70 dark:bg-red-900/25 dark:text-red-300">
-                                        {error}
-                                    </p>
-                                )}
-
-                                <button 
-                                    type="submit" 
-                                    disabled={cargando}
-                                    className={`press mt-4 w-full rounded-xl py-3 font-semibold text-white shadow-[0_18px_36px_-20px_rgba(14,110,109,0.7)]
-                                        ${cargando 
-                                            ? 'bg-claro-borde text-claro-texto2 dark:bg-oscuro-borde dark:text-oscuro-texto2 cursor-not-allowed' 
-                                            : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover motion-safe:hover:-translate-y-0.5'
-                                        }`}
-                                >
-                                    {cargando ? 'Enviando...' : 'Enviar instrucciones'}
-                                </button>
-
-                            </form>
-
-                            <p className="text-center text-sm text-claro-texto2 dark:text-oscuro-texto2 mt-6">
-                                <Link to="/login" className="text-claro-primario dark:text-oscuro-primario font-bold hover:underline">
-                                    ← Volver al inicio de sesión
-                                </Link>
-                            </p>
-                        </>
-                    ) : (
-                        <div className="space-y-6 pt-4">
-                            {/* Ícono de éxito */}
-                            <div className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-
-                            <div className="text-center">
-                                <h3 className="text-lg font-bold text-claro-texto dark:text-oscuro-texto mb-2">
-                                    Revisá tu correo
-                                </h3>
-                                <p className="text-sm text-claro-texto2 dark:text-oscuro-texto2">
-                                    Si el correo <strong className="text-claro-texto dark:text-oscuro-texto">{correo}</strong> está registrado, te enviamos un enlace para restablecer tu contraseña.
-                                </p>
-                            </div>
-
-                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-xl">
-                                <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-                                    💡 <strong>Tip:</strong> Si no lo ves, revisá tu carpeta de <strong>Spam</strong> o correo no deseado. El enlace expira en 1 hora.
-                                </p>
-                            </div>
-
-                            <Link 
-                                to="/login" 
-                                className="block text-center text-sm text-claro-primario dark:text-oscuro-primario font-medium hover:underline"
-                            >
-                                ← Volver al inicio de sesión
-                            </Link>
-                        </div>
-                    )}
-                </div>
+                <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-cream/35">
+                    <span>© {new Date().getFullYear()} Donaciones y Voluntariados</span>
+                    <span>Plataforma solidaria</span>
+                </footer>
             </div>
         </div>
     );

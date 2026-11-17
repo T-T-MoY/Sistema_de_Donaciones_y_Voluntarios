@@ -95,10 +95,10 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
 
     return (
         <>
-            {/* Overlay oscuro en móvil */}
+            {/* Overlay en móvil */}
             {abierto && (
                 <div 
-                    className="anim-fade fixed inset-0 z-40 bg-arena-night/60 backdrop-blur-sm md:hidden"
+                    className="anim-fade fixed inset-0 z-40 bg-night/70 backdrop-blur-sm md:hidden"
                     onClick={onCerrar}
                     aria-hidden="true"
                 />
@@ -106,72 +106,120 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
 
             <aside className={`
                 fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
-                border-r border-claro-borde bg-claro-tarjeta
-                transition-transform duration-300 ease-drawer dark:border-oscuro-borde dark:bg-oscuro-tarjeta
+                bg-night text-cream
+                transition-transform duration-300 ease-out-soft
                 ${abierto ? 'translate-x-0' : '-translate-x-full'} 
                 md:translate-x-0
             `}>
+                {/* Filo dorado */}
+                <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-px bg-linear-to-b from-transparent via-gold/40 to-transparent"
+                />
+                <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-30" />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -left-24 top-24 h-56 w-56 rounded-full bg-gold/[0.10] blur-[90px]"
+                />
+
+                {/* Marca */}
                 <Link 
                     to="/" 
                     onClick={onCerrar}
-                    className="flex items-center gap-3 px-6 py-6 border-b border-claro-borde/60 dark:border-oscuro-borde/60 hover:opacity-90 transition-opacity"
+                    className="press group relative z-10 flex items-center gap-3 border-b border-cream/10 px-5 py-5"
                     title="Ir a la página principal / Home"
                 >
-                    <IconLogo className="w-9 h-9" />
-                    <div className="flex flex-col">
-                        <span className="text-base font-bold text-claro-texto dark:text-oscuro-texto tracking-tight leading-tight">
-                            Donaciones y Voluntariados
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cream/10 bg-cream/[0.05] transition-colors duration-300 group-hover:border-gold/45">
+                        <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
+                    </span>
+                    <div className="flex min-w-0 flex-col leading-none">
+                        <span className="font-display text-[12.5px] font-bold tracking-[-0.01em] text-cream">
+                            Donaciones <span className="text-gold">&amp; Voluntariados</span>
                         </span>
-                        <span className="text-[11px] text-claro-texto2 dark:text-oscuro-texto2 mt-0.5">
-                            Plataforma de Gestión
+                        <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.26em] text-cream/40">
+                            Plataforma de gestión
                         </span>
                     </div>
                 </Link>
 
-                <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-                    {menuFiltrado.map((item) => (
-                        item.enDesarrollo ? (
-                            <span
-                                key={item.path}
-                                className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-4 py-3 font-medium text-claro-texto2/55 opacity-70 dark:text-oscuro-texto2/55"
-                                aria-disabled="true"
-                                title="Módulo en desarrollo"
-                            >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                                </svg>
-                                {item.name}
-                            </span>
-                        ) : (
-                            <NavLink 
-                                key={item.path} 
-                                to={item.path} 
-                                onClick={onCerrar}   
-                                className={({ isActive }) => `
-                                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-[background-color,color,box-shadow] duration-200
-                                    ${isActive 
-                                        ? 'bg-claro-tinte text-claro-primario dark:bg-oscuro-tinte dark:text-oscuro-primario font-semibold shadow-soft ring-1 ring-claro-primario/10 dark:ring-oscuro-primario/20' 
-                                        : 'text-claro-texto2 hover:bg-claro-fondo hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-fondo dark:hover:text-oscuro-texto'
-                                    }
-                                `}
-                            >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                                </svg>
-                                {item.name}
-                            </NavLink>
-                        )
-                    ))}
+                {/* Navegación */}
+                <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-5">
+                    <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-cream/35">
+                        Navegación
+                    </p>
+
+                    <ul className="space-y-1">
+                        {menuFiltrado.map((item) => (
+                            <li key={item.path}>
+                                {item.enDesarrollo ? (
+                                    <span
+                                        className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-cream/30"
+                                        aria-disabled="true"
+                                        title="Módulo en desarrollo"
+                                    >
+                                        <svg className="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
+                                        </svg>
+                                        <span className="truncate">{item.name}</span>
+                                        <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-cream/20" />
+                                    </span>
+                                ) : (
+                                    <NavLink 
+                                        key={item.path} 
+                                        to={item.path} 
+                                        onClick={onCerrar}   
+                                        className={({ isActive }) => `
+                                            press group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-colors duration-200
+                                            ${isActive 
+                                                ? 'bg-cream/[0.08] font-semibold text-cream' 
+                                                : 'font-medium text-cream/60 hover:bg-cream/[0.05] hover:text-cream'
+                                            }
+                                        `}
+                                    >
+                                        {({ isActive }) => (
+                                            <>
+                                                <span
+                                                    aria-hidden="true"
+                                                    className={`absolute left-0 top-1/2 h-6 w-[2px] -translate-y-1/2 rounded-full bg-gold transition-opacity duration-200 ${
+                                                        isActive ? 'opacity-100' : 'opacity-0'
+                                                    }`}
+                                                />
+                                                <svg
+                                                    className={`h-[18px] w-[18px] shrink-0 transition-colors duration-200 ${
+                                                        isActive ? 'text-gold' : 'text-cream/45 group-hover:text-gold/80'
+                                                    }`}
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                >
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
+                                                </svg>
+                                                <span className="truncate">{item.name}</span>
+                                            </>
+                                        )}
+                                    </NavLink>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+
+                    <div className="mt-6 rounded-xl border border-cream/10 bg-cream/[0.04] p-3.5">
+                        <p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-cream/45">
+                            <span className="motion-safe:animate-pulse-dot h-1.5 w-1.5 rounded-full bg-gold" />
+                            Versión en curso
+                        </p>
+                        <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
+                            Los módulos marcados se habilitarán en la próxima entrega.
+                        </p>
+                    </div>
                 </nav>
 
-                {/* Footer del Sidebar con botón directo a Home */}
-                <div className="p-4 border-t border-claro-borde dark:border-oscuro-borde">
+                {/* Pie del sidebar */}
+                <div className="relative z-10 border-t border-cream/10 p-3">
                     <Link
                         to="/"
                         onClick={onCerrar}
-                        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-claro-borde bg-claro-tinte/60 px-4 py-2.5 text-sm font-semibold text-claro-primario hover:bg-claro-tinte dark:border-oscuro-borde dark:bg-oscuro-tinte/60 dark:text-oscuro-primario dark:hover:bg-oscuro-tinte"
+                        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.05] px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/80 hover:border-gold/45 hover:text-gold-bright"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
                         Volver al Home

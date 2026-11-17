@@ -362,23 +362,17 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
 
 /**
  * Devuelve una clase de Tailwind según el estado del campo.
- * Usa la paleta del sistema (EMERALD para OK, BURGUNDY para error).
+ * Usa los tokens semánticos de la paleta: neutro, error o foco dorado.
  */
 export const claseInput = (tieneError: boolean | string | undefined, touched: boolean | undefined = true): string => {
-    const base = 'w-full px-4 py-2.5 rounded-xl border bg-claro-fondo dark:bg-oscuro-fondo text-claro-texto dark:text-oscuro-texto placeholder:text-claro-texto2/60 dark:placeholder:text-oscuro-texto2/60 focus:outline-none focus:ring-2 transition-[border-color,box-shadow,background-color] duration-200';
+    const base =
+        'w-full rounded-xl border bg-surface-elevated px-4 py-2.5 text-sm text-text shadow-soft placeholder:text-text-subtle/75 transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none focus:ring-4';
 
-    if (!touched) {
-        // Neutro: borde normal de la paleta
-        return `${base} border-claro-borde dark:border-oscuro-borde focus:ring-claro-primario/35 dark:focus:ring-oscuro-primario/35`;
+    if (touched && tieneError) {
+        return `${base} border-error/70 focus:border-error focus:ring-error/15`;
     }
 
-    if (tieneError) {
-        // ❌ Error: terracota (acento)
-        return `${base} border-claro-acento dark:border-oscuro-acento focus:ring-claro-acento/35 dark:focus:ring-oscuro-acento/35`;
-    }
-
-    // ✅ OK: teal de marca
-    return `${base} border-claro-primario/60 dark:border-oscuro-primario/60 focus:ring-claro-primario/35 dark:focus:ring-oscuro-primario/35`;
+    return `${base} border-border hover:border-border-strong focus:border-accent focus:ring-accent/15`;
 };
 
 /**
@@ -407,14 +401,14 @@ export const textoFuerza = (nivel: number): string => {
 };
 
 /**
- * Devuelve el color de la barra de fuerza.
- * Ahora usa la paleta del sistema.
+ * Devuelve el color de la barra de fuerza usando los
+ * tokens semánticos: error, warning y success.
  */
 export const colorFuerza = (nivel: number): string => {
     switch (nivel) {
-        case 1: return 'bg-claro-acento dark:bg-oscuro-acento';           // Terracota: débil
-        case 2: return 'bg-amber-500 dark:bg-amber-400';                 // Ámbar: intermedia
-        case 3: return 'bg-claro-primario dark:bg-oscuro-primario';      // Teal: segura
-        default: return 'bg-claro-borde dark:bg-oscuro-borde';
+        case 1: return 'bg-error';
+        case 2: return 'bg-warning';
+        case 3: return 'bg-success';
+        default: return 'bg-border';
     }
 };

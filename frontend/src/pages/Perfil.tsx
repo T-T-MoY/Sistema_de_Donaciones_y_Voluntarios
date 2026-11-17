@@ -77,6 +77,44 @@ interface PerfilUpdateResponse {
 }
 
 // =====================================================
+// ESTILOS COMPARTIDOS
+// =====================================================
+const etiquetaCampo =
+    'mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.14em] text-text-muted';
+
+const tituloSeccion =
+    'flex items-center gap-2.5 font-display text-base font-bold tracking-[-0.02em] text-text';
+
+const subtituloSeccion = 'mt-1.5 mb-5 text-sm text-text-muted';
+
+// =====================================================
+// SKELETON DE CARGA
+// =====================================================
+const PerfilSkeleton = () => (
+    <div className="mx-auto max-w-6xl space-y-6" aria-busy="true" aria-live="polite">
+        <div className="h-48 animate-pulse rounded-3xl border border-border bg-surface-elevated" />
+        <div className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-5">
+                <div className="h-56 animate-pulse rounded-2xl border border-border bg-surface-elevated" />
+                <div className="h-36 animate-pulse rounded-2xl border border-border bg-surface-elevated" />
+            </div>
+            <div className="space-y-4 rounded-2xl border border-border bg-surface-elevated p-6 lg:col-span-2 md:p-8">
+                <div className="h-4 w-40 animate-pulse rounded-full bg-border" />
+                <div className="h-3 w-64 animate-pulse rounded-full bg-border/70" />
+                <div className="grid gap-4 pt-4 sm:grid-cols-2">
+                    {[0, 1, 2, 3].map((i) => (
+                        <div key={i} className="h-11 animate-pulse rounded-xl bg-surface-sunken" />
+                    ))}
+                </div>
+                <div className="h-11 w-full animate-pulse rounded-xl bg-surface-sunken" />
+                <div className="h-11 w-40 animate-pulse rounded-xl bg-border" />
+            </div>
+        </div>
+        <span className="sr-only">Cargando perfil…</span>
+    </div>
+);
+
+// =====================================================
 // COMPONENTE
 // =====================================================
 const Perfil = () => {
@@ -339,75 +377,103 @@ const Perfil = () => {
     const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
 
     if (cargandoInicial) {
-        return (
-            <div className="max-w-6xl mx-auto flex items-center justify-center py-20">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-4 border-claro-primario dark:border-oscuro-primario border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-sm text-claro-texto2 dark:text-oscuro-texto2">Cargando perfil...</p>
-                </div>
-            </div>
-        );
+        return <PerfilSkeleton />;
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="mx-auto max-w-6xl space-y-6">
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {/* =====================================================
+                HERO DE AVATAR
+                ===================================================== */}
+            <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-6 text-cream shadow-lift md:p-8">
+                <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
+                <div
+                    aria-hidden="true"
+                    className="motion-safe:animate-float-slow pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-gold/20 blur-3xl"
+                />
 
-                {/* ==================== COLUMNA LATERAL ==================== */}
-                <div className="lg:col-span-1 space-y-6">
+                <div className="relative z-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+                    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-4xl font-extrabold text-night shadow-deep">
+                        {iniciales}
+                    </span>
 
-                    {/* TARJETA AVATAR */}
-                    <div className="relative flex flex-col items-center overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta p-6 text-center shadow-soft dark:border-oscuro-borde dark:bg-oscuro-tarjeta">
-                        <span
-                            aria-hidden="true"
-                            className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-claro-tinte/80 to-transparent dark:from-oscuro-tinte/70"
-                        />
-
-                        <div className="relative mb-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-claro-primario text-3xl font-bold text-white shadow-lift ring-4 ring-claro-tarjeta dark:bg-oscuro-primario dark:text-oscuro-fondo dark:ring-oscuro-tarjeta">
-                            {iniciales}
-                        </div>
-
-                        <h3 className="relative text-lg font-bold text-claro-texto dark:text-oscuro-texto">
-                            {formData.nombre} {formData.paterno}
-                        </h3>
-                        <p className="relative mb-3 text-sm text-claro-texto2 dark:text-oscuro-texto2">{formData.correo}</p>
-
-                        <span className="relative rounded-full border border-claro-primario/25 bg-claro-primario/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-claro-primario dark:border-oscuro-primario/30 dark:bg-oscuro-primario/15 dark:text-oscuro-primario">
+                    <div className="min-w-0 flex-1">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md">
+                            <span className="h-1.5 w-1.5 rounded-full bg-gold" />
                             {datosRol.rol || usuario?.rol || 'Usuario'}
                         </span>
+
+                        <h1 className="mt-3 truncate font-display text-2xl font-extrabold leading-tight tracking-[-0.03em] text-cream md:text-[2rem]">
+                            {formData.nombre || 'Usuario'} {formData.paterno}
+                        </h1>
+
+                        <p className="mt-1.5 truncate text-sm text-cream/60">
+                            {formData.correo || 'Sin correo registrado'}
+                        </p>
+
+                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-cream/45">
+                            {formData.ciudad && <span>{formData.ciudad}</span>}
+                            {formData.ciudad && edadCalculada !== null && (
+                                <span className="h-1 w-1 rounded-full bg-cream/25" />
+                            )}
+                            {edadCalculada !== null && <span>{edadCalculada} años</span>}
+                            {(formData.ciudad || edadCalculada !== null) && (
+                                <span className="h-1 w-1 rounded-full bg-cream/25" />
+                            )}
+                            <span>Miembro de la red solidaria</span>
+                        </div>
                     </div>
 
-                    {/* TARJETA DATOS ESPECÍFICOS DEL ROL */}
+                    <a
+                        href="#seguridad"
+                        className="press inline-flex shrink-0 items-center gap-2 rounded-xl border border-cream/20 bg-cream/[0.06] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-cream/85 hover:border-gold/50 hover:text-gold-bright"
+                    >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Seguridad
+                    </a>
+                </div>
+            </section>
+
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+
+                {/* =====================================================
+                    COLUMNA LATERAL
+                    ===================================================== */}
+                <aside className="space-y-5 lg:col-span-1">
+
+                    {/* Datos del rol */}
                     {(esEmpleado || esAdmin) && (
-                        <div className="rounded-3xl border border-claro-borde bg-claro-tarjeta p-6 shadow-soft dark:border-oscuro-borde dark:bg-oscuro-tarjeta">
-                            <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.18em] text-claro-primario dark:text-oscuro-primario">
+                        <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:80ms]">
+                            <span className="block text-[9.5px] font-bold uppercase tracking-[0.2em] text-accent-text">
                                 {esEmpleado && 'Datos laborales'}
                                 {esAdmin && 'Datos de administrador'}
                             </span>
 
-                            <div className="space-y-3">
+                            <div className="mt-4 space-y-3.5">
                                 {esEmpleado && (
                                     <>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">Cargo</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">{datosRol.cargo || '—'}</span>
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">Cargo</span>
+                                            <span className="text-right font-semibold text-text">{datosRol.cargo || '—'}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">Turno</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">{datosRol.turno || '—'}</span>
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">Turno</span>
+                                            <span className="text-right font-semibold text-text">{datosRol.turno || '—'}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">Fecha contratación</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">Fecha contratación</span>
+                                            <span className="text-right font-semibold text-text">
                                                 {datosRol.fecha_contratacion
                                                     ? new Date(datosRol.fecha_contratacion).toLocaleDateString('es-BO')
                                                     : '—'}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">Antigüedad</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">Antigüedad</span>
+                                            <span className="text-right font-semibold text-text">
                                                 {datosRol.antiguedad !== '' && datosRol.antiguedad !== null
                                                     ? `${datosRol.antiguedad} año(s)`
                                                     : '—'}
@@ -418,13 +484,13 @@ const Perfil = () => {
 
                                 {esAdmin && (
                                     <>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">Nivel de acceso</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">{datosRol.nivel_acceso || '—'}</span>
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">Nivel de acceso</span>
+                                            <span className="text-right font-semibold text-text">{datosRol.nivel_acceso || '—'}</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-sm gap-3">
-                                            <span className="text-claro-texto2 dark:text-oscuro-texto2 shrink-0">En el cargo desde</span>
-                                            <span className="font-medium text-claro-texto dark:text-oscuro-texto text-right">
+                                        <div className="flex items-center justify-between gap-3 text-sm">
+                                            <span className="shrink-0 text-text-muted">En el cargo desde</span>
+                                            <span className="text-right font-semibold text-text">
                                                 {datosRol.fecha_asignacion_cargo
                                                     ? new Date(datosRol.fecha_asignacion_cargo).toLocaleDateString('es-BO')
                                                     : '—'}
@@ -435,24 +501,70 @@ const Perfil = () => {
                             </div>
                         </div>
                     )}
-                </div>
 
-                {/* ==================== FORMULARIO ==================== */}
-                <div className="lg:col-span-2">
-                    <form onSubmit={handleSubmit} className="overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta shadow-soft dark:border-oscuro-borde dark:bg-oscuro-tarjeta" noValidate>
+                    {/* Resumen de contacto */}
+                    <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:140ms]">
+                        <span className="block text-[9.5px] font-bold uppercase tracking-[0.2em] text-text-subtle">
+                            Contacto
+                        </span>
 
-                        {/* === SECCIÓN 1: DATOS BÁSICOS === */}
-                        <div className="border-b border-claro-borde p-6 dark:border-oscuro-borde md:p-8">
-                            <h2 className="mb-1 flex items-center gap-2 text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
-                                <span aria-hidden="true" className="h-4 w-1 rounded-full bg-claro-primario dark:bg-oscuro-primario" />
+                        <ul className="mt-4 space-y-3.5">
+                            <li className="flex items-start gap-2.5 text-sm">
+                                <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <span className="min-w-0 break-words text-text-muted">
+                                    {formData.correo || '—'}
+                                </span>
+                            </li>
+                            <li className="flex items-start gap-2.5 text-sm">
+                                <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 5a2 2 0 012-2h2.5a1 1 0 011 .8l1 3.5a1 1 0 01-.4 1L7.5 9.5a12 12 0 007 7l1.2-1.6a1 1 0 011-.4l3.5 1a1 1 0 01.8 1V19a2 2 0 01-2 2A16 16 0 013 5z" />
+                                </svg>
+                                <span className="text-text-muted">{formData.celular || '—'}</span>
+                            </li>
+                            {(formData.calle || formData.zona || formData.ciudad) && (
+                                <li className="flex items-start gap-2.5 text-sm">
+                                    <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span className="text-text-muted">
+                                        {[formData.calle, formData.zona, formData.ciudad].filter(Boolean).join(', ')}
+                                    </span>
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+
+                    {/* Nota */}
+                    <div className="anim-rise rounded-2xl border border-border bg-primary-soft p-5 [animation-delay:200ms]">
+                        <p className="text-[11.5px] leading-relaxed text-text-muted">
+                            Los datos de tu perfil se usan únicamente para coordinar donaciones y
+                            voluntariados. Podés actualizarlos cuando quieras.
+                        </p>
+                    </div>
+                </aside>
+
+                {/* =====================================================
+                    FORMULARIO
+                    ===================================================== */}
+                <div className="anim-rise lg:col-span-2 [animation-delay:60ms]">
+                    <form onSubmit={handleSubmit} className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft" noValidate>
+
+                        {/* SECCIÓN 1: DATOS BÁSICOS */}
+                        <div className="border-b border-border p-6 md:p-8">
+                            <h2 className={tituloSeccion}>
+                                <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
                                 Datos personales
                             </h2>
-                            <p className="mb-5 text-sm text-claro-texto2 dark:text-oscuro-texto2">Así te identificamos en la plataforma.</p>
+                            <p className={subtituloSeccion}>Así te identificamos en la plataforma.</p>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-1">
+                            <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
                                 <div className="md:col-span-2">
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Nombre</label>
+                                    <label htmlFor="perfil-nombre" className={etiquetaCampo}>Nombre</label>
                                     <input
+                                        id="perfil-nombre"
                                         type="text" name="nombre"
                                         value={formData.nombre} onChange={handleChange} onBlur={handleBlur}
                                         maxLength={50}
@@ -461,8 +573,9 @@ const Perfil = () => {
                                     <FieldError error={errores.nombre} touched={touched.nombre} />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Apellido Paterno</label>
+                                    <label htmlFor="perfil-paterno" className={etiquetaCampo}>Apellido paterno</label>
                                     <input
+                                        id="perfil-paterno"
                                         type="text" name="paterno"
                                         value={formData.paterno} onChange={handleChange} onBlur={handleBlur}
                                         maxLength={50}
@@ -471,8 +584,9 @@ const Perfil = () => {
                                     <FieldError error={errores.paterno} touched={touched.paterno} />
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Apellido Materno</label>
+                                    <label htmlFor="perfil-materno" className={etiquetaCampo}>Apellido materno</label>
                                     <input
+                                        id="perfil-materno"
                                         type="text" name="materno"
                                         value={formData.materno} onChange={handleChange} onBlur={handleBlur}
                                         placeholder="Opcional"
@@ -482,8 +596,9 @@ const Perfil = () => {
                                     <FieldError error={errores.materno} touched={touched.materno} />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Correo electrónico</label>
+                                    <label htmlFor="perfil-correo" className={etiquetaCampo}>Correo electrónico</label>
                                     <input
+                                        id="perfil-correo"
                                         type="email" name="correo"
                                         value={formData.correo} onChange={handleChange} onBlur={handleBlur}
                                         maxLength={150}
@@ -492,8 +607,9 @@ const Perfil = () => {
                                     <FieldError error={errores.correo} touched={touched.correo} />
                                 </div>
                                 <div className="md:col-span-2">
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Celular</label>
+                                    <label htmlFor="perfil-celular" className={etiquetaCampo}>Celular</label>
                                     <input
+                                        id="perfil-celular"
                                         type="tel" name="celular"
                                         inputMode="numeric"
                                         value={formData.celular} onChange={handleChange} onBlur={handleBlur}
@@ -505,19 +621,20 @@ const Perfil = () => {
                             </div>
                         </div>
 
-                        {/* === SECCIÓN 2: DATOS ADICIONALES (SOLO CLIENTE) === */}
+                        {/* SECCIÓN 2: DATOS ADICIONALES (SOLO CLIENTE) */}
                         {esCliente && (
-                            <div className="border-b border-claro-borde p-6 dark:border-oscuro-borde md:p-8">
-                                <h2 className="mb-1 flex items-center gap-2 text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
-                                    <span aria-hidden="true" className="h-4 w-1 rounded-full bg-claro-primario dark:bg-oscuro-primario" />
+                            <div className="border-b border-border p-6 md:p-8">
+                                <h2 className={tituloSeccion}>
+                                    <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
                                     Datos adicionales
                                 </h2>
-                                <p className="mb-5 text-sm text-claro-texto2 dark:text-oscuro-texto2">Completá tu información de identificación y dirección.</p>
+                                <p className={subtituloSeccion}>Completá tu información de identificación y dirección.</p>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-1">
+                                <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">CI / NIT</label>
+                                        <label htmlFor="perfil-ci" className={etiquetaCampo}>CI / NIT</label>
                                         <input
+                                            id="perfil-ci"
                                             type="text" name="ci_nit"
                                             inputMode="numeric"
                                             value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
@@ -527,8 +644,9 @@ const Perfil = () => {
                                         <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Fecha de nacimiento</label>
+                                        <label htmlFor="perfil-fecha" className={etiquetaCampo}>Fecha de nacimiento</label>
                                         <input
+                                            id="perfil-fecha"
                                             type="date" name="fecha_nacimiento"
                                             value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
                                             max={fechaMaximaStr}
@@ -537,16 +655,17 @@ const Perfil = () => {
                                         {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
                                             <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
                                         ) : (
-                                            <p className="text-xs mt-1 min-h-[16px] text-claro-texto2 dark:text-oscuro-texto2">
+                                            <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
                                                 {edadCalculada !== null ? (
-                                                    <>Edad: <span className="font-semibold text-claro-primario dark:text-oscuro-primario">{edadCalculada} años</span></>
+                                                    <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
                                                 ) : '\u00A0'}
                                             </p>
                                         )}
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Calle / Avenida</label>
+                                        <label htmlFor="perfil-calle" className={etiquetaCampo}>Calle / Avenida</label>
                                         <input
+                                            id="perfil-calle"
                                             type="text" name="calle"
                                             value={formData.calle} onChange={handleChange}
                                             maxLength={150}
@@ -555,8 +674,9 @@ const Perfil = () => {
                                         <FieldError error={errores.calle} touched={touched.calle} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Zona / Barrio</label>
+                                        <label htmlFor="perfil-zona" className={etiquetaCampo}>Zona / Barrio</label>
                                         <input
+                                            id="perfil-zona"
                                             type="text" name="zona"
                                             value={formData.zona} onChange={handleChange}
                                             maxLength={100}
@@ -565,8 +685,9 @@ const Perfil = () => {
                                         <FieldError error={errores.zona} touched={touched.zona} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Ciudad</label>
+                                        <label htmlFor="perfil-ciudad" className={etiquetaCampo}>Ciudad</label>
                                         <input
+                                            id="perfil-ciudad"
                                             type="text" name="ciudad"
                                             value={formData.ciudad} onChange={handleChange}
                                             maxLength={100}
@@ -578,18 +699,19 @@ const Perfil = () => {
                             </div>
                         )}
 
-                        {/* === SECCIÓN 3: CONTRASEÑA === */}
-                        <div className="p-6 md:p-8">
-                            <h2 className="mb-1 flex items-center gap-2 text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
-                                <span aria-hidden="true" className="h-4 w-1 rounded-full bg-claro-primario dark:bg-oscuro-primario" />
+                        {/* SECCIÓN 3: CONTRASEÑA */}
+                        <div id="seguridad" className="p-6 md:p-8">
+                            <h2 className={tituloSeccion}>
+                                <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
                                 Cambiar contraseña
                             </h2>
-                            <p className="mb-5 text-sm text-claro-texto2 dark:text-oscuro-texto2">Dejá los campos vacíos si no querés cambiarla.</p>
+                            <p className={subtituloSeccion}>Dejá los campos vacíos si no querés cambiarla.</p>
 
                             <div className="space-y-1">
                                 <div>
-                                    <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Contraseña actual</label>
+                                    <label htmlFor="perfil-password-actual" className={etiquetaCampo}>Contraseña actual</label>
                                     <input
+                                        id="perfil-password-actual"
                                         type="password" name="passwordActual"
                                         value={formData.passwordActual} onChange={handleChange}
                                         placeholder="••••••••"
@@ -598,10 +720,11 @@ const Perfil = () => {
                                     />
                                     <FieldError error="" touched={false} />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-1">
+                                <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Nueva contraseña</label>
+                                        <label htmlFor="perfil-password-nueva" className={etiquetaCampo}>Nueva contraseña</label>
                                         <input
+                                            id="perfil-password-nueva"
                                             type="password" name="passwordNueva"
                                             value={formData.passwordNueva} onChange={handleChange}
                                             placeholder="Mínimo 8 caracteres"
@@ -611,8 +734,9 @@ const Perfil = () => {
                                         <FieldError error="" touched={false} />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-claro-texto2 dark:text-oscuro-texto2">Repetir nueva</label>
+                                        <label htmlFor="perfil-password-confirmar" className={etiquetaCampo}>Repetir nueva</label>
                                         <input
+                                            id="perfil-password-confirmar"
                                             type="password" name="passwordConfirmar"
                                             value={formData.passwordConfirmar} onChange={handleChange}
                                             placeholder="Repetí la contraseña"
@@ -625,26 +749,43 @@ const Perfil = () => {
                             </div>
 
                             {mensaje.texto && (
-                                <div className={`mt-4 rounded-xl border p-4 text-sm font-medium ${mensaje.tipo === 'error' ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-800/70 dark:bg-red-900/25 dark:text-red-300' : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/70 dark:bg-emerald-900/25 dark:text-emerald-200'}`}>
-                                    {mensaje.texto}
+                                <div
+                                    role="alert"
+                                    className={`anim-fade mt-4 flex items-start gap-2.5 rounded-xl border p-4 text-sm font-medium ${
+                                        mensaje.tipo === 'error'
+                                            ? 'border-error/30 bg-error-soft text-error'
+                                            : 'border-success/30 bg-success-soft text-success'
+                                    }`}
+                                >
+                                    <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        {mensaje.tipo === 'error' ? (
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                        ) : (
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        )}
+                                    </svg>
+                                    <span>{mensaje.texto}</span>
                                 </div>
                             )}
 
-                            <div className="mt-6 flex items-center gap-3">
+                            <div className="mt-6 flex flex-wrap items-center gap-3">
                                 <button
                                     type="submit"
                                     disabled={cargando}
-                                    className={`press rounded-xl px-6 py-2.5 font-semibold text-white shadow-[0_16px_32px_-20px_rgba(14,110,109,0.85)]
+                                    className={`press inline-flex items-center justify-center gap-2.5 rounded-xl px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] shadow-soft
                                     ${cargando
-                                        ? 'bg-claro-borde text-claro-texto2 dark:bg-oscuro-borde dark:text-oscuro-texto2 cursor-not-allowed'
-                                        : 'bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover'}`}
+                                        ? 'cursor-wait bg-surface-inset text-text-subtle'
+                                        : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'}`}
                                 >
-                                    {cargando ? 'Guardando...' : 'Guardar cambios'}
+                                    {cargando && (
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
+                                    )}
+                                    {cargando ? 'Guardando…' : 'Guardar cambios'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => window.location.reload()}
-                                    className="press rounded-xl border border-claro-borde px-6 py-2.5 font-semibold text-claro-texto2 hover:bg-claro-tinte hover:text-claro-texto dark:border-oscuro-borde dark:text-oscuro-texto2 dark:hover:bg-oscuro-tinte dark:hover:text-oscuro-texto"
+                                    className="press rounded-xl border border-border bg-surface px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text"
                                 >
                                     Cancelar
                                 </button>

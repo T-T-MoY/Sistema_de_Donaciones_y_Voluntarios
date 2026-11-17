@@ -13,7 +13,7 @@ export default function AppLayout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex h-screen bg-claro-fondo dark:bg-oscuro-fondo transition-colors duration-300 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-surface-sunken">
       {/* Sidebar (fijo a la izquierda) */}
       <Navbar
         abierto={sidebarAbierto}
@@ -21,11 +21,13 @@ export default function AppLayout() {
       />
 
       {/* Columna derecha: Header arriba + contenido scrolleable */}
-      <div className="flex-1 md:ml-64 flex flex-col overflow-hidden w-full">
+      <div className="flex w-full flex-1 flex-col overflow-hidden md:ml-64">
         <Header onAbrirMenu={() => setSidebarAbierto(true)} />
 
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <div className="mx-auto w-full max-w-[1400px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

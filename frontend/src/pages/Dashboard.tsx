@@ -8,6 +8,8 @@ interface Kpi {
     etiqueta: string;
     valor: string;
     detalle: string;
+    delta: string;
+    tendencia: 'up' | 'flat';
     icono: string;
     acento: string;
 }
@@ -32,29 +34,37 @@ const KPIS: Kpi[] = [
         etiqueta: 'Campañas',
         valor: '12+',
         detalle: 'Activas este mes',
+        delta: '+2',
+        tendencia: 'up',
         icono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-        acento: 'bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario',
+        acento: 'bg-primary-soft text-primary',
     },
     {
         etiqueta: 'Donaciones',
         valor: '24/7',
         detalle: 'Registro en línea',
+        delta: 'En vivo',
+        tendencia: 'flat',
         icono: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-        acento: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+        acento: 'bg-success-soft text-success',
     },
     {
         etiqueta: 'Voluntariados',
         valor: 'Abiertos',
         detalle: 'Postulaciones activas',
+        delta: '+5',
+        tendencia: 'up',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        acento: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+        acento: 'bg-warning-soft text-warning',
     },
     {
         etiqueta: 'Pagos QR',
         valor: 'Seguro',
         detalle: 'Verificación manual',
+        delta: 'Estable',
+        tendencia: 'flat',
         icono: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
-        acento: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+        acento: 'bg-info-soft text-info',
     },
 ];
 
@@ -65,9 +75,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Administrá roles, donantes, voluntarios y permisos de la plataforma.',
         cta: 'Ir al Panel de Usuarios',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario',
+        iconoBg: 'bg-primary-soft text-primary',
         badge: 'Admin',
-        badgeClass: 'bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario',
+        badgeClass: 'bg-primary-soft text-primary',
     },
     {
         to: '/donaciones',
@@ -75,9 +85,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Registrá y supervisá las donaciones recibidas, sus montos y su destino.',
         cta: 'Administrar Donaciones',
         icono: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-        iconoBg: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+        iconoBg: 'bg-success-soft text-success',
         badge: 'Donaciones',
-        badgeClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+        badgeClass: 'bg-success-soft text-success',
         enDesarrollo: true,
     },
     {
@@ -86,9 +96,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Revisá los comprobantes QR de donaciones y aprobá o rechazá pagos pendientes.',
         cta: 'Ir a Verificación de Pagos',
         icono: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-        iconoBg: 'bg-purple-500/15 text-sky-700 dark:text-sky-300',
+        iconoBg: 'bg-info-soft text-info',
         badge: 'Finanzas',
-        badgeClass: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-200',
+        badgeClass: 'bg-info-soft text-info',
         enDesarrollo: true,
     },
     {
@@ -97,9 +107,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Creá campañas solidarias, definí metas y seguí el avance de cada una.',
         cta: 'Gestionar Campañas',
         icono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-        iconoBg: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+        iconoBg: 'bg-warning-soft text-warning',
         badge: 'Campañas',
-        badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+        badgeClass: 'bg-warning-soft text-warning',
         enDesarrollo: true,
     },
     {
@@ -108,9 +118,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Coordiná postulaciones, turnos y actividad de los voluntarios.',
         cta: 'Ir a Gestión de Voluntariados',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
+        iconoBg: 'bg-error-soft text-error',
         badge: 'Voluntariado',
-        badgeClass: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
+        badgeClass: 'bg-error-soft text-error',
         enDesarrollo: true,
     },
     {
@@ -119,9 +129,9 @@ const MODULOS_ADMIN: Modulo[] = [
         descripcion: 'Analizá donaciones, campañas activas y participación de voluntarios.',
         cta: 'Ver Estadísticas',
         icono: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-        iconoBg: 'bg-sky-500/15 text-sky-700 dark:text-sky-300',
+        iconoBg: 'bg-info-soft text-info',
         badge: 'Análisis',
-        badgeClass: 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-200',
+        badgeClass: 'bg-info-soft text-info',
         enDesarrollo: true,
     },
 ];
@@ -133,7 +143,7 @@ const MODULOS_EMPLEADO: Modulo[] = [
         descripcion: 'Aprobá o rechazá comprobantes de donaciones pendientes de los donantes de manera rápida.',
         cta: 'Ir a Verificación de Pagos',
         icono: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-        iconoBg: 'bg-purple-500/15 text-sky-700 dark:text-sky-300',
+        iconoBg: 'bg-info-soft text-info',
         enDesarrollo: true,
     },
     {
@@ -142,7 +152,7 @@ const MODULOS_EMPLEADO: Modulo[] = [
         descripcion: 'Supervisá la agenda de voluntariados, atendé a los voluntarios y gestioná cambios.',
         cta: 'Ir a Gestión de Voluntariados',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+        iconoBg: 'bg-warning-soft text-warning',
         enDesarrollo: true,
     },
     {
@@ -151,7 +161,7 @@ const MODULOS_EMPLEADO: Modulo[] = [
         descripcion: 'Consultá las campañas activas y asistí a los beneficiarios.',
         cta: 'Ir a Gestión de Campañas',
         icono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-        iconoBg: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
+        iconoBg: 'bg-error-soft text-error',
         enDesarrollo: true,
     },
 ];
@@ -163,9 +173,9 @@ const MODULOS_CLIENTE: Modulo[] = [
         descripcion: 'Explorá las campañas activas y elegí a quién querés apoyar con tu donación.',
         cta: 'Explorar Campañas',
         icono: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-        iconoBg: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+        iconoBg: 'bg-success-soft text-success',
         badge: 'En vivo',
-        badgeClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
+        badgeClass: 'bg-success-soft text-success',
         enDesarrollo: true,
     },
     {
@@ -174,9 +184,9 @@ const MODULOS_CLIENTE: Modulo[] = [
         descripcion: 'Revisá tus aportes, los comprobantes y el historial de tus donaciones.',
         cta: 'Ver Mis Donaciones',
         icono: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-        iconoBg: 'bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario',
+        iconoBg: 'bg-primary-soft text-primary',
         badge: 'Historial',
-        badgeClass: 'bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario',
+        badgeClass: 'bg-primary-soft text-primary',
         enDesarrollo: true,
     },
     {
@@ -185,9 +195,9 @@ const MODULOS_CLIENTE: Modulo[] = [
         descripcion: 'Descubrí las convocatorias abiertas y postulate como voluntario.',
         cta: 'Explorar Voluntariados',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+        iconoBg: 'bg-warning-soft text-warning',
         badge: 'Activo',
-        badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
+        badgeClass: 'bg-warning-soft text-warning',
         enDesarrollo: true,
     },
     {
@@ -196,82 +206,115 @@ const MODULOS_CLIENTE: Modulo[] = [
         descripcion: 'Consultá los voluntariados en los que te inscribiste y los detalles de cada uno.',
         cta: 'Ver Postulaciones',
         icono: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-        iconoBg: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
+        iconoBg: 'bg-error-soft text-error',
         badge: 'En desarrollo',
-        badgeClass: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-200',
+        badgeClass: 'bg-error-soft text-error',
         enDesarrollo: true,
     },
 ];
+
+// Retardos escalonados sin estilos inline
+const RETARDOS = [
+    '[animation-delay:60ms]',
+    '[animation-delay:120ms]',
+    '[animation-delay:180ms]',
+    '[animation-delay:240ms]',
+    '[animation-delay:300ms]',
+];
+
+const retardo = (i: number): string => RETARDOS[Math.min(i, RETARDOS.length - 1)];
 
 // =====================================================
 // SUBCOMPONENTES
 // =====================================================
 const KpiCard = ({ kpi, index }: { kpi: Kpi; index: number }) => (
     <div
-        className="anim-rise group relative overflow-hidden bg-claro-tarjeta dark:bg-oscuro-tarjeta p-5 rounded-2xl border border-claro-borde dark:border-oscuro-borde shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft motion-safe:hover:-translate-y-0.5 hover:shadow-lift hover:border-claro-primario/25 dark:hover:border-oscuro-primario/35"
-        style={{ animationDelay: `${60 + index * 60}ms` }}
+        className={`anim-rise group relative overflow-hidden rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/40 hover:shadow-lift motion-safe:hover:-translate-y-0.5 ${retardo(index)}`}
     >
-        <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] uppercase font-bold tracking-wider text-claro-texto2 dark:text-oscuro-texto2">
+        <div className="mb-3 flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-text-muted">
                 {kpi.etiqueta}
             </span>
-            <span className={`flex items-center justify-center w-9 h-9 rounded-xl ${kpi.acento}`}>
-                <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${kpi.acento}`}>
+                <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={kpi.icono} />
                 </svg>
             </span>
         </div>
-        <div className="text-2xl md:text-[1.75rem] font-bold leading-tight tabular-nums text-claro-texto dark:text-oscuro-texto">
+
+        <div className="font-display text-2xl font-extrabold leading-tight tracking-[-0.02em] text-text tabular-nums md:text-[1.75rem]">
             {kpi.valor}
         </div>
-        <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2 mt-1">{kpi.detalle}</p>
+
+        <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="text-xs text-text-muted">{kpi.detalle}</p>
+            <span
+                className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                    kpi.tendencia === 'up'
+                        ? 'bg-success-soft text-success'
+                        : 'bg-surface-inset text-text-subtle'
+                }`}
+            >
+                {kpi.tendencia === 'up' && (
+                    <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" />
+                    </svg>
+                )}
+                {kpi.delta}
+            </span>
+        </div>
     </div>
 );
 
 const ModuloCard = ({ modulo, index }: { modulo: Modulo; index: number }) => (
     <div
-        className="anim-rise group bg-claro-tarjeta dark:bg-oscuro-tarjeta p-6 rounded-3xl border border-claro-borde dark:border-oscuro-borde shadow-soft flex flex-col justify-between transition-[transform,box-shadow,border-color] duration-300 ease-out-soft motion-safe:hover:-translate-y-1 hover:shadow-lift hover:border-claro-primario/35 dark:hover:border-oscuro-primario/45"
-        style={{ animationDelay: `${Math.min(60 + index * 45, 320)}ms` }}
+        className={`anim-rise group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface-elevated p-6 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/45 hover:shadow-lift motion-safe:hover:-translate-y-1 ${retardo(index)}`}
     >
+        <span
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[2px] w-0 bg-linear-to-r from-accent to-accent/30 transition-[width] duration-300 ease-out-soft group-hover:w-full"
+        />
+
         <div>
             <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${modulo.iconoBg} transition-transform duration-300 ease-out-soft motion-safe:group-hover:scale-105`}>
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={modulo.icono} />
                 </svg>
             </div>
 
-            <div className="flex items-start justify-between gap-3 mb-2">
-                <h3 className="text-xl font-bold leading-snug text-claro-texto dark:text-oscuro-texto">
+            <div className="mb-2 flex items-start justify-between gap-3">
+                <h3 className="font-display text-[1.05rem] font-bold leading-snug tracking-[-0.01em] text-text">
                     {modulo.titulo}
                 </h3>
                 {modulo.badge && (
-                    <span className={`shrink-0 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${modulo.badgeClass}`}>
+                    <span className={`shrink-0 rounded-full border border-current/20 px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.12em] ${modulo.badgeClass}`}>
                         {modulo.badge}
                     </span>
                 )}
             </div>
 
-            <p className="text-claro-texto2 dark:text-oscuro-texto2 text-sm leading-relaxed mb-6">
+            <p className="mb-6 text-sm leading-relaxed text-text-muted">
                 {modulo.descripcion}
             </p>
         </div>
 
         {modulo.enDesarrollo ? (
             <span
-                className="w-full py-3 px-4 rounded-xl font-semibold text-sm text-center bg-claro-tinte dark:bg-oscuro-tinte text-claro-texto2/80 dark:text-oscuro-texto2/80 opacity-60 cursor-not-allowed pointer-events-none select-none"
+                className="pointer-events-none flex w-full select-none items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-4 py-3 text-center text-[12px] font-semibold text-text-subtle"
                 aria-disabled="true"
                 title="Módulo en desarrollo"
             >
+                <span className="h-1.5 w-1.5 rounded-full bg-warning" />
                 En desarrollo
             </span>
         ) : (
             <Link
                 to={modulo.to}
-                className="press w-full py-3 px-4 rounded-xl font-semibold text-sm text-center bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:hover:bg-oscuro-hover text-white dark:text-oscuro-fondo shadow-[0_14px_30px_-18px_rgba(14,110,109,0.8)] transition-colors duration-200 flex items-center justify-center gap-2"
+                className="press flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-center text-[12.5px] font-bold text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift"
             >
                 <span>{modulo.cta}</span>
                 <svg
-                    className="w-4 h-4 transition-transform duration-200 ease-out-soft motion-safe:group-hover:translate-x-0.5"
+                    className="h-4 w-4 transition-transform duration-200 ease-out-soft motion-safe:group-hover:translate-x-0.5"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -310,147 +353,264 @@ const Dashboard = () => {
             ? MODULOS_EMPLEADO
             : MODULOS_CLIENTE;
 
+    const iniciales = usuario?.nombre ? usuario.nombre.charAt(0).toUpperCase() : 'U';
+
     return (
-        <div className="space-y-8 pb-10">
+        <div className="pb-10">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
 
-            {/* =========================================================
-                1. CABECERA PERSONAL
-               ========================================================= */}
-            <div className="anim-rise relative overflow-hidden rounded-3xl bg-linear-to-br from-arena-base via-arena-deep to-arena-night p-8 md:p-10 text-arena-ivory shadow-lift border border-white/10">
-                <div aria-hidden="true" className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-arena-accent/20 blur-3xl pointer-events-none" />
-                <div aria-hidden="true" className="absolute right-32 -bottom-20 w-72 h-72 rounded-full bg-arena-wine/25 blur-3xl pointer-events-none" />
-                <div
-                    aria-hidden="true"
-                    className="absolute inset-0 pointer-events-none opacity-[0.06] [background-size:28px_28px] bg-[radial-gradient(#f6f3ea_1px,transparent_1px)]"
-                />
+                {/* =========================================================
+                    COLUMNA PRINCIPAL
+                   ========================================================= */}
+                <div className="space-y-8">
 
-                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-7">
-                    <div className="space-y-3">
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-arena-ivory">
-                                <span className="w-2 h-2 rounded-full bg-arena-accent motion-safe:animate-pulse" />
-                                Sesión activa
-                            </span>
-                            <span className="text-xs uppercase tracking-wider text-arena-ivory/65 capitalize">
-                                {fechaFormateada}
+                    {/* 1. CABECERA PERSONAL */}
+                    <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-8 text-cream shadow-lift md:p-10">
+                        <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
+                        <div
+                            aria-hidden="true"
+                            className="motion-safe:animate-float-slow pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-gold/25 blur-3xl"
+                        />
+
+                        <div className="relative z-10 flex flex-col justify-between gap-7 lg:flex-row lg:items-center">
+                            <div className="space-y-3.5">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cream backdrop-blur-md">
+                                        <span className="motion-safe:animate-pulse-dot h-1.5 w-1.5 rounded-full bg-gold" />
+                                        Sesión activa
+                                    </span>
+                                    <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-cream/50 capitalize">
+                                        {fechaFormateada}
+                                    </span>
+                                </div>
+
+                                <h1 className="font-display text-3xl font-extrabold leading-[1.05] tracking-[-0.035em] text-balance text-cream md:text-4xl lg:text-[2.6rem]">
+                                    {getSaludo()}, {usuario?.nombre || 'Usuario'}
+                                </h1>
+
+                                <p className="max-w-xl text-sm leading-relaxed text-cream/70 md:text-base">
+                                    Panel de{' '}
+                                    <span className="font-semibold text-gold-bright">
+                                        {usuario?.rol || 'Usuario'}
+                                    </span>
+                                    . Supervisá usuarios, beneficiarios y actividad de la plataforma
+                                    en tiempo real.
+                                </p>
+                            </div>
+
+                            <div className="flex shrink-0 flex-wrap items-center gap-3">
+                                <Link
+                                    to="/"
+                                    className="press inline-flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/[0.06] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/85 backdrop-blur-md hover:border-cream/35 hover:bg-cream/[0.12] hover:text-cream"
+                                    title="Volver a la página principal"
+                                >
+                                    <svg className="h-4 w-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    <span>Ir al Home</span>
+                                </Link>
+
+                                {esAdmin ? (
+                                    <Link
+                                        to="/usuarios"
+                                        className="press inline-flex items-center gap-2.5 rounded-xl bg-gold px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-night shadow-glow hover:bg-gold-bright"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                        <span>Ver usuarios</span>
+                                    </Link>
+                                ) : (
+                                    <span
+                                        className="pointer-events-none inline-flex select-none items-center gap-2.5 rounded-xl border border-cream/15 bg-cream/[0.04] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/45"
+                                        aria-disabled="true"
+                                        title="Módulo en desarrollo"
+                                    >
+                                        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                                        En desarrollo
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 2. MÉTRICAS KPI */}
+                    <section className="grid grid-cols-2 gap-4 md:gap-5 xl:grid-cols-4">
+                        {KPIS.map((kpi, i) => (
+                            <KpiCard key={kpi.etiqueta} kpi={kpi} index={i} />
+                        ))}
+                    </section>
+
+                    {/* 3. MÓDULOS DE GESTIÓN */}
+                    <section>
+                        <div className="anim-rise mb-6 flex flex-wrap items-end justify-between gap-3 [animation-delay:120ms]">
+                            <div>
+                                <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-text">
+                                    Módulos de gestión
+                                </h2>
+                                <p className="mt-1 text-sm text-text-muted">
+                                    Seleccioná un módulo para empezar a operar.
+                                </p>
+                            </div>
+                            <span className="rounded-full border border-border bg-surface-elevated px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-text-muted shadow-soft">
+                                {modulos.length} {modulos.length === 1 ? 'módulo' : 'módulos'}
                             </span>
                         </div>
 
-                        <h1 className="text-3xl md:text-4xl lg:text-[2.9rem] font-extrabold tracking-tight leading-[1.08] text-arena-ivory text-balance">
-                            {getSaludo()}, {usuario?.nombre || 'Usuario'} 👋
-                        </h1>
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+                            {modulos.map((modulo, i) => (
+                                <ModuloCard key={modulo.to + modulo.titulo} modulo={modulo} index={i} />
+                            ))}
+                        </div>
+                    </section>
 
-                        <p className="text-arena-ivory/75 text-base md:text-lg max-w-xl">
-                            Panel de <span className="font-semibold text-arena-accent-soft">{usuario?.rol || 'Usuario'}</span>. Supervisá usuarios, beneficiarios y actividad de la plataforma en tiempo real.
-                        </p>
-                    </div>
+                    {/* 4. BARRA INFORMATIVA */}
+                    <section className="anim-rise flex flex-col items-start justify-between gap-5 rounded-2xl border border-border bg-surface-elevated p-6 shadow-soft [animation-delay:200ms] md:flex-row md:items-center">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 className="font-display text-[0.95rem] font-bold text-text">
+                                    Sistema de Donaciones y Voluntariados
+                                </h4>
+                                <p className="mt-1 text-xs leading-relaxed text-text-muted">
+                                    Plataforma disponible las 24 horas · Conectamos donaciones,
+                                    campañas y voluntariados en un solo lugar.
+                                </p>
+                            </div>
+                        </div>
 
-                    <div className="flex flex-wrap items-center gap-3 shrink-0">
-                        <Link
-                            to="/"
-                            className="press motion-safe:hover:-translate-y-0.5 inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 text-arena-ivory font-semibold text-sm backdrop-blur-md shadow-soft"
-                            title="Volver a la página principal"
-                        >
-                            <svg className="w-5 h-5 text-arena-accent-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <span>Volver al Home</span>
-                        </Link>
-
-                        {esAdmin ? (
+                        <div className="flex w-full shrink-0 items-center gap-3 md:w-auto">
                             <Link
-                                to="/usuarios"
-                                className="press motion-safe:hover:-translate-y-0.5 inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-arena-accent hover:bg-arena-accent-hover text-arena-ink font-semibold text-sm shadow-[0_18px_36px_-18px_rgba(245,178,103,0.7)]"
+                                to="/perfil"
+                                className="press flex-1 rounded-xl border border-border bg-surface px-4 py-2.5 text-center text-[11.5px] font-bold text-text-muted hover:border-accent/50 hover:bg-accent-soft hover:text-text md:flex-none"
                             >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                <span>Explorar Usuarios</span>
+                                Mi perfil
                             </Link>
-                        ) : (
-                            <span
-                                className="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white/10 border border-white/20 text-arena-ivory font-semibold text-sm opacity-60 cursor-not-allowed pointer-events-none select-none backdrop-blur-md"
-                                aria-disabled="true"
-                                title="Módulo en desarrollo"
+                            <Link
+                                to="/"
+                                className="press flex-1 rounded-xl bg-primary px-4 py-2.5 text-center text-[11.5px] font-bold text-on-primary shadow-soft hover:bg-primary-hover md:flex-none"
                             >
-                                <svg className="w-5 h-5 text-arena-accent-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                <span>En desarrollo</span>
+                                Ver landing
+                            </Link>
+                        </div>
+                    </section>
+                </div>
+
+                {/* =========================================================
+                    PANEL LATERAL
+                   ========================================================= */}
+                <aside className="space-y-5 xl:sticky xl:top-4 xl:self-start">
+
+                    {/* Cuenta */}
+                    <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:100ms]">
+                        <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-text-subtle">
+                            Tu cuenta
+                        </p>
+
+                        <div className="mt-4 flex items-center gap-3">
+                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary font-display text-lg font-bold text-on-primary">
+                                {iniciales}
                             </span>
-                        )}
+                            <div className="min-w-0">
+                                <p className="truncate font-display text-sm font-bold text-text">
+                                    {usuario?.nombre || 'Usuario'}
+                                </p>
+                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent-text">
+                                    {usuario?.rol || 'Usuario'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-5 flex flex-col gap-2">
+                            <Link
+                                to="/perfil"
+                                className="press flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[12px] font-semibold text-text hover:border-accent/50 hover:bg-accent-soft"
+                            >
+                                Editar mi perfil
+                                <svg className="h-3.5 w-3.5 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+
+                            {esAdmin && (
+                                <Link
+                                    to="/usuarios"
+                                    className="press flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[12px] font-semibold text-text hover:border-accent/50 hover:bg-accent-soft"
+                                >
+                                    Gestionar usuarios
+                                    <svg className="h-3.5 w-3.5 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </Link>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            {/* =========================================================
-                2. MÉTRICAS KPI
-               ========================================================= */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-                {KPIS.map((kpi, i) => (
-                    <KpiCard key={kpi.etiqueta} kpi={kpi} index={i} />
-                ))}
-            </div>
-
-            {/* =========================================================
-                3. MÓDULOS DE GESTIÓN
-               ========================================================= */}
-            <div>
-                <div className="anim-rise flex flex-wrap items-end justify-between gap-3 mb-6 [animation-delay:120ms]">
-                    <div>
-                        <h2 className="text-2xl font-bold tracking-tight text-claro-texto dark:text-oscuro-texto">
-                            Módulos de gestión
-                        </h2>
-                        <p className="text-sm text-claro-texto2 dark:text-oscuro-texto2">
-                            Seleccioná un módulo para empezar a operar.
+                    {/* Estado del sistema */}
+                    <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:160ms]">
+                        <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-text-subtle">
+                            Estado del sistema
                         </p>
-                    </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full border border-claro-borde dark:border-oscuro-borde bg-claro-tarjeta dark:bg-oscuro-tarjeta text-claro-texto2 dark:text-oscuro-texto2">
-                        {modulos.length} {modulos.length === 1 ? 'módulo disponible' : 'módulos disponibles'}
-                    </span>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-                    {modulos.map((modulo, i) => (
-                        <ModuloCard key={modulo.to + modulo.titulo} modulo={modulo} index={i} />
-                    ))}
-                </div>
-            </div>
+                        <ul className="mt-4 space-y-3.5">
+                            {[
+                                { nombre: 'Autenticación', estado: 'Operativo' },
+                                { nombre: 'Donaciones', estado: 'Operativo' },
+                                { nombre: 'Voluntariados', estado: 'Operativo' },
+                                { nombre: 'Reportes', estado: 'En desarrollo', alerta: true },
+                            ].map((servicio) => (
+                                <li key={servicio.nombre} className="flex items-center justify-between gap-3">
+                                    <span className="text-[12.5px] font-medium text-text-muted">
+                                        {servicio.nombre}
+                                    </span>
+                                    <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-text-subtle">
+                                        <span
+                                            className={`h-1.5 w-1.5 rounded-full ${servicio.alerta ? 'bg-warning' : 'bg-success'}`}
+                                        />
+                                        {servicio.estado}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
 
-            {/* =========================================================
-                4. BARRA INFORMATIVA
-               ========================================================= */}
-            <div className="anim-rise rounded-3xl bg-claro-tarjeta dark:bg-oscuro-tarjeta border border-claro-borde dark:border-oscuro-borde shadow-soft p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 [animation-delay:200ms]">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-claro-primario/10 dark:bg-oscuro-primario/10 text-claro-primario dark:text-oscuro-primario flex items-center justify-center shrink-0">
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
+                        <div className="mt-5 rounded-xl bg-surface px-3.5 py-3">
+                            <p className="text-[11px] leading-relaxed text-text-subtle">
+                                Los módulos en desarrollo se habilitarán en la próxima versión de la
+                                plataforma.
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h4 className="font-bold text-claro-texto dark:text-oscuro-texto">
-                            Sistema de Donaciones y Voluntariados
-                        </h4>
-                        <p className="text-xs leading-relaxed text-claro-texto2 dark:text-oscuro-texto2">
-                            Plataforma disponible las 24 horas · Conectamos donaciones, campañas y voluntariados en un solo lugar.
+
+                    {/* Soporte */}
+                    <div className="anim-rise relative overflow-hidden rounded-2xl border border-cream/10 bg-night p-5 text-cream shadow-lift [animation-delay:220ms]">
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold/20 blur-2xl"
+                        />
+                        <p className="relative text-[9.5px] font-bold uppercase tracking-[0.22em] text-cream/45">
+                            Soporte
                         </p>
+                        <p className="relative mt-3 font-display text-sm font-bold leading-snug">
+                            ¿Necesitás ayuda con tu cuenta?
+                        </p>
+                        <p className="relative mt-1.5 text-[11.5px] leading-relaxed text-cream/60">
+                            Escribinos y te respondemos en horario de oficina.
+                        </p>
+                        <a
+                            href="#contacto"
+                            className="press relative mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-cream/20 bg-cream/[0.06] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-cream hover:border-gold/50 hover:text-gold-bright"
+                        >
+                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Contactar soporte
+                        </a>
                     </div>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0 w-full md:w-auto">
-                    <Link
-                        to="/perfil"
-                        className="press flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-semibold text-center border border-claro-borde dark:border-oscuro-borde hover:bg-claro-tinte dark:hover:bg-oscuro-tinte text-claro-primario dark:text-oscuro-primario transition-colors duration-200"
-                    >
-                        Mi Perfil
-                    </Link>
-                    <Link
-                        to="/"
-                        className="press flex-1 md:flex-none px-4 py-2 rounded-xl text-xs font-semibold text-center bg-claro-primario hover:bg-claro-hover dark:bg-oscuro-primario dark:hover:bg-oscuro-hover text-white dark:text-oscuro-fondo shadow-[0_12px_26px_-16px_rgba(14,110,109,0.8)] transition-colors duration-200"
-                    >
-                        Ver Landing Page
-                    </Link>
-                </div>
+                </aside>
             </div>
         </div>
     );

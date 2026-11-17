@@ -42,6 +42,18 @@ interface UsuarioModalProps {
 }
 
 // =====================================================
+// ESTILOS COMPARTIDOS
+// =====================================================
+const etiquetaCampo =
+    'mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.14em] text-text-muted';
+
+const tituloSeccion =
+    'flex items-center gap-2.5 font-display text-[11px] font-bold uppercase tracking-[0.16em] text-text';
+
+const claseSelect =
+    'w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text transition-[border-color,box-shadow] duration-200 hover:border-border-strong focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15';
+
+// =====================================================
 // COMPONENTE
 // =====================================================
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
@@ -286,7 +298,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     return createPortal(
         <div
-            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-arena-night/70 p-4 backdrop-blur-sm"
+            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 p-4 backdrop-blur-md"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}
@@ -295,13 +307,17 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-usuario"
-                className="animate-modal-in flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-claro-borde bg-claro-tarjeta shadow-lift dark:border-oscuro-borde dark:bg-oscuro-tarjeta"
+                className="anim-scale flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
             >
+                <span
+                    aria-hidden="true"
+                    className="h-[3px] w-full shrink-0 bg-linear-to-r from-accent via-accent/40 to-transparent"
+                />
 
                 {/* Cabecera */}
-                <div className="flex shrink-0 items-center justify-between border-b border-claro-borde px-6 py-4 dark:border-oscuro-borde">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-6 py-4">
                     <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-claro-primario/10 text-claro-primario dark:bg-oscuro-primario/15 dark:text-oscuro-primario">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
                             <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -309,11 +325,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         <div>
                             <h2
                                 id="titulo-modal-usuario"
-                                className="text-lg font-bold tracking-tight text-claro-texto dark:text-oscuro-texto"
+                                className="font-display text-base font-bold tracking-[-0.02em] text-text"
                             >
                                 {modoEdicion ? 'Editar usuario' : 'Nuevo usuario'}
                             </h2>
-                            <p className="text-xs text-claro-texto2 dark:text-oscuro-texto2">
+                            <p className="mt-0.5 text-xs text-text-muted">
                                 {modoEdicion
                                     ? 'Actualizá los datos del perfil seleccionado.'
                                     : 'Completá los datos para registrar una nueva cuenta.'}
@@ -324,9 +340,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         type="button"
                         onClick={onClose}
                         aria-label="Cerrar"
-                        className="press rounded-xl p-2 text-claro-texto2 hover:bg-claro-tinte hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-tinte dark:hover:text-oscuro-texto"
+                        className="press rounded-xl p-2 text-text-muted hover:bg-surface-inset hover:text-text"
                     >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -340,14 +356,16 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     noValidate
                 >
                     {/* === DATOS BÁSICOS === */}
-                    <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em]">
+                    <h3 className={tituloSeccion}>
+                        <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
                         Datos básicos
                     </h3>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Nombre *</label>
+                            <label htmlFor="modal-nombre" className={etiquetaCampo}>Nombre *</label>
                             <input
+                                id="modal-nombre"
                                 type="text" name="nombre"
                                 value={formData.nombre} onChange={handleChange} onBlur={handleBlur}
                                 maxLength={50}
@@ -356,8 +374,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             <FieldError error={errores.nombre} touched={touched.nombre} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Ap. Paterno *</label>
+                            <label htmlFor="modal-paterno" className={etiquetaCampo}>Ap. paterno *</label>
                             <input
+                                id="modal-paterno"
                                 type="text" name="paterno"
                                 value={formData.paterno} onChange={handleChange} onBlur={handleBlur}
                                 maxLength={50}
@@ -366,8 +385,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             <FieldError error={errores.paterno} touched={touched.paterno} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Ap. Materno</label>
+                            <label htmlFor="modal-materno" className={etiquetaCampo}>Ap. materno</label>
                             <input
+                                id="modal-materno"
                                 type="text" name="materno"
                                 value={formData.materno} onChange={handleChange} onBlur={handleBlur}
                                 maxLength={50}
@@ -377,10 +397,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Correo *</label>
+                            <label htmlFor="modal-correo" className={etiquetaCampo}>Correo *</label>
                             <input
+                                id="modal-correo"
                                 type="email" name="correo"
                                 value={formData.correo} onChange={handleChange} onBlur={handleBlur}
                                 maxLength={150}
@@ -389,8 +410,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             <FieldError error={errores.correo} touched={touched.correo} />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Teléfono *</label>
+                            <label htmlFor="modal-telefono" className={etiquetaCampo}>Teléfono *</label>
                             <input
+                                id="modal-telefono"
                                 type="tel" name="telefono"
                                 inputMode="numeric"
                                 value={formData.telefono} onChange={handleChange} onBlur={handleBlur}
@@ -401,14 +423,15 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Rol *</label>
+                            <label htmlFor="modal-rol" className={etiquetaCampo}>Rol *</label>
                             <select
+                                id="modal-rol"
                                 name="rol"
                                 value={formData.rol}
                                 onChange={handleRolChange}
-                                className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
+                                className={claseSelect}
                             >
                                 <option value="Cliente">{getRolDisplay('Cliente')}</option>
                                 <option value="Empleado">{getRolDisplay('Empleado')}</option>
@@ -416,23 +439,25 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Estado</label>
+                            <label htmlFor="modal-estado" className={etiquetaCampo}>Estado</label>
                             <select
+                                id="modal-estado"
                                 name="estado"
                                 value={formData.estado}
                                 onChange={handleChange}
-                                className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
+                                className={claseSelect}
                             >
                                 <option value="Activo">Activo</option>
                                 <option value="Inactivo">Inactivo</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">
+                            <label htmlFor="modal-password" className={etiquetaCampo}>
                                 Contraseña {modoEdicion ? '(opcional)' : '*'}
                             </label>
                             <div className="relative">
                                 <input
+                                    id="modal-password"
                                     type={mostrarContraseña ? 'text' : 'password'}
                                     name="contraseña"
                                     value={formData.contraseña}
@@ -440,12 +465,12 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     onBlur={handleBlur}
                                     placeholder={modoEdicion ? 'Dejar vacío' : '••••••••'}
                                     maxLength={100}
-                                    className={claseInput(errores.contraseña, touched.contraseña)}
+                                    className={`${claseInput(errores.contraseña, touched.contraseña)} pr-20`}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setMostrarContraseña(!mostrarContraseña)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-claro-texto2 hover:text-claro-primario dark:text-oscuro-texto2 dark:hover:text-oscuro-primario font-medium transition-colors"
+                                    className="press absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-text-muted hover:bg-surface-inset hover:text-text"
                                     tabIndex={-1}
                                 >
                                     {mostrarContraseña ? 'Ocultar' : 'Mostrar'}
@@ -458,14 +483,16 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === DATOS PERSONALES (SOLO CLIENTE) === */}
                     {esCliente && (
                         <>
-                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
+                            <h3 className={`${tituloSeccion} pt-3`}>
+                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
                                 Datos personales
                             </h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">CI / NIT</label>
+                                    <label htmlFor="modal-ci" className={etiquetaCampo}>CI / NIT</label>
                                     <input
+                                        id="modal-ci"
                                         type="text" name="ci_nit"
                                         inputMode="numeric"
                                         value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
@@ -475,8 +502,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Fecha de nacimiento</label>
+                                    <label htmlFor="modal-fecha-nacimiento" className={etiquetaCampo}>Fecha de nacimiento</label>
                                     <input
+                                        id="modal-fecha-nacimiento"
                                         type="date" name="fecha_nacimiento"
                                         value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
                                         max={fechaMaximaStr}
@@ -485,9 +513,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
                                         <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
                                     ) : (
-                                        <p className="text-xs mt-1 min-h-[16px] text-claro-texto2 dark:text-oscuro-texto2">
+                                        <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
                                             {edadCalculada !== null ? (
-                                                <>Edad: <span className="font-semibold text-claro-primario dark:text-oscuro-primario">{edadCalculada} años</span></>
+                                                <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
                                             ) : '\u00A0'}
                                         </p>
                                     )}
@@ -495,8 +523,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Calle / Avenida</label>
+                                <label htmlFor="modal-calle" className={etiquetaCampo}>Calle / Avenida</label>
                                 <input
+                                    id="modal-calle"
                                     type="text" name="calle"
                                     value={formData.calle} onChange={handleChange} onBlur={handleBlur}
                                     maxLength={150}
@@ -505,10 +534,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 <FieldError error={errores.calle} touched={touched.calle} />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Zona / Barrio</label>
+                                    <label htmlFor="modal-zona" className={etiquetaCampo}>Zona / Barrio</label>
                                     <input
+                                        id="modal-zona"
                                         type="text" name="zona"
                                         value={formData.zona} onChange={handleChange} onBlur={handleBlur}
                                         maxLength={100}
@@ -517,8 +547,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <FieldError error={errores.zona} touched={touched.zona} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Ciudad</label>
+                                    <label htmlFor="modal-ciudad" className={etiquetaCampo}>Ciudad</label>
                                     <input
+                                        id="modal-ciudad"
                                         type="text" name="ciudad"
                                         value={formData.ciudad} onChange={handleChange} onBlur={handleBlur}
                                         maxLength={100}
@@ -533,14 +564,16 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === CAMPOS EMPLEADO === */}
                     {esEmpleado && (
                         <>
-                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
+                            <h3 className={`${tituloSeccion} pt-3`}>
+                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
                                 Datos de voluntariado
                             </h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Fecha de incorporación *</label>
+                                    <label htmlFor="modal-fecha-contratacion" className={etiquetaCampo}>Fecha de incorporación *</label>
                                     <input
+                                        id="modal-fecha-contratacion"
                                         type="date" name="fecha_contratacion"
                                         value={formData.fecha_contratacion} onChange={handleChange} onBlur={handleBlur}
                                         className={claseInput(errores.fecha_contratacion, touched.fecha_contratacion)}
@@ -548,8 +581,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <FieldError error={errores.fecha_contratacion} touched={touched.fecha_contratacion} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Cargo *</label>
+                                    <label htmlFor="modal-cargo" className={etiquetaCampo}>Cargo *</label>
                                     <input
+                                        id="modal-cargo"
                                         type="text" name="cargo"
                                         value={formData.cargo} onChange={handleChange} onBlur={handleBlur}
                                         placeholder="Ej: Coordinador de voluntariado"
@@ -559,12 +593,13 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <FieldError error={errores.cargo} touched={touched.cargo} />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Turno *</label>
+                                    <label htmlFor="modal-turno" className={etiquetaCampo}>Turno *</label>
                                     <select
+                                        id="modal-turno"
                                         name="turno"
                                         value={formData.turno}
                                         onChange={handleChange}
-                                        className="w-full rounded-xl border border-claro-borde bg-claro-fondo px-3 py-2.5 text-claro-texto transition-[border-color,box-shadow] duration-200 focus:outline-none focus:ring-2 focus:ring-claro-primario/35 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto dark:focus:ring-oscuro-primario/35"
+                                        className={claseSelect}
                                     >
                                         <option value="Mañana">Mañana</option>
                                         <option value="Tarde">Tarde</option>
@@ -578,12 +613,14 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     {/* === CAMPOS ADMIN === */}
                     {esAdmin && (
                         <>
-                            <h3 className="text-[11px] font-bold text-claro-primario dark:text-oscuro-primario uppercase tracking-[0.16em] pt-2">
+                            <h3 className={`${tituloSeccion} pt-3`}>
+                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
                                 Datos del administrador
                             </h3>
                             <div>
-                                <label className="block text-sm font-medium text-claro-texto2 dark:text-oscuro-texto2 mb-1">Nivel de acceso *</label>
+                                <label htmlFor="modal-nivel" className={etiquetaCampo}>Nivel de acceso *</label>
                                 <select
+                                    id="modal-nivel"
                                     name="nivel_acceso"
                                     value={formData.nivel_acceso}
                                     onChange={handleChange} onBlur={handleBlur}
@@ -599,18 +636,24 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     )}
 
                     {error && (
-                        <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700 dark:border-red-800/70 dark:bg-red-900/25 dark:text-red-300">
+                        <div
+                            role="alert"
+                            className="anim-fade flex items-start gap-2.5 rounded-xl border border-error/30 bg-error-soft p-3 text-sm font-medium text-error"
+                        >
+                            <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                            </svg>
                             {error}
                         </div>
                     )}
                 </form>
 
                 {/* Pie con botones */}
-                <div className="flex shrink-0 justify-end gap-3 border-t border-claro-borde px-6 py-4 dark:border-oscuro-borde">
+                <div className="flex shrink-0 justify-end gap-3 border-t border-border bg-surface px-6 py-4">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="press rounded-xl px-5 py-2 text-sm font-semibold text-claro-texto2 hover:bg-claro-tinte hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-tinte dark:hover:text-oscuro-texto"
+                        className="press rounded-xl border border-border bg-surface-elevated px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text"
                     >
                         Cancelar
                     </button>
@@ -618,12 +661,15 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         type="submit"
                         form="form-usuario"
                         disabled={cargando}
-                        className={`press rounded-xl px-5 py-2 text-sm font-semibold shadow-soft
+                        className={`press inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] shadow-soft
                             ${cargando
-                                ? 'bg-claro-borde text-claro-texto2 dark:bg-oscuro-borde dark:text-oscuro-texto2 cursor-not-allowed'
-                                : 'bg-claro-primario text-white hover:bg-claro-hover dark:bg-oscuro-primario dark:text-oscuro-fondo dark:hover:bg-oscuro-hover'}`}
+                                ? 'cursor-wait bg-surface-inset text-text-subtle'
+                                : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'}`}
                     >
-                        {cargando ? 'Guardando...' : 'Guardar'}
+                        {cargando && (
+                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
+                        )}
+                        {cargando ? 'Guardando…' : 'Guardar'}
                     </button>
                 </div>
             </div>

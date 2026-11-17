@@ -26,19 +26,25 @@ interface Touched {
 type CampoLogin = 'correo' | 'contraseña';
 
 // =====================================================
-// ESTILOS DE CAMPO (sobre vidrio oscuro)
+// ESTILOS DE CAMPO (sobre la tarjeta de superficie)
 // =====================================================
 const campoBase =
-    'w-full rounded-xl border bg-white/[0.07] py-3 pl-11 pr-4 text-[15px] text-arena-ivory placeholder:text-arena-ivory/45 outline-none transition-[border-color,box-shadow,background-color] duration-200 focus:bg-white/[0.1] focus:ring-2';
+    'w-full rounded-xl border bg-surface-sunken py-3 pl-11 pr-4 text-[15px] text-text placeholder:text-text-subtle outline-none transition-[border-color,box-shadow,background-color] duration-200';
 
 const claseCampo = (conError: boolean, conPasswordToggle = false) =>
     `${campoBase} ${conPasswordToggle ? 'pr-12' : ''} ${conError
-        ? 'border-red-400/70 focus:border-red-400 focus:ring-red-400/25'
-        : 'border-white/15 hover:border-white/30 focus:border-arena-accent/70 focus:ring-arena-accent/20'
+        ? 'border-error/70 focus:border-error focus:ring-4 focus:ring-error/15'
+        : 'border-border hover:border-border-strong focus:border-accent focus:ring-4 focus:ring-accent/15'
     }`;
 
 const etiquetaCampo =
-    'mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-arena-ivory/65';
+    'mb-1.5 block text-[10.5px] font-bold uppercase tracking-[0.16em] text-text-muted';
+
+const BENEFICIOS = [
+    'Gestión transparente de donaciones',
+    'Registro ágil de voluntarios y beneficiarios',
+    'Coordinación de campañas en tiempo real',
+];
 
 // =====================================================
 // COMPONENTE
@@ -133,40 +139,35 @@ const Login = () => {
     };
 
     return (
-        <div className="relative min-h-screen w-full overflow-hidden bg-arena-base text-arena-ivory dark:bg-arena-night">
+        <div className="relative min-h-screen w-full overflow-hidden bg-night text-cream">
 
             {/* =====================================================
-                FONDO CONTINUO — una sola imagen a pantalla completa,
-                sin panel dividido a la mitad.
+                FONDO CONTINUO — imagen a pantalla completa
                 ===================================================== */}
             <img
                 src="/images/auth-complex.jpg"
                 alt=""
                 aria-hidden="true"
-                className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
+                className="absolute inset-0 h-full w-full object-cover object-center opacity-70"
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-linear-to-r from-arena-night/95 via-arena-night/80 to-arena-base/30"
+                className="absolute inset-0 bg-linear-to-r from-night via-night/92 to-night/45"
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-linear-to-t from-arena-base/90 via-transparent to-arena-night/60"
+                className="absolute inset-0 bg-linear-to-t from-night via-night/30 to-night/70"
             />
-            <div aria-hidden="true" className="pitch-lines pointer-events-none absolute inset-0 opacity-25" />
+            <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-40 right-[18%] h-[520px] w-[520px] rounded-full bg-arena-accent/[0.10] blur-[140px]"
-            />
-            <div
-                aria-hidden="true"
-                className="pointer-events-none absolute bottom-[-15%] left-[-10%] h-[420px] w-[420px] rounded-full bg-arena-accent/[0.08] blur-[130px]"
+                className="motion-safe:animate-float-slow pointer-events-none absolute -top-40 right-[12%] h-[520px] w-[520px] rounded-full bg-gold/[0.12] blur-[140px]"
             />
 
             {/* =====================================================
                 CONTENIDO
                 ===================================================== */}
-            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1240px] flex-col px-5 py-6 sm:px-8 lg:px-10">
+            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-5 py-6 sm:px-8 lg:px-10">
 
                 {/* Barra superior */}
                 <header className="flex items-center justify-between">
@@ -175,63 +176,58 @@ const Login = () => {
                         className="group flex items-center gap-3 rounded-xl"
                         title="Ir al inicio"
                     >
-                        <IconLogo className="h-9 w-9 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cream/10 bg-cream/[0.05] transition-colors duration-300 group-hover:border-gold/40">
+                            <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
+                        </span>
                         <span className="flex flex-col leading-none">
-                            <span className="text-[14px] font-extrabold uppercase tracking-[0.16em]">
-                                Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
+                            <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-cream">
+                                Donaciones <span className="text-gold">&amp; Voluntariados</span>
                             </span>
-                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/55">
-                                Plataforma de Gestión
+                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-cream/45">
+                                Plataforma de gestión
                             </span>
                         </span>
                     </Link>
 
-                    <div className="flex items-center gap-2.5">
-                        <ThemeToggle variant="dark" />
-                        <Link
-                            to="/"
-                            className="press inline-flex items-center gap-2 rounded-xl border border-white/15 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-arena-ivory/70 hover:border-white/30 hover:bg-white/5 hover:text-arena-ivory"
-                        >
-                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Volver
-                        </Link>
-                    </div>
+                    <Link
+                        to="/"
+                        className="press inline-flex items-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.03] px-3.5 py-2 text-[10.5px] font-bold uppercase tracking-[0.14em] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.07] hover:text-cream"
+                    >
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Volver
+                    </Link>
                 </header>
 
-                <main className="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-12">
+                <main className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:py-14">
 
                     {/* =====================================================
-                        COLUMNA IZQUIERDA: marca + propuesta de valor
+                        COLUMNA IZQUIERDA: mensaje
                         ===================================================== */}
                     <div className="hidden lg:block">
-                        <span className="anim-rise inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/70">
-                            <span className="h-px w-10 bg-arena-accent-soft" />
+                        <span className="anim-rise inline-flex items-center gap-3 text-[9.5px] font-bold uppercase tracking-[0.28em] text-cream/60">
+                            <span className="h-px w-10 bg-gold" />
                             Acceso a la plataforma
                         </span>
 
-                        <h1 className="anim-rise mt-6 text-5xl font-extrabold uppercase leading-[0.9] tracking-[-0.02em] text-balance xl:text-[3.7rem] [animation-delay:60ms]">
+                        <h1 className="anim-rise mt-6 font-display text-5xl font-extrabold leading-[0.94] tracking-[-0.035em] text-balance text-cream xl:text-[3.9rem] [animation-delay:60ms]">
                             Sumate a la
                             <br />
                             red solidaria.
                             <br />
-                            <span className="text-arena-accent-soft">Es tu momento.</span>
+                            <span className="text-gold-gradient">Es tu momento.</span>
                         </h1>
 
-                        <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-arena-ivory/75 [animation-delay:120ms]">
+                        <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-cream/70 [animation-delay:120ms]">
                             Tus donaciones, voluntariados y solicitudes en un solo lugar.
                             Conexión directa y seguimiento transparente.
                         </p>
 
                         <ul className="anim-rise mt-8 space-y-3.5 [animation-delay:180ms]">
-                            {[
-                                'Gestión transparente de donaciones',
-                                'Registro ágil de voluntarios y beneficiarios',
-                                'Coordinación de campañas en tiempo real',
-                            ].map((item) => (
-                                <li key={item} className="flex items-center gap-3 text-sm text-arena-ivory/80">
-                                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-arena-accent text-arena-ink">
+                            {BENEFICIOS.map((item) => (
+                                <li key={item} className="flex items-center gap-3 text-sm text-cream/75">
+                                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-gold text-night">
                                         <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
                                         </svg>
@@ -241,34 +237,39 @@ const Login = () => {
                             ))}
                         </ul>
 
-                        <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.18em] text-arena-ivory/50 [animation-delay:240ms]">
-                            <span>Comunidad Activa</span>
-                            <span className="h-1 w-1 rounded-full bg-arena-ivory/30" />
+                        <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/40 [animation-delay:240ms]">
+                            <span>Comunidad activa</span>
+                            <span className="h-1 w-1 rounded-full bg-cream/25" />
                             <span>4 roles</span>
-                            <span className="h-1 w-1 rounded-full bg-arena-ivory/30" />
+                            <span className="h-1 w-1 rounded-full bg-cream/25" />
                             <span>Sede La Paz</span>
                         </div>
                     </div>
 
                     {/* =====================================================
-                        COLUMNA DERECHA: formulario de vidrio
+                        COLUMNA DERECHA: tarjeta de acceso
                         ===================================================== */}
                     <div className="mx-auto w-full max-w-[460px]">
-                        <div className="anim-rise relative overflow-hidden rounded-[2rem] border border-white/15 bg-arena-deep/95 p-6 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:p-8 dark:bg-arena-panel/95">
+                        <div className="anim-rise relative overflow-hidden rounded-[1.75rem] border border-border bg-surface-elevated p-6 shadow-deep sm:p-8">
                             <span
                                 aria-hidden="true"
-                                className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-arena-accent via-arena-accent/40 to-transparent"
+                                className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-accent via-accent/40 to-transparent"
                             />
 
-                            <span className="inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/[0.05] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-arena-ivory/65">
-                                <span className="h-1.5 w-1.5 rounded-full bg-arena-accent" />
-                                Acceso Seguro
+                            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-text-muted">
+                                <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                                Acceso seguro
                             </span>
 
-                            <h2 className="mt-5 text-[1.7rem] font-extrabold uppercase leading-none tracking-tight text-arena-ivory">
-                                Iniciar sesión
-                            </h2>
-                            <p className="mt-2 text-sm text-arena-ivory/70">
+                            {/* Título + toggle de tema dentro de la tarjeta */}
+                            <div className="mt-5 flex items-start justify-between gap-4">
+                                <h2 className="font-display text-[1.75rem] font-extrabold leading-none tracking-[-0.03em] text-text">
+                                    Iniciar sesión
+                                </h2>
+                                <ThemeToggle />
+                            </div>
+
+                            <p className="mt-2.5 text-sm leading-relaxed text-text-muted">
                                 Ingresá con tu cuenta para acceder a la plataforma.
                             </p>
 
@@ -282,7 +283,7 @@ const Login = () => {
                                     <div className="group relative">
                                         <svg
                                             aria-hidden="true"
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-arena-ivory/30 transition-colors duration-200 group-focus-within:text-arena-accent-soft"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-text-subtle transition-colors duration-200 group-focus-within:text-accent-text"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                         >
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -314,7 +315,7 @@ const Login = () => {
                                     <div className="group relative">
                                         <svg
                                             aria-hidden="true"
-                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-arena-ivory/30 transition-colors duration-200 group-focus-within:text-arena-accent-soft"
+                                            className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-text-subtle transition-colors duration-200 group-focus-within:text-accent-text"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                         >
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -337,7 +338,7 @@ const Login = () => {
                                             onClick={() => setMostrarContraseña(!mostrarContraseña)}
                                             aria-label={mostrarContraseña ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                                             aria-pressed={mostrarContraseña}
-                                            className="press absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-arena-ivory/35 hover:bg-white/10 hover:text-arena-ivory"
+                                            className="press absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-text-subtle hover:bg-surface-inset hover:text-text"
                                         >
                                             {mostrarContraseña ? (
                                                 <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -357,7 +358,7 @@ const Login = () => {
                                 {error && (
                                     <div
                                         role="alert"
-                                        className="anim-fade flex items-start gap-2.5 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-sm font-medium text-red-200"
+                                        className="anim-fade flex items-start gap-2.5 rounded-xl border border-error/30 bg-error-soft p-3 text-sm font-medium text-error"
                                     >
                                         <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
@@ -369,7 +370,7 @@ const Login = () => {
                                 <div className="flex justify-end pt-1.5">
                                     <Link
                                         to="/solicitar-recuperacion"
-                                        className="rounded text-[12px] font-semibold text-arena-accent-soft underline-offset-4 hover:text-arena-ivory hover:underline"
+                                        className="rounded text-[12px] font-semibold text-accent-text underline-offset-4 hover:text-primary hover:underline"
                                     >
                                         ¿Olvidaste tu contraseña?
                                     </Link>
@@ -378,40 +379,40 @@ const Login = () => {
                                 <button
                                     type="submit"
                                     disabled={cargando}
-                                    className={`press mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-[13px] font-extrabold uppercase tracking-[0.14em]
+                                    className={`press mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-[12.5px] font-bold uppercase tracking-[0.14em] shadow-soft
                                         ${cargando
-                                            ? 'cursor-wait bg-white/15 text-arena-ivory/70'
-                                            : 'bg-arena-accent text-arena-ink shadow-[0_18px_36px_-18px_rgba(245,178,103,0.7)] hover:bg-arena-accent-hover'
+                                            ? 'cursor-wait bg-surface-inset text-text-subtle'
+                                            : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'
                                         }`}
                                 >
                                     {cargando && (
-                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-arena-ink/30 border-t-arena-ink" />
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
                                     )}
                                     {cargando ? 'Ingresando…' : 'Iniciar sesión'}
                                 </button>
 
                             </form>
 
-                            <p className="mt-6 border-t border-white/10 pt-5 text-center text-[13px] text-arena-ivory/65">
+                            <p className="mt-6 border-t border-border pt-5 text-center text-[13px] text-text-muted">
                                 ¿Todavía no tenés cuenta?{' '}
                                 <Link
                                     to="/registro"
-                                    className="rounded font-bold text-arena-ivory underline-offset-4 hover:text-arena-accent-soft hover:underline"
+                                    className="rounded font-bold text-primary underline-offset-4 hover:text-accent-text hover:underline"
                                 >
                                     Creá una gratis
                                 </Link>
                             </p>
                         </div>
 
-                        <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-arena-ivory/45">
+                        <p className="mt-4 text-center text-[9.5px] font-semibold uppercase tracking-[0.18em] text-cream/40">
                             Conexión segura · Donaciones y Voluntariados
                         </p>
                     </div>
                 </main>
 
-                <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-arena-ivory/45">
+                <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-cream/35">
                     <span>© {new Date().getFullYear()} Donaciones y Voluntariados</span>
-                    <span>Plataforma Solidaria</span>
+                    <span>Plataforma solidaria</span>
                 </footer>
             </div>
         </div>

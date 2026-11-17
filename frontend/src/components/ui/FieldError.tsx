@@ -9,8 +9,7 @@ const FieldError = ({ error, touched = true }: FieldErrorProps) => {
     return (
         <p
             className={`
-                text-red-600 dark:text-red-400 text-xs font-medium
-                mt-1 min-h-[16px]
+                mt-1.5 min-h-[18px] text-xs font-medium text-error
                 transition-opacity duration-150
                 ${mostrar ? 'opacity-100' : 'opacity-0'}
             `}

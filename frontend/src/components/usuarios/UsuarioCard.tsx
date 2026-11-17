@@ -28,18 +28,18 @@ const getRolBadgeClass = (rol?: string): string => {
   const r = (rol || '').toLowerCase();
 
   if (r === 'admin' || r === 'administrador') {
-    return 'bg-claro-primario/10 text-claro-primario border-claro-primario/25 dark:bg-oscuro-primario/15 dark:text-oscuro-primario dark:border-oscuro-primario/30';
+    return 'border-primary/25 bg-primary-soft text-primary';
   }
   if (r === 'donante' || r === 'cliente') {
-    return 'bg-claro-acento/10 text-claro-acento border-claro-acento/25 dark:bg-oscuro-acento/15 dark:text-oscuro-acento dark:border-oscuro-acento/30';
+    return 'border-accent/35 bg-accent-soft text-accent-text';
   }
   if (r === 'empleado' || r === 'voluntario') {
-    return 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-400/30';
+    return 'border-success/30 bg-success-soft text-success';
   }
   if (r === 'beneficiario') {
-    return 'bg-sky-500/10 text-sky-800 border-sky-500/25 dark:bg-sky-500/15 dark:text-sky-200 dark:border-sky-400/30';
+    return 'border-info/30 bg-info-soft text-info';
   }
-  return 'bg-claro-tinte text-claro-primario border-claro-borde dark:bg-oscuro-tinte dark:text-oscuro-primario dark:border-oscuro-borde';
+  return 'border-border bg-surface text-text-muted';
 };
 
 export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => {
@@ -48,26 +48,26 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
   const id = obtenerId(usuario);
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-claro-borde bg-claro-tarjeta p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-claro-primario/30 hover:shadow-lift motion-safe:hover:-translate-y-0.5 dark:border-oscuro-borde dark:bg-oscuro-tarjeta dark:hover:border-oscuro-primario/40">
+    <div className="lift group relative overflow-hidden rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft hover:border-accent/45 hover:shadow-lift">
       <span
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-[2px] w-0 bg-claro-primario transition-[width] duration-300 ease-out-soft group-hover:w-full dark:bg-oscuro-primario"
+        className="absolute inset-x-0 top-0 h-[2px] w-0 bg-linear-to-r from-accent to-accent/30 transition-[width] duration-300 ease-out-soft group-hover:w-full"
       />
 
       {/* Cabecera: avatar + nombre + correo */}
       <div className="mb-4 flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-claro-tinte text-sm font-bold text-claro-primario ring-1 ring-claro-primario/15 dark:bg-oscuro-tinte dark:text-oscuro-primario dark:ring-oscuro-primario/25">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15 transition-colors duration-300 group-hover:bg-primary group-hover:text-on-primary">
           {getIniciales(usuario)}
         </div>
         <div className="min-w-0 flex-1">
           <h3
-            className="font-semibold text-claro-texto dark:text-oscuro-texto truncate"
+            className="truncate font-display text-sm font-bold tracking-[-0.01em] text-text"
             title={getNombreCompleto(usuario)}
           >
             {getNombreCompleto(usuario)}
           </h3>
           <p
-            className="text-xs text-claro-texto2 dark:text-oscuro-texto2 truncate"
+            className="truncate text-xs text-text-muted"
             title={usuario.correo}
           >
             {usuario.correo || 'sin correo'}
@@ -78,31 +78,29 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
       {/* Rol + Estado */}
       <div className="mb-4 grid grid-cols-2 gap-3 text-xs">
         <div className="min-w-0">
-          <p className="mb-1 font-bold uppercase tracking-[0.12em] text-claro-texto2 dark:text-oscuro-texto2">
+          <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">
             Rol
           </p>
           <span
-            className={`inline-flex max-w-full items-center truncate rounded-full border px-2 py-0.5 text-[11px] font-semibold ${getRolBadgeClass(usuario.rol)}`}
+            className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(usuario.rol)}`}
             title={getRolDisplay(usuario.rol)}
           >
             {getRolDisplay(usuario.rol) || '—'}
           </span>
         </div>
         <div>
-          <p className="mb-1 font-bold uppercase tracking-[0.12em] text-claro-texto2 dark:text-oscuro-texto2">
+          <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">
             Estado
           </p>
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold ${
               activo
-                ? 'bg-emerald-500/10 text-emerald-800 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-200 dark:border-emerald-400/30'
-                : 'bg-red-500/10 text-red-700 border-red-500/25 dark:bg-red-500/15 dark:text-red-300 dark:border-red-400/30'
+                ? 'border-success/30 bg-success-soft text-success'
+                : 'border-error/30 bg-error-soft text-error'
             }`}
           >
             <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                activo ? 'bg-emerald-500' : 'bg-red-500'
-              }`}
+              className={`h-1.5 w-1.5 rounded-full ${activo ? 'bg-success' : 'bg-error'}`}
             />
             {estado}
           </span>
@@ -114,14 +112,14 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
         <button
           type="button"
           onClick={() => onEdit(usuario)}
-          className="press flex-1 rounded-xl border border-claro-borde bg-claro-fondo py-2 text-sm font-semibold text-claro-texto2 hover:border-claro-primario/40 hover:text-claro-primario dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-oscuro-texto2 dark:hover:border-oscuro-primario/40 dark:hover:text-oscuro-primario"
+          className="press flex-1 rounded-xl border border-border bg-surface py-2 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-accent/50 hover:bg-accent-soft hover:text-text"
         >
           Editar
         </button>
         <button
           type="button"
           onClick={() => id !== undefined && onDelete(Number(id))}
-          className="press flex-1 rounded-xl border border-claro-borde bg-claro-fondo py-2 text-sm font-semibold text-red-600 hover:border-red-300 hover:bg-red-50 dark:border-oscuro-borde dark:bg-oscuro-fondo dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-900/20"
+          className="press flex-1 rounded-xl border border-border bg-surface py-2 text-[11.5px] font-bold uppercase tracking-[0.06em] text-error hover:border-error/40 hover:bg-error-soft"
         >
           Eliminar
         </button>
