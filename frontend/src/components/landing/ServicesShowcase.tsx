@@ -1,9 +1,7 @@
 /**
  * ============================================================================
  * ARCHIVO: ServicesShowcase.tsx
- * COMPONENTE: Sección de Servicios e Instalaciones del Complejo
- * Banda clara de "concreto" con tarjetas de papel, iconografía lineal y
- * acentos lima. En modo oscuro pasa a una banda nocturna.
+ * COMPONENTE: Sección de Roles y Áreas de Participación del Sistema
  * ============================================================================
  */
 
@@ -11,67 +9,45 @@ import React from 'react';
 
 const SERVICES = [
   {
-    title: 'Iluminación LED profesional',
-    description: 'Torres de luz de alta potencia para que el partido nocturno se vea como de día, hasta las 23:30.',
+    title: 'Administrador',
+    description: 'Supervisa la plataforma, gestiona usuarios, valida solicitudes de beneficiarios y asegura la transparencia en cada proceso.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.4-6.4l-1.4 1.4M7 17l-1.4 1.4m12.8 0L17 17M7 7L5.6 5.6" />
-        <circle cx="12" cy="12" r="3.2" strokeWidth={1.7} />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
     ),
   },
   {
-    title: 'Vestuarios con agua caliente',
-    description: 'Casilleros individuales, baños higienizados y duchas presurizadas listas antes y después de jugar.',
+    title: 'Donante',
+    description: 'Publica y canaliza donaciones en especie o recursos esenciales para apoyar a personas, familias e instituciones vulnerables.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 20V7a3 3 0 013-3h3" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M10 4h2m4 4v5a3 3 0 01-3 3H9a3 3 0 01-3-3" />
-        <path strokeLinecap="round" strokeWidth={1.7} d="M16 16.5v.01M13.5 19v.01M18.5 19v.01" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
     ),
   },
   {
-    title: 'Parqueo privado y seguro',
-    description: 'Playa de estacionamiento con vigilancia por cámaras 24/7 y acceso directo a los vestuarios.',
+    title: 'Beneficiario',
+    description: 'Registra y gestiona solicitudes de ayuda indicando necesidades prioritarias para recibir asistencia directa y digna.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 16v-3.2L6 8h12l2 4.8V16" />
-        <path strokeLinecap="round" strokeWidth={1.7} d="M3 16h18M6 16v2m12-2v2" />
-        <circle cx="8" cy="13" r="1.2" strokeWidth={1.7} />
-        <circle cx="16" cy="13" r="1.2" strokeWidth={1.7} />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
     ),
   },
   {
-    title: 'Cafetería e hidratación',
-    description: 'Isotónicas, snacks y un área lounge con pantallas para ver el partido antes o después del turno.',
+    title: 'Voluntario',
+    description: 'Participa activamente en campañas solidarias, jornadas de acopio, distribución y actividades comunitarias en terreno.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M5 8h11v6a4 4 0 01-4 4H9a4 4 0 01-4-4V8z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M16 9h2a2 2 0 010 4h-2M7 4v2m4-2v2m4-2v2" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     ),
   },
   {
-    title: 'Organización de torneos',
-    description: 'Logística completa para ligas empresariales, campeonatos intercolegiales y eventos corporativos.',
+    title: 'Campañas Solidarias',
+    description: 'Iniciativas colectivas organizadas con metas claras para canalizar esfuerzos ante emergencias o causas prioritarias.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 4h8v5a4 4 0 01-8 0V4z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 5H5v2a3 3 0 003 3m8-5h3v2a3 3 0 01-3 3" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 13v4m-3 3h6" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
     ),
   },
   {
-    title: 'Seguridad y primeros auxilios',
-    description: 'Personal de atención primaria y botiquín de emergencia disponible durante toda la jornada.',
+    title: 'Trazabilidad y Transparencia',
+    description: 'Seguimiento y registro claro de cada donación para asegurar que la ayuda llegue efectivamente a su destino final.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 9v6m-3-3h6" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
     ),
   },
 ];
@@ -88,19 +64,19 @@ export const ServicesShowcase: React.FC = () => {
         <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-[640px]">
             <span className="inline-flex items-center gap-2 rounded-md bg-arena-ink px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-arena-accent-soft dark:bg-arena-accent dark:text-arena-ink">
-              Comodidades
+              Ecosistema Solidario
             </span>
             <h2 className="mt-4 text-3xl font-extrabold uppercase leading-[0.98] tracking-tight text-arena-ivory text-balance dark:text-arena-ivory sm:text-4xl lg:text-[2.9rem]">
-              Instalaciones de primer nivel
+              Roles y Participación
             </h2>
             <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/60 dark:text-arena-ivory/55">
-              Todo lo que necesitás para que la experiencia sea completa, segura y memorable.
+              Una estructura organizada donde cada actor cumple un rol fundamental para transformar realidades.
             </p>
           </div>
 
           <div className="hidden items-center gap-4 md:flex">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/40 dark:text-arena-ivory/35">
-              6 servicios incluidos
+              4 roles principales
             </span>
             <span className="h-px w-16 bg-arena-ivory/15 dark:bg-white/15" />
           </div>

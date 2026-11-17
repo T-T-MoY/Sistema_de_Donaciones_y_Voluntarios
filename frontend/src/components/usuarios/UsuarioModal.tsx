@@ -10,15 +10,15 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import api from '../../services/api';                       // ← +1 ../
-import FieldError from '../FieldError';                    // ← +1 ../
+import api from '../../api/client';                       // ← +1 ../
+import FieldError from '../ui/FieldError';                    // ← +1 ../
 import {
     validarCampo,
     validarFormularioCompleto,
     claseInput,
     calcularEdad
 } from '../../utils/validaciones';                          // ← +1 ../
-import type { Rol, UsuarioFormData } from './usuario.types';
+import type { Rol, UsuarioFormData } from '../../types/usuario.types';
 
 // =====================================================
 // TIPOS LOCALES (auxiliares del modal)

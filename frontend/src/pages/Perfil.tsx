@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import FieldError from '../components/FieldError';
+import FieldError from '../components/ui/FieldError';
 import {
     validarCampo,
     esContraseñaSegura,

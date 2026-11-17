@@ -5,14 +5,14 @@
  * ============================================================================
  */
 
-import type { Usuario } from './usuario.types';
+import type { Usuario } from '../../types/usuario.types';
 import {
   obtenerId,
   getNombreCompleto,
   getIniciales,
   getEstado,
   esActivo,
-} from './usuario.types';
+} from '../../types/usuario.types';
 
 interface UsuarioCardProps {
   usuario: Usuario;

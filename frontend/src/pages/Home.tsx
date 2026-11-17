@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * ARCHIVO: Home.tsx
- * PÁGINA: Página Principal del Complejo Deportivo (Landing Page)
+ * PÁGINA: Página Principal (Landing Page)
  * RUTA: /
  * NOTA: El chrome (LandingNavbar + Footer) lo provee PublicLayout.
  *       Esta página solo compone las secciones de la landing.
@@ -9,7 +9,6 @@
  */
 
 import { Hero } from '../components/landing/Hero';
-import { CanchaList } from '../components/canchas/CanchaList';
 import { HowItWorks } from '../components/landing/HowItWorks';
 import { ServicesShowcase } from '../components/landing/ServicesShowcase';
 
@@ -19,15 +18,10 @@ export default function Home() {
       {/* 1. Sección Hero con métricas y bienvenida */}
       <Hero />
 
-      {/* 2. Catálogo y Gestión de Canchas (CRUD con permisos admin) */}
-      <div className="bg-arena-deep dark:bg-arena-night">
-        <CanchaList tono="oscuro" />
-      </div>
-
-      {/* 3. ¿Cómo funciona la reserva? */}
+      {/* 2. ¿Cómo funciona? */}
       <HowItWorks />
 
-      {/* 4. Comodidades y Servicios */}
+      {/* 3. Comodidades y Servicios */}
       <ServicesShowcase />
     </>
   );

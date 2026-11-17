@@ -1,9 +1,7 @@
 /**
  * ============================================================================
  * ARCHIVO: HowItWorks.tsx
- * COMPONENTE: Sección explicativa "Cómo Reservar"
- * Banda oscura tipo menú de videojuego: números grandes, acento lima y
- * tarjetas de vidrio sobre líneas de cancha.
+ * COMPONENTE: Sección explicativa "Cómo Funciona"
  * ============================================================================
  */
 
@@ -12,32 +10,26 @@ import React from 'react';
 const STEPS = [
   {
     number: '01',
-    title: 'Elegí tu cancha',
-    description: 'Filtrá por disciplina (fútbol, pádel, tenis, básquet) y revisá medidas, capacidad y estado de cada escenario.',
+    title: 'Creá tu cuenta',
+    description: 'Registrate según tu rol (Donante, Beneficiario o Voluntario) y completá tu perfil para formar parte de la red solidaria.',
     icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     ),
   },
   {
     number: '02',
-    title: 'Elegí fecha y hora',
-    description: 'Mirá la disponibilidad real del día y quedate con el turno que te sirve, sin llamadas ni esperas.',
+    title: 'Publicá o solicitá apoyo',
+    description: 'Indicá los recursos que podés aportar o detallá las necesidades prioritarias para canalizar la ayuda adecuada.',
     icon: (
-      <>
-        <rect x="3" y="5" width="18" height="16" rx="2.5" strokeWidth={1.6} />
-        <path strokeLinecap="round" strokeWidth={1.6} d="M8 3v4m8-4v4M3 10h18" />
-        <path strokeLinecap="round" strokeWidth={1.6} d="M9 15h2m4 0h1" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
     ),
   },
   {
     number: '03',
-    title: 'Confirmá y jugá',
-    description: 'Pagá con QR o tarjeta y recibí la confirmación al instante. Solo queda llegar y entrar a la cancha.',
+    title: 'Coordiná y generá impacto',
+    description: 'Conectá de manera directa, participá en campañas solidarias y seguí el destino de cada colaboración con total transparencia.',
     icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M5 13l4 4L19 7" />
-      </>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
     ),
   },
 ];
@@ -62,16 +54,16 @@ export const HowItWorks: React.FC = () => {
               Cómo funciona
             </span>
             <h2 className="mt-4 text-3xl font-extrabold uppercase leading-[0.98] tracking-tight text-balance sm:text-4xl lg:text-[2.9rem]">
-              Reservar es así de simple
+              Ayudar es así de simple
             </h2>
             <p className="mt-3 max-w-[520px] text-base leading-relaxed text-arena-ivory/55">
-              Tres pasos, cero vueltas. Todo el proceso vive en la misma pantalla.
+              Tres pasos transparentes para conectar voluntades y recursos donde más se necesitan.
             </p>
           </div>
 
           <div className="hidden shrink-0 items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 md:flex">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/40">Tiempo promedio</span>
-            <span className="font-mono text-lg font-bold text-arena-accent-soft">45 s</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-arena-ivory/40">Plataforma</span>
+            <span className="font-mono text-lg font-bold text-arena-accent-soft">100% Solidaria</span>
           </div>
         </div>
 
@@ -81,7 +73,6 @@ export const HowItWorks: React.FC = () => {
               key={step.number}
               className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-[transform,border-color,background-color] duration-300 ease-out-soft hover:border-arena-accent/40 hover:bg-white/[0.055] motion-safe:hover:-translate-y-1"
             >
-              {/* Filo de acento que aparece al pasar el mouse */}
               <span
                 aria-hidden="true"
                 className="absolute inset-x-0 top-0 h-[2px] w-0 bg-arena-accent transition-[width] duration-300 ease-out-soft group-hover:w-full"

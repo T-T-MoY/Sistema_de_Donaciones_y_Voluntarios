@@ -1,10 +1,10 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import ThemeToggle from '../components/ThemeToggle';
-import FieldError from '../components/FieldError';
+import ThemeToggle from '../components/ui/ThemeToggle';
+import FieldError from '../components/ui/FieldError';
 import { esCorreoValido, claseInput } from '../utils/validaciones';
-import IconCanchas from '../assets/icon_canchas.svg?react';
+import IconLogo from '../assets/logo.svg?react';
 
 
 const SolicitarRecuperacion = () => {
@@ -77,7 +77,7 @@ const SolicitarRecuperacion = () => {
                 <div className="relative z-10 p-10 lg:p-16 flex flex-col justify-between w-full h-full">
                     <div>
                         <Link to="/" className="inline-block transition-transform hover:scale-105" title="Ir al inicio">
-                            <IconCanchas className="w-10 h-10" />
+                            <IconLogo className="w-10 h-10" />
                         </Link>
                     </div>
                     <div className="mb-8">

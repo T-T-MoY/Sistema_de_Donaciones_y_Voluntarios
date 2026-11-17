@@ -20,17 +20,17 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { usuarioApi } from './usuario.api';
+import { usuarioApi } from '../../api/usuario.api';
 import { UsuarioCard } from './UsuarioCard';
 import UsuarioModal from './UsuarioModal';
-import type { Usuario, UsuarioListProps } from './usuario.types';
+import type { Usuario, UsuarioListProps } from '../../types/usuario.types';
 import {
   obtenerId,
   getNombreCompleto,
   getIniciales,
   getEstado,
   esActivo,
-} from './usuario.types';
+} from '../../types/usuario.types';
 
 const PREVIEW_LIMIT = 3;
 

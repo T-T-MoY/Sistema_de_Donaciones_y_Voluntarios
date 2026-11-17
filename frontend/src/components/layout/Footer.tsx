@@ -2,7 +2,6 @@
  * ============================================================================
  * ARCHIVO: Footer.tsx
  * COMPONENTE: Pie de página institucional
- * Cierra la landing con una banda nocturna, wordmark grande y acento lima.
  * ============================================================================
  */
 
@@ -31,18 +30,17 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-arena-accent text-arena-ink">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" />
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </span>
               <span className="text-lg font-extrabold uppercase tracking-[0.18em]">
-                Sport<span className="text-arena-accent-soft">Plex</span>
+                Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
               </span>
             </div>
 
             <p className="mt-4 max-w-[300px] text-sm leading-relaxed text-arena-ivory/45">
-              El complejo deportivo más completo de la ciudad. Infraestructura pensada
-              para competir en serio y disfrutar cada turno.
+              Plataforma para coordinar y canalizar donaciones solidarias y actividades de voluntariado con total transparencia e impacto comunitario.
             </p>
 
             <p className="mt-5 flex items-center gap-2 text-sm text-arena-ivory/40">
@@ -54,14 +52,14 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Disciplinas */}
+          {/* Áreas de Apoyo */}
           <div>
-            <h4 className={tituloColumna}>Disciplinas</h4>
+            <h4 className={tituloColumna}>Áreas de Apoyo</h4>
             <ul className="flex flex-col gap-3">
-              <li><a href="#canchas" className={linkClass}>Fútbol 11 y futsal</a></li>
-              <li><a href="#canchas" className={linkClass}>Pádel y tenis</a></li>
-              <li><a href="#canchas" className={linkClass}>Básquet reglamentario</a></li>
-              <li><a href="#canchas" className={linkClass}>Vóley y arena</a></li>
+              <li><a href="#servicios" className={linkClass}>Donaciones en especie</a></li>
+              <li><a href="#servicios" className={linkClass}>Alimentos y abrigo</a></li>
+              <li><a href="#servicios" className={linkClass}>Campañas solidarias</a></li>
+              <li><a href="#servicios" className={linkClass}>Voluntariado activo</a></li>
             </ul>
           </div>
 
@@ -70,15 +68,15 @@ export const Footer: React.FC = () => {
             <h4 className={tituloColumna}>Sistema</h4>
             <ul className="flex flex-col gap-3">
               <li><Link to="/login" className={linkClass}>Iniciar sesión</Link></li>
-              <li><Link to="/registro" className={linkClass}>Crear cuenta cliente</Link></li>
-              <li><a href="#como-funciona" className={linkClass}>Políticas de reserva</a></li>
-              <li><a href="#servicios" className={linkClass}>Tarifas y horarios</a></li>
+              <li><Link to="/registro" className={linkClass}>Crear cuenta</Link></li>
+              <li><a href="#como-funciona" className={linkClass}>Cómo funciona</a></li>
+              <li><a href="#servicios" className={linkClass}>Roles y participación</a></li>
             </ul>
           </div>
 
           {/* Contacto */}
           <div>
-            <h4 className={tituloColumna}>Atención y reservas</h4>
+            <h4 className={tituloColumna}>Contacto</h4>
             <ul className="flex flex-col gap-3 text-sm text-arena-ivory/50">
               <li className="flex items-center gap-2.5">
                 <svg className="h-4 w-4 shrink-0 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -96,14 +94,14 @@ export const Footer: React.FC = () => {
                 <svg className="h-4 w-4 shrink-0 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                contacto@sportplex.bo
+                contacto@donacionesyvoluntariado.bo
               </li>
               <li className="flex items-center gap-2.5">
                 <svg className="h-4 w-4 shrink-0 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <circle cx="12" cy="12" r="9" strokeWidth={1.8} />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 7v5l3 2" />
                 </svg>
-                Lun a Dom · 06:00 – 23:30
+                Atención: Lun a Vie · 08:30 – 18:00
               </li>
             </ul>
           </div>
@@ -113,14 +111,14 @@ export const Footer: React.FC = () => {
         <div className="mt-14 select-none overflow-hidden border-t border-white/10 pt-8">
           <p
             aria-hidden="true"
-            className="whitespace-nowrap text-[15vw] font-black uppercase leading-[0.8] tracking-[-0.04em] text-arena-ivory/[0.045]"
+            className="whitespace-nowrap text-[13vw] font-black uppercase leading-[0.8] tracking-[-0.04em] text-arena-ivory/[0.045]"
           >
-            SportPlex
+            SOLIDARIDAD
           </p>
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[11px] font-medium uppercase tracking-[0.14em] text-arena-ivory/25">
-          <p>© {new Date().getFullYear()} SportPlex · Todos los derechos reservados</p>
+          <p>© {new Date().getFullYear()} Donaciones y Voluntariados · Todos los derechos reservados</p>
           <p>Proyecto Análisis y Diseño de Datos — UMSA</p>
         </div>
       </div>

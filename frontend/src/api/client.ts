@@ -11,7 +11,6 @@ const api: AxiosInstance = axios.create({
 
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-
         const token = localStorage.getItem('token');
 
         if (token) {
@@ -27,13 +26,11 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (response: AxiosResponse) => {
-
         return response;
     },
     (error: AxiosError) => {
-
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-            console.warn("La sesión ha expirado o es inválida (Interceptado por api.ts)");
+            console.warn("La sesión ha expirado o es inválida (Interceptado por client.ts)");
 
             localStorage.removeItem('token');
 
@@ -46,4 +43,5 @@ api.interceptors.response.use(
     }
 );
 
+export { api, api as apiClient };
 export default api;

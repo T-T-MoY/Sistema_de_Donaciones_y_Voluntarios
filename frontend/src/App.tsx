@@ -13,8 +13,8 @@ import PublicLayout from './components/layout/PublicLayout';
 import AppLayout from './components/layout/AppLayout';
 
 // Guards de rutas privadas
-import RutasProtegidas from './components/RutasProtegidas';
-import RutasAdmin from './components/RutasAdmin';
+import RutasProtegidas from './components/guards/RutasProtegidas';
+import RutasAdmin from './components/guards/RutasAdmin';
 
 // Páginas
 import Home from './pages/Home';

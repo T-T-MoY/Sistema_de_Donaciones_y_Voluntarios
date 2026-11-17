@@ -2,9 +2,9 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import IconCanchas from '../assets/icon_canchas.svg?react';
-import FieldError from '../components/FieldError';
-import ThemeToggle from '../components/ThemeToggle';
+import IconLogo from '../assets/logo.svg?react';
+import FieldError from '../components/ui/FieldError';
+import ThemeToggle from '../components/ui/ThemeToggle';
 import { esCorreoValido } from '../utils/validaciones';
 
 // =====================================================
@@ -175,13 +175,13 @@ const Login = () => {
                         className="group flex items-center gap-3 rounded-xl"
                         title="Ir al inicio"
                     >
-                        <IconCanchas className="h-9 w-9 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
+                        <IconLogo className="h-9 w-9 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
                         <span className="flex flex-col leading-none">
-                            <span className="text-[14px] font-extrabold uppercase tracking-[0.18em]">
-                                Sport<span className="text-arena-accent-soft">Plex</span>
+                            <span className="text-[14px] font-extrabold uppercase tracking-[0.16em]">
+                                Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
                             </span>
-                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.34em] text-arena-ivory/40">
-                                Complejo Deportivo
+                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/40">
+                                Plataforma de Gestión
                             </span>
                         </span>
                     </Link>
@@ -208,27 +208,27 @@ const Login = () => {
                     <div className="hidden lg:block">
                         <span className="anim-rise inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-arena-ivory/55">
                             <span className="h-px w-10 bg-arena-accent-soft" />
-                            Acceso al club
+                            Acceso a la plataforma
                         </span>
 
                         <h1 className="anim-rise mt-6 text-5xl font-extrabold uppercase leading-[0.9] tracking-[-0.02em] text-balance xl:text-[3.7rem] [animation-delay:60ms]">
-                            Entrá a la
+                            Sumate a la
                             <br />
-                            cancha.
+                            red solidaria.
                             <br />
-                            <span className="text-arena-accent-soft">Es tu turno.</span>
+                            <span className="text-arena-accent-soft">Es tu momento.</span>
                         </h1>
 
                         <p className="anim-rise mt-6 max-w-[420px] text-base leading-relaxed text-arena-ivory/60 [animation-delay:120ms]">
-                            Tus reservas, tus pagos y tus torneos en un solo lugar.
-                            Horarios reales y confirmación inmediata.
+                            Tus donaciones, voluntariados y solicitudes en un solo lugar.
+                            Conexión directa y seguimiento transparente.
                         </p>
 
                         <ul className="anim-rise mt-8 space-y-3.5 [animation-delay:180ms]">
                             {[
-                                'Disponibilidad actualizada al instante',
-                                'Pago con QR, débito o crédito',
-                                'Cancelá con hasta 24 h de anticipación',
+                                'Gestión transparente de donaciones',
+                                'Registro ágil de voluntarios y beneficiarios',
+                                'Coordinación de campañas en tiempo real',
                             ].map((item) => (
                                 <li key={item} className="flex items-center gap-3 text-sm text-arena-ivory/65">
                                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-arena-accent text-arena-ink">
@@ -242,9 +242,9 @@ const Login = () => {
                         </ul>
 
                         <div className="anim-rise mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.18em] text-arena-ivory/30 [animation-delay:240ms]">
-                            <span>06:00 – 23:30</span>
+                            <span>Comunidad Activa</span>
                             <span className="h-1 w-1 rounded-full bg-white/25" />
-                            <span>7 disciplinas</span>
+                            <span>4 roles</span>
                             <span className="h-1 w-1 rounded-full bg-white/25" />
                             <span>Sede La Paz</span>
                         </div>
@@ -258,14 +258,14 @@ const Login = () => {
 
                             <span className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-arena-ivory/45">
                                 <span className="h-1.5 w-1.5 rounded-full bg-arena-accent" />
-                                Cuenta de jugador
+                                Acceso Seguro
                             </span>
 
                             <h2 className="mt-5 text-[1.7rem] font-extrabold uppercase leading-none tracking-tight text-arena-ivory">
                                 Iniciar sesión
                             </h2>
                             <p className="mt-2 text-sm text-arena-ivory/50">
-                                Ingresá con tu cuenta para reservar tu cancha.
+                                Ingresá con tu cuenta para acceder a la plataforma.
                             </p>
 
                             <form onSubmit={handleSubmit} className="mt-6 space-y-1" noValidate>
@@ -383,7 +383,7 @@ const Login = () => {
                                     {cargando && (
                                         <span className="h-4 w-4 animate-spin rounded-full border-2 border-arena-ink/30 border-t-arena-ink" />
                                     )}
-                                    {cargando ? 'Ingresando…' : 'Entrar a la cancha'}
+                                    {cargando ? 'Ingresando…' : 'Iniciar sesión'}
                                 </button>
 
                             </form>
@@ -400,14 +400,14 @@ const Login = () => {
                         </div>
 
                         <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-arena-ivory/25">
-                            Conexión segura · SportPlex
+                            Conexión segura · Donaciones y Voluntariados
                         </p>
                     </div>
                 </main>
 
                 <footer className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-arena-ivory/25">
-                    <span>© {new Date().getFullYear()} SportPlex</span>
-                    <span>Lun a Dom · 06:00 – 23:30</span>
+                    <span>© {new Date().getFullYear()} Donaciones y Voluntariados</span>
+                    <span>Plataforma Solidaria</span>
                 </footer>
             </div>
         </div>

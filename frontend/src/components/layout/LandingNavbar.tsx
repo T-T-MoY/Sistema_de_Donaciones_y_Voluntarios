@@ -2,11 +2,7 @@
  * ============================================================================
  * ARCHIVO: LandingNavbar.tsx
  * COMPONENTE: Barra de navegación pública principal
- * - Lenguaje visual "estadio nocturno": vidrio oscuro, acento lima y
- *   etiquetas en mayúsculas con tracking amplio.
- * - Visitante anónimo: Ingresar / Registro / Reservar
- * - Usuario logueado:  Panel + ThemeToggle + avatar con dropdown
- * - Menú móvil propio (antes no existía: en pantallas chicas no había nav).
+ * - Plataforma de Donaciones y Voluntariados
  * ============================================================================
  */
 
@@ -14,14 +10,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useFotoPerfil } from '../../hooks/useFotoPerfil';
-import ThemeToggle from '../ThemeToggle';
-import IconCanchas from '../../assets/icon_canchas.svg?react';
+import ThemeToggle from '../ui/ThemeToggle';
+import IconLogo from '../../assets/logo.svg?react';
 
 const ENLACES = [
-  { href: '#canchas', label: 'Canchas' },
-  { href: '#como-funciona', label: 'Cómo reservar' },
-  { href: '#servicios', label: 'Servicios' },
-  { href: '#contacto', label: 'Contacto' },
+  { href: '#como-funciona', label: 'Cómo funciona', enDesarrollo: false },
+  { href: '#servicios', label: 'Roles y Áreas', enDesarrollo: false },
+  { href: '#contacto', label: 'Contacto', enDesarrollo: false },
+  { href: '#', label: 'En desarrollo', enDesarrollo: true },
 ];
 
 export const LandingNavbar = () => {
@@ -74,7 +70,7 @@ export const LandingNavbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-arena-deep/95 backdrop-blur-xl dark:bg-arena-night/90">
-      {/* Filo de acento: da el marco de "transmisión" */}
+      {/* Filo de acento */}
       <div aria-hidden="true" className="h-[2px] w-full bg-gradient-to-r from-arena-accent via-arena-accent/70 to-transparent" />
 
       <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 md:px-6">
@@ -86,13 +82,13 @@ export const LandingNavbar = () => {
           title="Ir a la página principal / Home"
           onClick={() => setMenuMovil(false)}
         >
-          <IconCanchas className="h-9 w-9 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
+          <IconLogo className="h-9 w-9 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
           <div className="flex flex-col leading-none">
-            <span className="text-[15px] font-extrabold uppercase tracking-[0.18em] text-arena-ivory">
-              Sport<span className="text-arena-accent-soft">Plex</span>
+            <span className="text-[14px] font-extrabold uppercase tracking-[0.16em] text-arena-ivory">
+              Donaciones <span className="text-arena-accent-soft">& Voluntariados</span>
             </span>
-            <span className="mt-1.5 text-[8.5px] font-semibold uppercase tracking-[0.36em] text-arena-ivory/40">
-              Complejo Deportivo
+            <span className="mt-1.5 text-[8.5px] font-semibold uppercase tracking-[0.3em] text-arena-ivory/40">
+              Plataforma de Gestión
             </span>
           </div>
         </Link>
@@ -100,13 +96,23 @@ export const LandingNavbar = () => {
         {/* NAV PÚBLICA */}
         <nav className="hidden items-center gap-7 md:flex">
           {ENLACES.map((enlace) => (
-            <a key={enlace.href} href={enlace.href} className={enlaceNav}>
-              {enlace.label}
+            enlace.enDesarrollo ? (
               <span
-                aria-hidden="true"
-                className="absolute -bottom-1.5 left-0 h-[2px] w-0 bg-arena-accent transition-[width] duration-300 ease-out-soft group-hover:w-full"
-              />
-            </a>
+                key={enlace.label}
+                className="text-[11px] font-bold uppercase tracking-[0.18em] text-arena-ivory/30 opacity-50 cursor-not-allowed select-none"
+                aria-disabled="true"
+              >
+                {enlace.label}
+              </span>
+            ) : (
+              <a key={enlace.href} href={enlace.href} className={enlaceNav}>
+                {enlace.label}
+                <span
+                  aria-hidden="true"
+                  className="absolute -bottom-1.5 left-0 h-[2px] w-0 bg-arena-accent transition-[width] duration-300 ease-out-soft group-hover:w-full"
+                />
+              </a>
+            )
           ))}
         </nav>
 
@@ -172,16 +178,12 @@ export const LandingNavbar = () => {
                       {isAdmin ? 'Panel Admin' : 'Mi Panel'}
                     </Link>
 
-                    <Link
-                      to="/eventos"
-                      onClick={() => setMenuAbierto(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-arena-ivory/80 transition-colors hover:bg-white/5 hover:text-arena-ivory"
-                    >
-                      <svg className="h-4 w-4 text-arena-ivory/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-arena-ivory/40 opacity-50 cursor-not-allowed select-none">
+                      <svg className="h-4 w-4 text-arena-ivory/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      Eventos
-                    </Link>
+                      En desarrollo
+                    </span>
 
                     <Link
                       to="/perfil"
@@ -214,9 +216,9 @@ export const LandingNavbar = () => {
               <Link to="/login" className={`${ctaGhost} hidden sm:inline-flex`}>
                 Ingresar
               </Link>
-              <a href="#canchas" className={`${ctaLima} hidden sm:inline-flex`}>
-                Reservar
-              </a>
+              <span className={`${ctaLima} hidden sm:inline-flex opacity-50 cursor-not-allowed pointer-events-none`} aria-disabled="true">
+                En desarrollo
+              </span>
             </>
           )}
 
@@ -247,17 +249,27 @@ export const LandingNavbar = () => {
         <div id="menu-movil" className="anim-fade border-t border-white/10 bg-arena-deep/95 px-5 pb-6 dark:bg-arena-panel/95 pt-4 md:hidden">
           <nav className="flex flex-col">
             {ENLACES.map((enlace) => (
-              <a
-                key={enlace.href}
-                href={enlace.href}
-                onClick={() => setMenuMovil(false)}
-                className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/70 transition-colors hover:text-arena-ivory"
-              >
-                {enlace.label}
-                <svg className="h-4 w-4 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
+              enlace.enDesarrollo ? (
+                <span
+                  key={enlace.label}
+                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/30 opacity-50 cursor-not-allowed select-none"
+                  aria-disabled="true"
+                >
+                  {enlace.label}
+                </span>
+              ) : (
+                <a
+                  key={enlace.href}
+                  href={enlace.href}
+                  onClick={() => setMenuMovil(false)}
+                  className="flex items-center justify-between border-b border-white/[0.06] py-3.5 text-[13px] font-bold uppercase tracking-[0.16em] text-arena-ivory/70 transition-colors hover:text-arena-ivory"
+                >
+                  {enlace.label}
+                  <svg className="h-4 w-4 text-arena-ivory/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              )
             ))}
           </nav>
 
@@ -271,15 +283,15 @@ export const LandingNavbar = () => {
                 >
                   {isAdmin ? 'Ir al Panel Admin' : 'Ir a Mi Panel'}
                 </Link>
-                <a href="#canchas" onClick={() => setMenuMovil(false)} className={`${ctaGhost} w-full`}>
-                  Reservar cancha
-                </a>
+                <span className={`${ctaGhost} w-full opacity-50 cursor-not-allowed pointer-events-none text-center`} aria-disabled="true">
+                  En desarrollo
+                </span>
               </>
             ) : (
               <>
-                <a href="#canchas" onClick={() => setMenuMovil(false)} className={`${ctaLima} w-full`}>
-                  Reservar cancha
-                </a>
+                <span className={`${ctaLima} w-full opacity-50 cursor-not-allowed pointer-events-none text-center`} aria-disabled="true">
+                  En desarrollo
+                </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Link to="/login" onClick={() => setMenuMovil(false)} className={`${ctaGhost} w-full`}>
                     Ingresar

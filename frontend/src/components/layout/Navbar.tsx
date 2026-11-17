@@ -1,6 +1,6 @@
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import IconCanchas from '../../assets/icon_canchas.svg?react';
+import IconLogo from '../../assets/logo.svg?react';
 
 // =====================================================
 // TIPOS
@@ -12,6 +12,7 @@ interface MenuItem {
     name: string;
     icon: string;
     roles: Rol[];
+    enDesarrollo?: boolean;
 }
 
 interface NavbarProps {
@@ -40,50 +41,52 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
         },
         { 
             path: '/canchas', 
-            name: 'Canchas', 
+            name: 'En desarrollo', 
             icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', 
-            roles: ['Administrador', 'Empleado', 'Cliente', 'Usuario'] 
+            roles: ['Administrador', 'Empleado', 'Cliente', 'Usuario'],
+            enDesarrollo: true
         },
-        // --- RESERVA PARA CLIENTE ---
         { 
             path: '/reservas', 
-            name: 'Mis Reservas', 
+            name: 'En desarrollo', 
             icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 
-            roles: ['Cliente', 'Usuario'] 
+            roles: ['Cliente', 'Usuario'],
+            enDesarrollo: true
         },
-        // --- RESERVA PARA ADMIN/EMPLEADO ---
         { 
             path: '/gestion-reservas', 
-            name: 'Gestión de Reservas', 
+            name: 'En desarrollo', 
             icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', 
-            roles: ['Administrador', 'Empleado'] 
+            roles: ['Administrador', 'Empleado'],
+            enDesarrollo: true
         },
-        // --- EVENTOS: catálogo/inscripción, visible para todos los roles ---
         { 
             path: '/eventos', 
-            name: 'Eventos', 
+            name: 'En desarrollo', 
             icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z', 
-            roles: ['Administrador', 'Empleado', 'Cliente', 'Usuario'] 
+            roles: ['Administrador', 'Empleado', 'Cliente', 'Usuario'],
+            enDesarrollo: true
         },
-        // --- MIS INSCRIPCIONES: solo cliente ---
         { 
             path: '/mis-inscripciones', 
-            name: 'Mis Inscripciones', 
+            name: 'En desarrollo', 
             icon: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 
-            roles: ['Cliente', 'Usuario'] 
+            roles: ['Cliente', 'Usuario'],
+            enDesarrollo: true
         },
-        // --- GESTIÓN DE EVENTOS: admin/empleado crea, asocia servicios y cancela ---
         { 
             path: '/gestion-eventos', 
-            name: 'Gestión de Eventos', 
+            name: 'En desarrollo', 
             icon: 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5', 
-            roles: ['Administrador', 'Empleado'] 
+            roles: ['Administrador', 'Empleado'],
+            enDesarrollo: true
         },
         { 
             path: '/reportes', 
-            name: 'Reportes', 
+            name: 'En desarrollo', 
             icon: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 
-            roles: ['Administrador'] 
+            roles: ['Administrador'],
+            enDesarrollo: true
         }
     ];
 
@@ -114,36 +117,50 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                     className="flex items-center gap-3 px-6 py-6 border-b border-claro-borde/60 dark:border-oscuro-borde/60 hover:opacity-90 transition-opacity"
                     title="Ir a la página principal / Home"
                 >
-                    <IconCanchas className="w-9 h-9" />
+                    <IconLogo className="w-9 h-9" />
                     <div className="flex flex-col">
-                        <span className="text-xl font-bold text-claro-texto dark:text-oscuro-texto tracking-tight leading-none">
-                            SportPlex
+                        <span className="text-base font-bold text-claro-texto dark:text-oscuro-texto tracking-tight leading-tight">
+                            Donaciones y Voluntariados
                         </span>
-                        <span className="text-xs text-claro-texto2 dark:text-oscuro-texto2 mt-1">
-                            Complejo Deportivo
+                        <span className="text-[11px] text-claro-texto2 dark:text-oscuro-texto2 mt-0.5">
+                            Plataforma de Gestión
                         </span>
                     </div>
                 </Link>
 
                 <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
                     {menuFiltrado.map((item) => (
-                        <NavLink 
-                            key={item.name} 
-                            to={item.path} 
-                            onClick={onCerrar}   
-                            className={({ isActive }) => `
-                                flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 
-                                ${isActive 
-                                    ? 'bg-claro-tinte text-claro-primario dark:bg-oscuro-tinte dark:text-oscuro-primario font-semibold shadow-sm' 
-                                    : 'text-claro-texto2 hover:bg-gray-50 hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-fondo dark:hover:text-oscuro-texto'
-                                }
-                            `}
-                        >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                            </svg>
-                            {item.name}
-                        </NavLink>
+                        item.enDesarrollo ? (
+                            <span
+                                key={item.path}
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-claro-texto2/40 dark:text-oscuro-texto2/40 opacity-50 cursor-not-allowed select-none"
+                                aria-disabled="true"
+                                title="Módulo en desarrollo"
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                                </svg>
+                                {item.name}
+                            </span>
+                        ) : (
+                            <NavLink 
+                                key={item.path} 
+                                to={item.path} 
+                                onClick={onCerrar}   
+                                className={({ isActive }) => `
+                                    flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 
+                                    ${isActive 
+                                        ? 'bg-claro-tinte text-claro-primario dark:bg-oscuro-tinte dark:text-oscuro-primario font-semibold shadow-sm' 
+                                        : 'text-claro-texto2 hover:bg-gray-50 hover:text-claro-texto dark:text-oscuro-texto2 dark:hover:bg-oscuro-fondo dark:hover:text-oscuro-texto'
+                                    }
+                                `}
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                                </svg>
+                                {item.name}
+                            </NavLink>
+                        )
                     ))}
                 </nav>
 

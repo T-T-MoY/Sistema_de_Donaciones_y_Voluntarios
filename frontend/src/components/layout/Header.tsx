@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useFotoPerfil } from '../../hooks/useFotoPerfil';
-import ThemeToggle from '../ThemeToggle';
+import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
   onAbrirMenu?: () => void;
@@ -39,13 +39,13 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const titulosPorRuta: Record<string, string> = {
     '/dashboard': 'Inicio',
     '/usuarios': 'Gestión de Usuarios',
-    '/canchas': 'Canchas Disponibles',
-    '/reservas': 'Mis Reservas',
+    '/canchas': 'En desarrollo',
+    '/reservas': 'En desarrollo',
     '/reportes': 'Reportes y Estadísticas',
     '/perfil': 'Mi Perfil',
   };
 
-  const tituloActual = titulosPorRuta[location.pathname] || 'Sistema';
+  const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
 
   return (
     <header className="h-20 bg-claro-tarjeta dark:bg-oscuro-tarjeta border-b border-claro-borde dark:border-oscuro-borde flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 transition-colors duration-300">
