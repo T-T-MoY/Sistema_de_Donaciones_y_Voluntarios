@@ -49,6 +49,8 @@ const etiquetaCampo =
 const tituloSeccion =
     'flex items-center gap-2.5 font-display text-[11px] font-bold uppercase tracking-[0.2em] text-text';
 
+const filaDosColumnas = 'grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2';
+
 // =====================================================
 // COMPONENTE
 // =====================================================
@@ -217,7 +219,7 @@ const Registro = () => {
                     </Link>
                 </header>
 
-                <main className="grid flex-1 items-start gap-12 py-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:py-14">
+                <main className="grid flex-1 items-start gap-12 py-6 lg:grid-cols-[1fr_1fr] lg:gap-14 lg:py-8">
                     {/* COLUMNA IZQUIERDA: mensaje (Igual al Login) */}
                     <div className="hidden lg:block lg:sticky lg:top-24">
                         <span className="anim-rise inline-flex items-center gap-3 text-[9.5px] font-bold uppercase tracking-[0.28em] text-cream/60">
@@ -244,9 +246,9 @@ const Registro = () => {
                         </div>
                     </div>
 
-                    {/* COLUMNA DERECHA: tarjeta de registro (ANCHO AJUSTADO) */}
-                    <div className="mx-auto w-full max-w-[480px] lg:max-w-[580px]">
-                        <div className="anim-rise relative overflow-hidden rounded-[1.75rem] border border-border bg-surface-elevated p-6 shadow-deep sm:p-8">
+                    {/* COLUMNA DERECHA: tarjeta de registro */}
+                    <div className="mx-auto w-full max-w-[480px] lg:max-w-[640px]">
+                        <div className="anim-rise relative overflow-hidden rounded-[1.75rem] border border-border bg-surface-elevated p-5 shadow-deep sm:p-7">
                             <span
                                 aria-hidden="true"
                                 className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-accent via-accent/40 to-transparent"
@@ -258,40 +260,38 @@ const Registro = () => {
                             </span>
 
                             {/* Título + toggle de tema dentro de la tarjeta */}
-                            <div className="mt-5 flex items-start justify-between gap-4">
+                            <div className="mt-4 flex items-start justify-between gap-4">
                                 <h2 className="font-display text-[1.75rem] font-extrabold leading-none tracking-[-0.03em] text-text">
                                     Crear cuenta
                                 </h2>
                                 <ThemeToggle />
                             </div>
 
-                            <p className="mt-2.5 text-sm leading-relaxed text-text-muted">
+                            <p className="mt-2 text-sm leading-relaxed text-text-muted">
                                 Completá tus datos para empezar a participar.
                             </p>
 
-                            <form onSubmit={handleSubmit} className="mt-7 space-y-4" noValidate>
+                            <form onSubmit={handleSubmit} className="mt-5 space-y-3" noValidate>
 
-                                {/* NOMBRE */}
-                                <div>
-                                    <label className={etiquetaCampo} htmlFor="registro-nombre">
-                                        Nombres *
-                                    </label>
-                                    <input
-                                        id="registro-nombre"
-                                        type="text"
-                                        name="nombre"
-                                        value={formData.nombre}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        placeholder="Ej: Juan Carlos"
-                                        maxLength={50}
-                                        className={claseInput(errores.nombre, touched.nombre)}
-                                    />
-                                    <FieldError error={errores.nombre} touched={touched.nombre} />
-                                </div>
-
-                                {/* APELLIDOS */}
-                                <div className="grid grid-cols-2 gap-4">
+                                {/* NOMBRE + PATERNO */}
+                                <div className={filaDosColumnas}>
+                                    <div>
+                                        <label className={etiquetaCampo} htmlFor="registro-nombre">
+                                            Nombres *
+                                        </label>
+                                        <input
+                                            id="registro-nombre"
+                                            type="text"
+                                            name="nombre"
+                                            value={formData.nombre}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            placeholder="Ej: Juan Carlos"
+                                            maxLength={50}
+                                            className={claseInput(errores.nombre, touched.nombre)}
+                                        />
+                                        <FieldError error={errores.nombre} touched={touched.nombre} />
+                                    </div>
                                     <div>
                                         <label className={etiquetaCampo} htmlFor="registro-paterno">
                                             Apellido paterno *
@@ -309,6 +309,10 @@ const Registro = () => {
                                         />
                                         <FieldError error={errores.paterno} touched={touched.paterno} />
                                     </div>
+                                </div>
+
+                                {/* MATERNO + FECHA */}
+                                <div className={filaDosColumnas}>
                                     <div>
                                         <label className={etiquetaCampo} htmlFor="registro-materno">
                                             Apellido materno
@@ -326,10 +330,31 @@ const Registro = () => {
                                         />
                                         <FieldError error={errores.materno} touched={touched.materno} />
                                     </div>
+                                    <div>
+                                        <label className={etiquetaCampo} htmlFor="registro-fecha">
+                                            Fecha de nacimiento *
+                                            {formData.fecha_nacimiento && edadCalculada !== null && (
+                                                <span className="ml-2 normal-case tracking-normal text-primary">
+                                                    ({edadCalculada} años)
+                                                </span>
+                                            )}
+                                        </label>
+                                        <input
+                                            id="registro-fecha"
+                                            type="date"
+                                            name="fecha_nacimiento"
+                                            value={formData.fecha_nacimiento}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            max={fechaMaximaStr}
+                                            className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
+                                        />
+                                        <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
+                                    </div>
                                 </div>
 
-                                {/* CI/NIT Y TELÉFONO */}
-                                <div className="grid grid-cols-2 gap-4">
+                                {/* CI/NIT + TELÉFONO */}
+                                <div className={filaDosColumnas}>
                                     <div>
                                         <label className={etiquetaCampo} htmlFor="registro-ci">
                                             CI / NIT *
@@ -368,40 +393,14 @@ const Registro = () => {
                                     </div>
                                 </div>
 
-                                {/* FECHA NACIMIENTO */}
-                                <div>
-                                    <label className={etiquetaCampo} htmlFor="registro-fecha">
-                                        Fecha de nacimiento *
-                                    </label>
-                                    <input
-                                        id="registro-fecha"
-                                        type="date"
-                                        name="fecha_nacimiento"
-                                        value={formData.fecha_nacimiento}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        max={fechaMaximaStr}
-                                        className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
-                                    />
-                                    {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
-                                        <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
-                                    ) : (
-                                        <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
-                                            {formData.fecha_nacimiento && edadCalculada !== null ? (
-                                                <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
-                                            ) : '\u00A0'}
-                                        </p>
-                                    )}
-                                </div>
-
                                 {/* DIRECCIÓN */}
-                                <div className="pt-2">
+                                <div className="pt-1">
                                     <h3 className={tituloSeccion}>
                                         <span className="h-px w-5 bg-accent" />
                                         Dirección
                                     </h3>
 
-                                    <div className="mt-4 space-y-4">
+                                    <div className="mt-3 space-y-3">
                                         <div>
                                             <label className={etiquetaCampo} htmlFor="registro-calle">
                                                 Calle / Avenida
@@ -420,7 +419,7 @@ const Registro = () => {
                                             <FieldError error={errores.calle} touched={touched.calle} />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className={filaDosColumnas}>
                                             <div>
                                                 <label className={etiquetaCampo} htmlFor="registro-zona">
                                                     Zona / Barrio
@@ -460,13 +459,13 @@ const Registro = () => {
                                 </div>
 
                                 {/* CUENTA */}
-                                <div className="pt-2">
+                                <div className="pt-1">
                                     <h3 className={tituloSeccion}>
                                         <span className="h-px w-5 bg-accent" />
                                         Cuenta
                                     </h3>
 
-                                    <div className="mt-4 space-y-4">
+                                    <div className={`mt-3 ${filaDosColumnas}`}>
                                         <div>
                                             <label className={etiquetaCampo} htmlFor="registro-correo">
                                                 Correo electrónico *
@@ -493,7 +492,7 @@ const Registro = () => {
                                             <div className="relative">
                                                 <input
                                                     id="registro-password"
-                                                    type={mostrarContraseña ? "text" : "password"}
+                                                    type={mostrarContraseña ? 'text' : 'password'}
                                                     name="contraseña"
                                                     value={formData.contraseña}
                                                     onChange={handleChange}
@@ -530,7 +529,7 @@ const Registro = () => {
                                 {error && (
                                     <div
                                         role="alert"
-                                        className="anim-fade mt-2 flex items-start gap-2.5 rounded-xl border border-error/30 bg-error-soft p-3 text-sm font-medium text-error"
+                                        className="anim-fade flex items-start gap-2.5 rounded-xl border border-error/30 bg-error-soft p-3 text-sm font-medium text-error"
                                     >
                                         <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
@@ -540,7 +539,7 @@ const Registro = () => {
                                 )}
 
                                 {/* TÉRMINOS */}
-                                <div className="flex items-start gap-2.5 pt-4">
+                                <div className="flex items-start gap-2.5 pt-2">
                                     <input
                                         type="checkbox"
                                         id="terminos"
@@ -559,7 +558,7 @@ const Registro = () => {
                                 <button
                                     type="submit"
                                     disabled={cargando}
-                                    className={`press mt-5 flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-[12.5px] font-bold uppercase tracking-[0.14em] shadow-soft
+                                    className={`press mt-2 flex w-full items-center justify-center gap-2.5 rounded-xl py-3 text-[12.5px] font-bold uppercase tracking-[0.14em] shadow-soft
                                         ${cargando
                                             ? 'cursor-wait bg-surface-inset text-text-subtle'
                                             : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift motion-safe:hover:-translate-y-0.5'
@@ -572,7 +571,7 @@ const Registro = () => {
                                 </button>
                             </form>
 
-                            <p className="mt-6 border-t border-border pt-5 text-center text-[13px] text-text-muted">
+                            <p className="mt-5 border-t border-border pt-4 text-center text-[13px] text-text-muted">
                                 ¿Ya tenés cuenta?{' '}
                                 <Link
                                     to="/login"
