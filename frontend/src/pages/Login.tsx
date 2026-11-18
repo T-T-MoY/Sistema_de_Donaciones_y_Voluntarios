@@ -148,15 +148,15 @@ const Login = () => {
                 src="/images/auth-complex.jpg"
                 alt=""
                 aria-hidden="true"
-                className="absolute inset-0 h-full w-full object-cover object-center opacity-70"
+                className="absolute inset-0 h-full w-full object-cover object-center opacity-85"
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-linear-to-r from-night via-night/92 to-night/45"
+                className="absolute inset-0 bg-linear-to-r from-night/95 via-night/75 to-night/30"
             />
             <div
                 aria-hidden="true"
-                className="absolute inset-0 bg-linear-to-t from-night via-night/30 to-night/70"
+                className="absolute inset-0 bg-linear-to-t from-night/85 via-night/15 to-night/50"
             />
             <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
             <div
