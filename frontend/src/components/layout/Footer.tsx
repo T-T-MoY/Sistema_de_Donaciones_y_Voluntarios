@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import IconLogo from '../../assets/logo.svg?react';
 
 const linkClass =
   'group inline-flex items-center gap-2 text-sm text-cream/60 transition-colors duration-200 hover:text-gold-bright';
@@ -77,9 +78,7 @@ export const Footer: React.FC = () => {
           <div>
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold text-night">
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
+                <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
               </span>
               <span className="font-display text-base font-bold tracking-[-0.01em]">
                 Donaciones <span className="text-gold">&amp; Voluntariados</span>
@@ -158,15 +157,6 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Wordmark de cierre */}
-        <div className="mt-14 select-none overflow-hidden border-t border-cream/10 pt-8">
-          <p
-            aria-hidden="true"
-            className="whitespace-nowrap font-display text-[13vw] font-extrabold uppercase leading-[0.78] tracking-[-0.05em] text-cream/[0.045]"
-          >
-            Solidaridad
-          </p>
-        </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[10.5px] font-medium uppercase tracking-[0.14em] text-cream/35">
           <p>© {new Date().getFullYear()} Donaciones y Voluntariados · Todos los derechos reservados</p>

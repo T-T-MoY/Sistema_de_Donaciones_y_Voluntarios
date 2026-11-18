@@ -190,9 +190,7 @@ const Registro = () => {
                         className="group flex items-center gap-3 rounded-xl"
                         title="Ir al inicio"
                     >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cream/10 bg-cream/[0.05] transition-colors duration-300 group-hover:border-gold/40">
-                            <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
-                        </span>
+                        <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
                         <span className="flex flex-col leading-none">
                             <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-cream">
                                 Donaciones <span className="text-gold">&amp; Voluntariados</span>

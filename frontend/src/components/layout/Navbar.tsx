@@ -129,9 +129,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                     className="press group relative z-10 flex items-center gap-3 border-b border-cream/10 px-5 py-5"
                     title="Ir a la página principal / Home"
                 >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cream/10 bg-cream/[0.05] transition-colors duration-300 group-hover:border-gold/45">
-                        <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
-                    </span>
+                    <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
                     <div className="flex min-w-0 flex-col leading-none">
                         <span className="font-display text-[12.5px] font-bold tracking-[-0.01em] text-cream">
                             Donaciones <span className="text-gold">&amp; Voluntariados</span>

@@ -87,9 +87,7 @@ export const LandingNavbar = () => {
           title="Ir a la página principal / Home"
           onClick={() => setMenuMovil(false)}
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] transition-colors duration-300 group-hover:border-gold/40">
-            <IconLogo className="h-8 w-8 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
-          </span>
+          <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
           <span className="flex flex-col leading-none">
             <span className="font-display text-[13.5px] font-bold uppercase tracking-[0.12em] text-cream">
               Donaciones <span className="text-gold">& Voluntariados</span>
