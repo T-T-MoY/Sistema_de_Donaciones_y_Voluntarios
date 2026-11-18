@@ -23,6 +23,7 @@
 - 🖥️ [Pantallas](#️-pantallas)
 - 📁 [Estructura del Proyecto](#-estructura-del-proyecto)
 - 🚀 [Puesta en Marcha](#-puesta-en-marcha)
+- 🧪 [Usuarios de Prueba](#-usuarios-de-prueba)
 - 🧩 [Endpoints](#-endpoints)
 - 🛠️ [Comandos Útiles](#️-comandos-útiles)
 
@@ -204,6 +205,31 @@ cd frontend
 npx tsc --noEmit    # tipos
 npm run build       # tsc + vite build
 ```
+
+---
+
+## 🧪 Usuarios de Prueba
+
+> [!NOTE]
+> Datos cargados por `database/02_inserts.sql`, solo para desarrollo. Todas las cuentas usan la misma contraseña: **`Passw123`**
+
+| Rol | Correo | Contraseña | Estado |
+|---|---|---|---|
+| Administrador (SUPERADMIN) | `carla.admin@donacionesbo.org` | `Passw123` | Activo |
+| Administrador (GENERAL) | `jorge.admin@donacionesbo.org` | `Passw123` | Activo |
+| Beneficiario (Persona) | `rosa.chambi@gmail.com` | `Passw123` | Activo |
+| Beneficiario (Familia) | `hector.poma@gmail.com` | `Passw123` | Activo |
+| Beneficiario (Institución) | `comedor.esperanza@gmail.com` | `Passw123` | Activo |
+| Donante | `diego.ramirez@gmail.com` | `Passw123` | Activo |
+| Donante | `sofia.paredes@gmail.com` | `Passw123` | Activo |
+| Donante | `andres.guzman@gmail.com` | `Passw123` | Activo |
+| Donante | `paola.duran@gmail.com` | `Passw123` | Inactivo |
+| Voluntario | `luis.choque@gmail.com` | `Passw123` | Activo |
+| Voluntario | `valeria.nina@gmail.com` | `Passw123` | Activo |
+| Voluntario | `sebastian.vega@gmail.com` | `Passw123` | Activo |
+
+> [!WARNING]
+> Estas credenciales son solo para pruebas locales. Cámbialas antes de cualquier despliegue real.
 
 ---
 
