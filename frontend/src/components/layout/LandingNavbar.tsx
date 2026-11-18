@@ -35,8 +35,8 @@ export const LandingNavbar = () => {
   const iniciales = usuario?.nombre ? usuario.nombre.charAt(0).toUpperCase() : 'U';
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    void logout();
+    void navigate('/login');
   };
 
   // Cerrar dropdown al click fuera

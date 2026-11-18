@@ -10,8 +10,8 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import api from '../../api/client';                       // ← +1 ../
-import FieldError from '../ui/FieldError';                    // ← +1 ../
+import api from '../../api/client';
+import FieldError from '../ui/FieldError';
 import { useToast } from '../../context/ToastContext';
 import {
     validarCampo,
@@ -62,6 +62,7 @@ const rolBackendAFormulario = (rol?: string | null): Rol => {
     const r = (rol || '').toLowerCase().trim();
     if (r === 'administrador' || r === 'admin') return 'Admin';
     if (r === 'voluntario' || r === 'empleado') return 'Empleado';
+    if (r === 'beneficiario') return 'Beneficiario';
     return 'Cliente';
 };
 
@@ -85,6 +86,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         ciudad: '',
         habilidades: '',
         disponibilidad: 'Mañana',
+        tipo_beneficiario: 'Persona',
+        direccion: '',
+        necesidad: '',
+        descripcion: '',
+        estado_beneficiario: 'Pendiente',
         nivel_acceso: 'GENERAL'
     };
 
@@ -101,6 +107,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const rolNorm = (formData.rol || '').toLowerCase().trim();
     const esCliente = rolNorm === 'cliente';
     const esEmpleado = rolNorm === 'empleado';
+    const esBeneficiario = rolNorm === 'beneficiario';
     const esAdmin = rolNorm === 'admin' || rolNorm === 'administrador';
 
     // =====================================================
@@ -171,6 +178,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         ? d.habilidades.join(', ')
                         : (d.habilidades || ''),
                     disponibilidad: d.disponibilidad || 'Mañana',
+                    tipo_beneficiario: d.tipo_beneficiario || 'Persona',
+                    direccion: d.direccion || '',
+                    necesidad: d.necesidad || '',
+                    descripcion: d.descripcion || '',
+                    estado_beneficiario: d.estado_beneficiario || 'Pendiente',
                     nivel_acceso: d.nivel_acceso === 'SUPERADMIN' ? 'SUPERADMIN' : 'GENERAL'
                 });
                 setErrores({});
@@ -180,7 +192,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 setError('Error al cargar los datos del usuario');
             }
         };
-        fetchUsuario();
+        void fetchUsuario();
     }, [isOpen, usuarioId]);
 
     if (!isOpen) return null;
@@ -188,7 +200,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     // HANDLERS
     // =====================================================
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
         const { name, value } = e.target;
 
         let valorFiltrado = value;
@@ -206,7 +218,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         if (error) setError('');
     };
 
-    const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
         const { name, value } = e.target;
         setTouched((prev) => ({ ...prev, [name]: true }));
         const err = validarCampo(name, value, formData);
@@ -261,8 +273,17 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             }
 
             if (esEmpleado) {
-                payload.habilidades = formData.habilidades;          // "Logística, Primeros auxilios"
+                payload.habilidades = formData.habilidades;
                 payload.disponibilidad = formData.disponibilidad?.trim() || '';
+            }
+
+            if (esBeneficiario) {
+                payload.tipo_beneficiario = formData.tipo_beneficiario;
+                payload.documento = formData.ci_nit ? String(formData.ci_nit).trim() : '';
+                payload.direccion = formData.direccion?.trim() || '';
+                payload.necesidad = formData.necesidad?.trim() || '';
+                payload.descripcion = formData.descripcion?.trim() || '';
+                payload.estado_beneficiario = formData.estado_beneficiario;
             }
 
             if (esAdmin) {
@@ -282,9 +303,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             }
 
             if (modoEdicion) {
-                exito('', 'Usuario actualizado con éxito');
+                void exito('', 'Usuario actualizado con éxito');
             } else {
-                exito('', 'Usuario creado con éxito');
+                void exito('', 'Usuario creado con éxito');
             }
 
             onSave();
@@ -300,17 +321,19 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // RENDER (portal)
     // =====================================================
     return createPortal(
-        <div
-            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
-            }}
-        >
+        <div className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:p-4">
+            <button
+                type="button"
+                className="absolute inset-0 h-full w-full cursor-default"
+                onClick={onClose}
+                aria-label="Cerrar modal"
+                tabIndex={-1}
+            />
             <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-usuario"
-                className="anim-scale flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
+                className="relative z-10 anim-scale flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
             >
                 <span
                     aria-hidden="true"
@@ -438,6 +461,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             >
                                 <option value="Cliente">{getRolDisplay('Cliente')}</option>
                                 <option value="Empleado">{getRolDisplay('Empleado')}</option>
+                                <option value="Beneficiario">Beneficiario</option>
                                 <option value="Admin">{getRolDisplay('Admin')}</option>
                             </select>
                         </div>
@@ -566,6 +590,99 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                         <option value="Fines de semana">Fines de semana</option>
                                     </select>
                                 </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* === CAMPOS BENEFICIARIO === */}
+                    {esBeneficiario && (
+                        <>
+                            <h3 className={`${tituloSeccion} pt-3`}>
+                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
+                                Datos del beneficiario
+                            </h3>
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <label htmlFor="modal-tipo-benef" className={etiquetaCampo}>Tipo *</label>
+                                    <select
+                                        id="modal-tipo-benef"
+                                        name="tipo_beneficiario"
+                                        value={formData.tipo_beneficiario}
+                                        onChange={handleChange}
+                                        className={claseSelect}
+                                    >
+                                        <option value="Persona">Persona</option>
+                                        <option value="Familia">Familia</option>
+                                        <option value="Institucion">Institución</option>
+                                    </select>
+                                    <FieldError error={errores.tipo_beneficiario} touched={touched.tipo_beneficiario} />
+                                </div>
+                                <div>
+                                    <label htmlFor="modal-documento" className={etiquetaCampo}>Documento (CI / NIT) *</label>
+                                    <input
+                                        id="modal-documento"
+                                        type="text" name="ci_nit"
+                                        inputMode="numeric"
+                                        value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
+                                        maxLength={15}
+                                        className={claseInput(errores.ci_nit, touched.ci_nit)}
+                                    />
+                                    <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-direccion" className={etiquetaCampo}>Dirección *</label>
+                                <input
+                                    id="modal-direccion"
+                                    type="text" name="direccion"
+                                    value={formData.direccion} onChange={handleChange} onBlur={handleBlur}
+                                    maxLength={255}
+                                    className={claseInput(errores.direccion, touched.direccion)}
+                                />
+                                <FieldError error={errores.direccion} touched={touched.direccion} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-necesidad" className={etiquetaCampo}>Necesidad *</label>
+                                <input
+                                    id="modal-necesidad"
+                                    type="text" name="necesidad"
+                                    value={formData.necesidad} onChange={handleChange} onBlur={handleBlur}
+                                    placeholder="Ej: Alimentos, ropa, útiles escolares"
+                                    maxLength={150}
+                                    className={claseInput(errores.necesidad, touched.necesidad)}
+                                />
+                                <FieldError error={errores.necesidad} touched={touched.necesidad} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-descripcion" className={etiquetaCampo}>Descripción</label>
+                                <textarea
+                                    id="modal-descripcion"
+                                    name="descripcion"
+                                    rows={3}
+                                    value={formData.descripcion} onChange={handleChange} onBlur={handleBlur}
+                                    maxLength={2000}
+                                    className={claseInput(errores.descripcion, touched.descripcion)}
+                                />
+                                <FieldError error={errores.descripcion} touched={touched.descripcion} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-estado-benef" className={etiquetaCampo}>Estado de verificación</label>
+                                <select
+                                    id="modal-estado-benef"
+                                    name="estado_beneficiario"
+                                    value={formData.estado_beneficiario}
+                                    onChange={handleChange}
+                                    className={claseSelect}
+                                >
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Verificado">Verificado</option>
+                                    <option value="Rechazado">Rechazado</option>
+                                </select>
                             </div>
                         </>
                     )}

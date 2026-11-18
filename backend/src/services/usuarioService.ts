@@ -162,7 +162,7 @@ export const usuarioService = {
     id: string | number,
     estado: string | boolean
   ): Promise<{ mensaje: string; usuario: unknown }> {
-    if (!id || isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
+    if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
 
     const estadoValido =
       typeof estado === 'boolean' ||
@@ -303,7 +303,7 @@ export const usuarioService = {
     id: string | number,
     body: Record<string, any>
   ): Promise<{ mensaje: string }> {
-    if (!id || isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
+    if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
 
     const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado } = body;
 
@@ -362,7 +362,7 @@ export const usuarioService = {
 
   // ---------- Eliminar ----------
   async eliminarUsuario(id: string | number): Promise<{ mensaje: string }> {
-    if (!id || isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
+    if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
     const eliminado = await usuarioRepository.eliminarUsuario(id);
     if (!eliminado) throw new AppError('Usuario no encontrado', 404);
     return { mensaje: 'Usuario eliminado' };
@@ -370,7 +370,7 @@ export const usuarioService = {
 
   // ---------- Obtener por id (admin) ----------
   async obtenerPorId(id: string | number): Promise<UsuarioResponse> {
-    if (!id || isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
+    if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
     const usuario = await usuarioRepository.obtenerPorId(id);
     if (!usuario) throw new AppError('Usuario no encontrado', 404);
     return usuario;

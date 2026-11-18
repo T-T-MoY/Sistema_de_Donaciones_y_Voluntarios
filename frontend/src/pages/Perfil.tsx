@@ -215,7 +215,7 @@ const Perfil = () => {
             }
         };
 
-        if (token) fetchPerfil();
+        if (token) void fetchPerfil();
     }, [token]);
 
     // =====================================================
@@ -550,7 +550,7 @@ const Perfil = () => {
                     FORMULARIO
                     ===================================================== */}
                 <div className="anim-rise lg:col-span-2 [animation-delay:60ms]">
-                    <form onSubmit={handleSubmit} className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft" noValidate>
+                    <form onSubmit={(e) => void handleSubmit(e)} className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft" noValidate>
 
                         {/* SECCIÓN 1: DATOS BÁSICOS */}
                         <div className="border-b border-border p-6 md:p-8">

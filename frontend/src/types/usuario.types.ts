@@ -8,7 +8,7 @@
 // =====================================================
 // ROLES Y ESTADOS
 // =====================================================
-export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador';
+export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador' | 'Beneficiario';
 export type Estado = 'Activo' | 'Inactivo';
 export type Turno = 'Mañana' | 'Tarde' | 'Noche';
 export type NivelAcceso = 'SUPERADMIN' | 'GENERAL';
@@ -60,6 +60,11 @@ export interface UsuarioFormData {
   ciudad: string;
   habilidades: string;
   disponibilidad: string;
+  tipo_beneficiario: string;
+  direccion: string;
+  necesidad: string;
+  descripcion: string;
+  estado_beneficiario: string;
   nivel_acceso: NivelAcceso;
 }
 

@@ -358,6 +358,22 @@
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* iOS hace zoom si el input tiene menos de 16px.
+     Se aplica por capacidad táctil, no por ancho de pantalla. */
+  @media (pointer: coarse) {
+    input, select, textarea { font-size: 16px; }
+  }
 }
 
 /* =========================================================
@@ -368,18 +384,6 @@
 @utility anim-scale { animation: modal-in 280ms var(--ease-out-soft) both; }
 @utility anim-toast { animation: toast-in 320ms var(--ease-out-soft) both; }
 @utility anim-toast-out { animation: toast-out 180ms ease-in both; }
-
-@utility press {
-  transition: transform 150ms var(--ease-out-soft), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 240ms var(--ease-out-soft), opacity 180ms ease;
-  &:active { transform: scale(0.97); }
-}
-
-@utility lift {
-  transition: transform 260ms var(--ease-out-soft), box-shadow 260ms var(--ease-out-soft), border-color 200ms ease, background-color 200ms ease;
-  @media (hover: hover) and (pointer: fine) {
-    &:hover { transform: translateY(-4px); }
-  }
-}
 
 @utility grid-paper {
   background-image:
@@ -433,6 +437,18 @@
 }
 
 @layer components {
+  .press {
+    transition: transform 150ms var(--ease-out-soft), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 240ms var(--ease-out-soft), opacity 180ms ease;
+    &:active { transform: scale(0.97); }
+  }
+
+  .lift {
+    transition: transform 260ms var(--ease-out-soft), box-shadow 260ms var(--ease-out-soft), border-color 200ms ease, background-color 200ms ease;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover { transform: translateY(-4px); }
+    }
+  }
+
   .reveal {
     opacity: 0;
     transform: translateY(20px);
@@ -451,20 +467,4 @@
   .reveal-d3 { --reveal-delay: 240ms; }
   .reveal-d4 { --reveal-delay: 320ms; }
   .reveal-d5 { --reveal-delay: 400ms; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* iOS hace zoom si el input tiene menos de 16px.
-   Se aplica por capacidad táctil, no por ancho de pantalla. */
-@media (pointer: coarse) {
-  input, select, textarea { font-size: 16px; }
 }

@@ -125,7 +125,7 @@ const Login = () => {
             });
 
             login(respuesta.data.token);
-            navigate('/dashboard');
+            void navigate('/dashboard');
 
         } catch (err: any) {
             if (err.response?.data?.error) {
@@ -273,7 +273,7 @@ const Login = () => {
                                 Ingresá con tu cuenta para acceder a la plataforma.
                             </p>
 
-                            <form onSubmit={handleSubmit} className="mt-6 space-y-1" noValidate>
+                            <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-1" noValidate>
 
                                 {/* CORREO */}
                                 <div>
@@ -298,7 +298,6 @@ const Login = () => {
                                             placeholder="nombre@correo.com"
                                             autoComplete="email"
                                             inputMode="email"
-                                            autoFocus
                                             maxLength={150}
                                             aria-invalid={Boolean(errores.correo && touched.correo)}
                                             className={claseCampo(Boolean(errores.correo))}

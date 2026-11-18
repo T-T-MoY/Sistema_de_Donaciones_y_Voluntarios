@@ -39,34 +39,22 @@ import { errorMiddleware, notFoundMiddleware } from './middlewares/errorMiddlewa
 
 export const app: Application = express();
 
+app.disable('x-powered-by');
+
 // ============================================================================
 // MIDDLEWARES GLOBALES
 // ============================================================================
 
 // CORS
-// Acepta: FRONTEND_URL exacto (Render env), cualquier subdominio *.vercel.app,
-// y localhost para desarrollo.
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://localhost:4000',
-].filter(Boolean) as string[];
+// Se utiliza la variable de entorno FRONTEND_URL para permitir solo peticiones 
+// desde tu frontend. Si no está definida, usa localhost:5173 por defecto.
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Permite peticiones sin Origin (Postman, Render health-checks, curl)
-      if (!origin) return callback(null, true);
-      // Dominio exacto configurado
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      // Cualquier subdominio de vercel.app (preview deployments incluidos)
-      if (/^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z0-9]+\.vercel\.app$/.test(origin)) return callback(null, true);
-      if (origin.endsWith('.vercel.app')) return callback(null, true);
-      callback(new Error(`CORS bloqueado para: ${origin}`));
-    },
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: frontendUrl,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
   })
 );
 
