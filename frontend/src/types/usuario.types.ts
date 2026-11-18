@@ -11,7 +11,7 @@
 export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador';
 export type Estado = 'Activo' | 'Inactivo';
 export type Turno = 'Mañana' | 'Tarde' | 'Noche';
-export type NivelAcceso = 'Total' | 'Medio' | 'Bajo';
+export type NivelAcceso = 'SUPERADMIN' | 'GENERAL';
 
 // =====================================================
 // MODELO DE USUARIO (lo que devuelve el backend)
@@ -58,9 +58,8 @@ export interface UsuarioFormData {
   calle: string;
   zona: string;
   ciudad: string;
-  fecha_contratacion: string;
-  cargo: string;
-  turno: Turno;
+  habilidades: string;
+  disponibilidad: string;
   nivel_acceso: NivelAcceso;
 }
 
