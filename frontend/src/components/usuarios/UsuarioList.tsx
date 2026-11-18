@@ -23,6 +23,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usuarioApi } from '../../api/usuario.api';
 import { UsuarioCard } from './UsuarioCard';
 import UsuarioModal from './UsuarioModal';
+import ConfirmModal from '../ui/ConfirmModal';
 import type { Usuario, UsuarioListProps } from '../../types/usuario.types';
 import {
   obtenerId,
@@ -79,6 +80,11 @@ export const UsuarioList = ({
   const [cargando, setCargando] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [eliminandoId, setEliminandoId] = useState<number | string | null>(null);
+
+  // Modal de confirmación de eliminación y modal de avisos/errores
+  const [usuarioAEliminar, setUsuarioAEliminar] = useState<Usuario | null>(null);
+  const [aviso, setAviso] = useState<{ titulo: string; mensaje: string } | null>(null);
+  const [desactivandoId, setDesactivandoId] = useState<number | string | null>(null);
 
   // Filtros
   const [busqueda, setBusqueda] = useState<string>('');
@@ -141,25 +147,36 @@ export const UsuarioList = ({
     fetchUsuarios();
   };
 
-  const handleEliminar = async (user: Usuario): Promise<void> => {
+  // 1) El botón "Eliminar" solo abre el modal
+  const handleEliminar = (user: Usuario): void => {
     const id = obtenerId(user);
     if (id === undefined || id === null || id === '') {
-      alert('No se pudo identificar el usuario a eliminar (ID inválido).');
+      setAviso({
+        titulo: 'No se pudo eliminar',
+        mensaje: 'No se pudo identificar el usuario a eliminar (ID inválido).',
+      });
       return;
     }
+    setUsuarioAEliminar(user);
+  };
 
-    const nombre = getNombreCompleto(user);
-    const confirmar = window.confirm(
-      `¿Estás seguro de eliminar a "${nombre}" de forma permanente?\n\n` +
-        `⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n` +
-        `En ese caso, considera cambiar su estado a "Inactivo" en lugar de borrarlo.`
-    );
-    if (!confirmar) return;
+  // 2) Cancelar (no permite cerrar mientras se está eliminando)
+  const cancelarEliminacion = (): void => {
+    if (eliminandoId !== null || desactivandoId !== null) return;
+    setUsuarioAEliminar(null);
+  };
+
+  // 3) Confirmar: aquí va la lógica real de borrado
+  const confirmarEliminacion = async (): Promise<void> => {
+    if (!usuarioAEliminar) return;
+    const id = obtenerId(usuarioAEliminar);
+    if (id === undefined || id === null || id === '') return;
 
     setEliminandoId(id);
 
     try {
       await usuarioApi.delete(id);
+      setUsuarioAEliminar(null);
       await fetchUsuarios();
     } catch (err: any) {
       console.error('Error al eliminar usuario:', {
@@ -188,12 +205,63 @@ export const UsuarioList = ({
           'Sugerencia: cambia su estado a "Inactivo" en lugar de eliminarlo.';
       }
 
-      alert(`No se pudo eliminar (${status ?? 'sin conexión'}):\n\n${mensaje}`);
+      setUsuarioAEliminar(null);
+      setAviso({
+        titulo: `No se pudo eliminar (${status ?? 'sin conexión'})`,
+        mensaje,
+      });
     } finally {
       setEliminandoId(null);
     }
   };
+  const desactivarUsuario = async (): Promise<void> => {
+  if (!usuarioAEliminar) return;
+  const id = obtenerId(usuarioAEliminar);
+  if (id === undefined || id === null || id === '') return;
 
+  const nombre = getNombreCompleto(usuarioAEliminar);
+  setDesactivandoId(id);
+
+  try {
+    await usuarioApi.cambiarEstado(id, 'Inactivo');
+    setUsuarioAEliminar(null);
+    await fetchUsuarios();
+    setAviso({
+      titulo: 'Usuario desactivado',
+      mensaje:
+        `"${nombre}" ahora está Inactivo y conserva todo su historial. ` +
+        'Puedes reactivarlo cuando quieras desde "Editar".',
+    });
+  } catch (err: any) {
+    console.error('Error al desactivar usuario:', {
+      status: err.response?.status,
+      data: err.response?.data,
+    });
+
+    const status = err.response?.status;
+    let mensaje =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      err.message ||
+      'Error desconocido';
+
+    if (status === 401 || status === 403) {
+      mensaje =
+        'No tienes permisos para desactivar usuarios o tu sesión expiró. ' +
+        'Vuelve a iniciar sesión e inténtalo de nuevo.';
+    } else if (status === 404) {
+      mensaje = 'El usuario no existe o ya fue eliminado.';
+    }
+
+    setUsuarioAEliminar(null);
+    setAviso({
+      titulo: `No se pudo desactivar (${status ?? 'sin conexión'})`,
+      mensaje,
+    });
+  } finally {
+    setDesactivandoId(null);
+  }
+};
   const limpiarFiltros = (): void => {
     setBusqueda('');
     setFiltroRol('');
@@ -883,6 +951,67 @@ export const UsuarioList = ({
           onClose={() => setModalAbierto(false)}
           onSave={handleGuardarUsuario}
           usuarioId={usuarioIdEditar}
+        />
+      )}
+            {/* Modal de confirmación de eliminación */}
+      {!isPreview && (
+        <ConfirmModal
+          isOpen={usuarioAEliminar !== null}
+          variante="peligro"
+          titulo="Eliminar usuario"
+          mensaje={
+            <>
+              ¿Estás seguro de eliminar a{' '}
+              <strong className="text-text">
+                {usuarioAEliminar ? getNombreCompleto(usuarioAEliminar) : ''}
+              </strong>{' '}
+              de forma permanente? Esta acción no se puede deshacer.
+            </>
+          }
+          advertencia={
+            '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n' +
+            'En ese caso, considera cambiar su estado a "Inactivo" en lugar de borrarlo.'
+          }
+          textoConfirmar="Sí, eliminar"
+          textoCancelar="Cancelar"
+          cargando={eliminandoId !== null}
+          onConfirm={confirmarEliminacion}
+          onCancel={cancelarEliminacion}
+        />
+      )}
+
+            {/* Modal de confirmación de eliminación */}
+      {!isPreview && (
+        <ConfirmModal
+          isOpen={usuarioAEliminar !== null}
+          variante="peligro"
+          titulo="Eliminar usuario"
+          mensaje={
+            <>
+              ¿Estás seguro de eliminar a{' '}
+              <strong className="text-text">
+                {usuarioAEliminar ? getNombreCompleto(usuarioAEliminar) : ''}
+              </strong>{' '}
+              de forma permanente? Esta acción no se puede deshacer.
+            </>
+          }
+          advertencia={
+            usuarioAEliminar && esActivo(usuarioAEliminar)
+              ? '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n' +
+                'Si solo quieres que deje de tener acceso, usa "Desactivar": conserva su historial y se puede revertir.'
+              : '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.'
+          }
+          textoConfirmar="Sí, eliminar"
+          textoCancelar="Cancelar"
+          cargando={eliminandoId !== null || desactivandoId !== null}
+          accionEnCurso={desactivandoId !== null ? 'secundaria' : 'confirmar'}
+          accionSecundaria={
+            usuarioAEliminar && esActivo(usuarioAEliminar)
+              ? { texto: 'Desactivar', onClick: desactivarUsuario }
+              : undefined
+          }
+          onConfirm={confirmarEliminacion}
+          onCancel={cancelarEliminacion}
         />
       )}
     </div>
