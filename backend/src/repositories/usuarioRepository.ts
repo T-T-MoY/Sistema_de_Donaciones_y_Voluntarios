@@ -41,18 +41,29 @@ const splitApellido = (apellido: string | null): { paterno: string; materno: str
 const unirApellido = (paterno?: string | null, materno?: string | null): string =>
   [paterno, materno].map((p) => (p || '').trim()).filter(Boolean).join(' ');
 
-const estadoABooleano = (estado?: string | boolean | null): boolean => {
-  if (typeof estado === 'boolean') return estado;
+type EstadoUsuario = 'Activo' | 'Inactivo' | 'Eliminado';
+
+/** Convierte cualquier valor recibido (string/boolean) a un estado válido. */
+const normalizarEstadoUsuario = (estado?: string | boolean | null): EstadoUsuario => {
+  if (typeof estado === 'boolean') return estado ? 'Activo' : 'Inactivo';
   const valor = (estado || '').toLowerCase().trim();
-  return !['inactivo', 'inactive', 'bloqueado', 'false', '0'].includes(valor);
+  if (valor === 'eliminado') return 'Eliminado';
+  if (['inactivo', 'inactive', 'bloqueado', 'false', '0'].includes(valor)) return 'Inactivo';
+  return 'Activo';
 };
 
-const normalizarNivelAcceso = (nivel?: string | null): 'SUPERADMIN' | 'GENERAL' => {
-  const valor = (nivel || '').toLowerCase().trim();
-  return valor === 'superadmin' || valor === 'total' || valor === 'alto'
-    ? 'SUPERADMIN'
-    : 'GENERAL';
-};
+  /**
+   * Estado permitido al crear/editar/cambiar estado desde la API:
+   * "Eliminado" solo se asigna con eliminarUsuario(), nunca por estos caminos.
+   */
+  const estadoParaGuardar = (estado?: string | boolean | null): 'Activo' | 'Inactivo' =>
+    normalizarEstadoUsuario(estado) === 'Inactivo' ? 'Inactivo' : 'Activo';
+  const normalizarNivelAcceso = (nivel?: string | null): 'SUPERADMIN' | 'GENERAL' => {
+    const valor = (nivel || '').toLowerCase().trim();
+    return valor === 'superadmin' || valor === 'total' || valor === 'alto'
+      ? 'SUPERADMIN'
+      : 'GENERAL';
+  };
 
 const normalizarTipoBeneficiario = (tipo?: string | null): string => {
   const valor = (tipo || '').toLowerCase().trim();
@@ -71,7 +82,7 @@ const normalizarEstadoBeneficiario = (estado?: string | null): string => {
 const mapearUsuario = (fila: UsuarioRow): UsuarioResponse => {
   const { paterno, materno } = splitApellido(fila.apellido);
   const rol = normalizarRol(fila.rol);
-  const estado = fila.estado ? 'Activo' : 'Inactivo';
+  const estado = normalizarEstadoUsuario(fila.estado);
 
   return {
     id_usuario: fila.id_usuario,
@@ -86,7 +97,7 @@ const mapearUsuario = (fila: UsuarioRow): UsuarioResponse => {
     ...(fila.contraseña !== undefined ? { contraseña: fila.contraseña } : {}),
     estado,
     estado_cuenta: estado,
-    activo: Boolean(fila.estado),
+    activo: estado === 'Activo',
     fecha_registro: fila.fecha_creacion,
     fecha_creacion: fila.fecha_creacion,
     rol,
@@ -295,14 +306,14 @@ export const usuarioRepository = {
 
   async obtenerTodos(): Promise<UsuarioResponse[]> {
     const { rows } = await pool.query<UsuarioRow>(
-      `${SELECT_USUARIO} ORDER BY u.id_usuario DESC`
+      `${SELECT_USUARIO} WHERE u.estado <> 'Eliminado' ORDER BY u.id_usuario DESC`
     );
     return rows.map(mapearUsuario);
   },
 
   async obtenerPorId(id_usuario: number | string): Promise<UsuarioResponse | undefined> {
     const { rows } = await pool.query<UsuarioRow>(
-      `${SELECT_USUARIO} WHERE u.id_usuario = $1`,
+      `${SELECT_USUARIO} WHERE u.id_usuario = $1 AND u.estado <> 'Eliminado'`,
       [id_usuario]
     );
     return rows[0] ? mapearUsuario(rows[0]) : undefined;
@@ -330,7 +341,7 @@ export const usuarioRepository = {
           usuarioData.correo.toLowerCase().trim(),
           usuarioData.telefono || null,
           usuarioData.contraseña,
-          estadoABooleano(usuarioData.estado_cuenta),
+          estadoParaGuardar(usuarioData.estado_cuenta),
         ]
       );
 
@@ -355,9 +366,10 @@ export const usuarioRepository = {
     | undefined
   > {
     const { rows } = await pool.query(
-      `UPDATE usuario SET estado = $1 WHERE id_usuario = $2
-       RETURNING id_usuario, nombre, correo, estado`,
-      [estadoABooleano(nuevoEstado), id_usuario]
+      `UPDATE usuario SET estado = $1
+        WHERE id_usuario = $2 AND estado <> 'Eliminado'
+        RETURNING id_usuario, nombre, correo, estado`,
+      [estadoParaGuardar(nuevoEstado), id_usuario]
     );
     const fila = rows[0];
     if (!fila) return undefined;
@@ -365,7 +377,7 @@ export const usuarioRepository = {
       id_usuario: fila.id_usuario,
       nombre: fila.nombre,
       correo: fila.correo,
-      estado: fila.estado ? 'Activo' : 'Inactivo',
+      estado: normalizarEstadoUsuario(fila.estado),
     };
   },
 
@@ -427,7 +439,7 @@ export const usuarioRepository = {
         unirApellido(usuarioData.paterno, usuarioData.materno),
         usuarioData.correo.toLowerCase().trim(),
         usuarioData.telefono || null,
-        estadoABooleano(usuarioData.estado_cuenta),
+        estadoParaGuardar(usuarioData.estado_cuenta),
       ];
       let contador = 6;
 
@@ -467,7 +479,9 @@ export const usuarioRepository = {
     id_usuario: number | string
   ): Promise<{ id_usuario: number } | undefined> {
     const { rows } = await pool.query(
-      `DELETE FROM usuario WHERE id_usuario = $1 RETURNING id_usuario`,
+      `UPDATE usuario SET estado = 'Eliminado'
+        WHERE id_usuario = $1 AND estado <> 'Eliminado'
+        RETURNING id_usuario`,
       [id_usuario]
     );
     return rows[0];

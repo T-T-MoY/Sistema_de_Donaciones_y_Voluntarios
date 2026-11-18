@@ -20,7 +20,7 @@ export interface UsuarioRow {
   correo: string;
   telefono: string | null;
   contraseña?: string;
-  estado: boolean;
+  estado: string;
   fecha_creacion: Date | string;
   nivel_acceso: string | null;
   tipo_beneficiario: string | null;

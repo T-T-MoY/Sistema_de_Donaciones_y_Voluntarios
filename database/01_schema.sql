@@ -12,7 +12,7 @@ CREATE TABLE usuario (
     correo         VARCHAR(150) NOT NULL UNIQUE,
     telefono       VARCHAR(20),
     password       VARCHAR(255) NOT NULL,
-    estado         BOOLEAN NOT NULL DEFAULT TRUE, -- TRUE: Activo | FALSE: Bloqueado/Inactivo
+    estado         VARCHAR(20) NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo','Inactivo','Eliminado')), -- TRUE: Activo | FALSE: Bloqueado/Inactivo
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

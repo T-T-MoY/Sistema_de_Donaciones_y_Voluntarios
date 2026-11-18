@@ -142,6 +142,13 @@ export const authService = {
     if (usuario.activo === false) {
       throw new AppError('Tu cuenta ha sido desactivada', 403);
     }
+    // en login():
+    if (!usuario || !usuario.contraseña || usuario.estado === 'Eliminado') {
+      throw new AppError('Credenciales inválidas', 401);
+    }
+
+    // en la recuperación de contraseña:
+    if (!usuario || usuario.estado === 'Eliminado') return RESPUESTA;
 
     const hash = usuario.contraseña;
     const esHash = /^\$2[aby]\$/.test(hash);
