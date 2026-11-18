@@ -39,14 +39,20 @@ import { errorMiddleware, notFoundMiddleware } from './middlewares/errorMiddlewa
 
 export const app: Application = express();
 
+app.disable('x-powered-by');
+
 // ============================================================================
 // MIDDLEWARES GLOBALES
 // ============================================================================
 
 // CORS
+// Se utiliza la variable de entorno FRONTEND_URL para permitir solo peticiones 
+// desde tu frontend. Si no está definida, usa localhost:5173 por defecto.
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 app.use(
   cors({
-    origin: '*',
+    origin: frontendUrl,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })

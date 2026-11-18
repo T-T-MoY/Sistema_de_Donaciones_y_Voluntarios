@@ -197,7 +197,7 @@ const SolicitarRecuperacion = () => {
                                         tu contraseña.
                                     </p>
 
-                                    <form onSubmit={handleSubmit} className="mt-6 space-y-1" noValidate>
+                                    <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-1" noValidate>
 
                                         <div>
                                             <label htmlFor="recuperacion-correo" className={etiquetaCampo}>
@@ -220,7 +220,6 @@ const SolicitarRecuperacion = () => {
                                                     placeholder="nombre@correo.com"
                                                     autoComplete="email"
                                                     inputMode="email"
-                                                    autoFocus
                                                     maxLength={150}
                                                     className={`${claseInput(errorCampo, touched)} pl-11`}
                                                 />

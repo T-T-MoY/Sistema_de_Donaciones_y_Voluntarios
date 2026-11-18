@@ -119,7 +119,7 @@ export const UsuarioList = ({
   }, []);
 
   useEffect(() => {
-    if (token) fetchUsuarios();
+    if (token) void fetchUsuarios();
   }, [token, fetchUsuarios]);
 
   // Resetear página al cambiar filtros
@@ -138,7 +138,7 @@ export const UsuarioList = ({
   const abrirModalEditar = (usuario: Usuario): void => {
     const id = obtenerId(usuario);
     if (id === undefined || id === null) {
-      mostrarError('', 'No se pudo abrir el usuario');
+      void mostrarError('', 'No se pudo abrir el usuario');
       return;
     }
     setUsuarioIdEditar(Number(id));
@@ -146,7 +146,7 @@ export const UsuarioList = ({
   };
 
   const handleGuardarUsuario = (): void => {
-    fetchUsuarios();
+    void fetchUsuarios();
   };
 
   // 1) El botón "Eliminar" solo abre el modal
@@ -180,7 +180,7 @@ export const UsuarioList = ({
       await usuarioApi.delete(id);
       setUsuarioAEliminar(null);
       await fetchUsuarios();
-      exito('', 'Usuario eliminado con éxito');
+      void exito('', 'Usuario eliminado con éxito');
     } catch (err: any) {
       console.error('Error al eliminar usuario:', {
         status: err.response?.status,
@@ -227,7 +227,7 @@ export const UsuarioList = ({
     await usuarioApi.cambiarEstado(id, 'Inactivo');
     setUsuarioAEliminar(null);
     await fetchUsuarios();
-    exito('', 'Usuario desactivado');
+    void exito('', 'Usuario desactivado');
   } catch (err: any) {
     console.error('Error al desactivar usuario:', {
       status: err.response?.status,
@@ -282,7 +282,7 @@ export const UsuarioList = ({
     usuarios.forEach((u) => {
       if (u.rol) set.add(String(u.rol));
     });
-    return Array.from(set).sort();
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [usuarios]);
 
   const estadosDisponibles = useMemo(() => {
@@ -291,7 +291,7 @@ export const UsuarioList = ({
       const est = getEstado(u);
       if (est) set.add(est);
     });
-    return Array.from(set).sort();
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [usuarios]);
 
   // =====================================================
@@ -539,10 +539,11 @@ export const UsuarioList = ({
 
               {/* Filtro Rol */}
               <div className="min-w-0 lg:col-span-2">
-                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
+                <label htmlFor="filtro-rol" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
                   Rol
                 </label>
                 <select
+                  id="filtro-rol"
                   value={filtroRol}
                   onChange={(e) => setFiltroRol(e.target.value)}
                   className={claseSelect}
@@ -558,10 +559,11 @@ export const UsuarioList = ({
 
               {/* Filtro Estado */}
               <div className="min-w-0 lg:col-span-2">
-                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
+                <label htmlFor="filtro-estado" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
                   Estado
                 </label>
                 <select
+                  id="filtro-estado"
                   value={filtroEstado}
                   onChange={(e) => setFiltroEstado(e.target.value)}
                   className={claseSelect}
@@ -577,10 +579,11 @@ export const UsuarioList = ({
 
               {/* Por página */}
               <div className="min-w-0 lg:col-span-1">
-                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
+                <label htmlFor="por-pagina" className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.12em] text-text-muted">
                   Mostrar
                 </label>
                 <select
+                  id="por-pagina"
                   value={porPagina}
                   onChange={(e) => setPorPagina(Number(e.target.value))}
                   className={claseSelect}

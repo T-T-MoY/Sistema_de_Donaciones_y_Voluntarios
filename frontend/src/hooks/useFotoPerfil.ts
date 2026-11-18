@@ -47,7 +47,7 @@ export const useFotoPerfil = (): string | null => {
       }
     };
 
-    fetchFoto();
+    void fetchFoto();
 
     return () => {
       cancelado = true;

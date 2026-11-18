@@ -47,7 +47,7 @@ export const esSoloNumeros = (texto: any): boolean => {
  */
 export const esCorreoValido = (correo: any): boolean => {
     if (!correo || typeof correo !== 'string') return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim());
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo.trim());
 };
 
 /**
@@ -77,7 +77,7 @@ export const calcularEdad = (fechaNacimiento: string | Date | null | undefined):
     if (!fechaNacimiento) return null;
 
     const nac = new Date(fechaNacimiento);
-    if (isNaN(nac.getTime())) return null;
+    if (Number.isNaN(nac.getTime())) return null;
 
     const hoy = new Date();
 
@@ -104,7 +104,7 @@ export const esFechaNacimientoValida = (fechaNacimiento: string | Date | null | 
     }
 
     const nac = new Date(fechaNacimiento);
-    if (isNaN(nac.getTime())) {
+    if (Number.isNaN(nac.getTime())) {
         return { valido: false, error: 'Fecha de nacimiento inválida.' };
     }
 

@@ -85,7 +85,7 @@ const ResetPassword = () => {
             }
         };
 
-        validarToken();
+        void validarToken();
     }, [token]);
 
     // =====================================================
@@ -374,7 +374,7 @@ const ResetPassword = () => {
                                         una mayúscula, una minúscula y un número.
                                     </p>
 
-                                    <form onSubmit={handleSubmit} className="mt-6 space-y-1" noValidate>
+                                    <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 space-y-1" noValidate>
 
                                         {/* NUEVA CONTRASEÑA */}
                                         <div>

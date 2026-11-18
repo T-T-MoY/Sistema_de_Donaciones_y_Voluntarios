@@ -2,7 +2,7 @@
  * ============================================================================
  * ARCHIVO: UsuarioModal.tsx
  * COMPONENTE: Modal para crear / editar usuarios.
- * - Valida por rol (Donante, Voluntario, Admin).
+ * - Valida por rol (Donante, Voluntario, Administrador).
  * - Carga datos si recibe `usuarioId`.
  * - Renderiza en portal.
  * ============================================================================
@@ -10,15 +10,14 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import api from '../../api/client';                       // ← +1 ../
-import FieldError from '../ui/FieldError';                    // ← +1 ../
+import api from '../../api/client';
+import FieldError from '../ui/FieldError';
 import { useToast } from '../../context/ToastContext';
 import {
     validarCampo,
     validarFormularioCompleto,
-    claseInput,
-    calcularEdad
-} from '../../utils/validaciones';                          // ← +1 ../
+    claseInput
+} from '../../utils/validaciones';
 import type { Rol, UsuarioFormData } from '../../types/usuario.types';
 import { getRolDisplay } from '../../types/usuario.types';
 
@@ -57,6 +56,16 @@ const claseSelect =
 // =====================================================
 // COMPONENTE
 // =====================================================
+// El backend devuelve Donante / Voluntario / Administrador / Beneficiario.
+// El select del modal usa Cliente / Empleado / Admin, así que se traduce al cargar.
+const rolBackendAFormulario = (rol?: string | null): Rol => {
+    const r = (rol || '').toLowerCase().trim();
+    if (r === 'administrador' || r === 'admin') return 'Admin';
+    if (r === 'voluntario' || r === 'empleado') return 'Empleado';
+    if (r === 'beneficiario') return 'Beneficiario';
+    return 'Cliente';
+};
+
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
     const modoEdicion = Boolean(usuarioId);
     const { exito } = useToast();
@@ -75,10 +84,14 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         calle: '',
         zona: '',
         ciudad: '',
-        fecha_contratacion: '',
-        cargo: '',
-        turno: 'Mañana',
-        nivel_acceso: 'Total'
+        habilidades: '',
+        disponibilidad: 'Mañana',
+        tipo_beneficiario: 'Persona',
+        direccion: '',
+        necesidad: '',
+        descripcion: '',
+        estado_beneficiario: 'Pendiente',
+        nivel_acceso: 'GENERAL'
     };
 
     const [formData, setFormData] = useState<FormData>(estadoInicial);
@@ -94,6 +107,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const rolNorm = (formData.rol || '').toLowerCase().trim();
     const esCliente = rolNorm === 'cliente';
     const esEmpleado = rolNorm === 'empleado';
+    const esBeneficiario = rolNorm === 'beneficiario';
     const esAdmin = rolNorm === 'admin' || rolNorm === 'administrador';
 
     // =====================================================
@@ -151,7 +165,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     correo: d.correo || '',
                     telefono: d.telefono || '',
                     contraseña: '',
-                    rol: d.rol || 'Cliente',
+                    rol: rolBackendAFormulario(d.rol),
                     estado: d.estado_cuenta || 'Activo',
                     ci_nit: d.ci_nit ? String(d.ci_nit) : '',
                     fecha_nacimiento: d.fecha_nacimiento
@@ -160,12 +174,16 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     calle: d.calle || '',
                     zona: d.zona || '',
                     ciudad: d.ciudad || '',
-                    fecha_contratacion: d.fecha_contratacion
-                        ? new Date(d.fecha_contratacion).toISOString().split('T')[0]
-                        : '',
-                    cargo: d.cargo || '',
-                    turno: d.turno || 'Mañana',
-                    nivel_acceso: d.nivel_acceso || 'Total'
+                    habilidades: Array.isArray(d.habilidades)
+                        ? d.habilidades.join(', ')
+                        : (d.habilidades || ''),
+                    disponibilidad: d.disponibilidad || 'Mañana',
+                    tipo_beneficiario: d.tipo_beneficiario || 'Persona',
+                    direccion: d.direccion || '',
+                    necesidad: d.necesidad || '',
+                    descripcion: d.descripcion || '',
+                    estado_beneficiario: d.estado_beneficiario || 'Pendiente',
+                    nivel_acceso: d.nivel_acceso === 'SUPERADMIN' ? 'SUPERADMIN' : 'GENERAL'
                 });
                 setErrores({});
                 setTouched({});
@@ -174,7 +192,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 setError('Error al cargar los datos del usuario');
             }
         };
-        fetchUsuario();
+        void fetchUsuario();
     }, [isOpen, usuarioId]);
 
     if (!isOpen) return null;
@@ -182,7 +200,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     // HANDLERS
     // =====================================================
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
         const { name, value } = e.target;
 
         let valorFiltrado = value;
@@ -200,7 +218,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         if (error) setError('');
     };
 
-    const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const handleBlur = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
         const { name, value } = e.target;
         setTouched((prev) => ({ ...prev, [name]: true }));
         const err = validarCampo(name, value, formData);
@@ -249,17 +267,23 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             };
 
             if (esCliente) {
-                payload.ci_nit = formData.ci_nit ? String(formData.ci_nit).trim() : '';
-                payload.fecha_nacimiento = formData.fecha_nacimiento || '';
                 payload.calle = formData.calle?.trim() || '';
                 payload.zona = formData.zona?.trim() || '';
                 payload.ciudad = formData.ciudad?.trim() || '';
             }
 
             if (esEmpleado) {
-                payload.fecha_contratacion = formData.fecha_contratacion;
-                payload.cargo = formData.cargo?.trim() || '';
-                payload.turno = formData.turno;
+                payload.habilidades = formData.habilidades;
+                payload.disponibilidad = formData.disponibilidad?.trim() || '';
+            }
+
+            if (esBeneficiario) {
+                payload.tipo_beneficiario = formData.tipo_beneficiario;
+                payload.documento = formData.ci_nit ? String(formData.ci_nit).trim() : '';
+                payload.direccion = formData.direccion?.trim() || '';
+                payload.necesidad = formData.necesidad?.trim() || '';
+                payload.descripcion = formData.descripcion?.trim() || '';
+                payload.estado_beneficiario = formData.estado_beneficiario;
             }
 
             if (esAdmin) {
@@ -279,9 +303,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             }
 
             if (modoEdicion) {
-                exito('', 'Usuario actualizado con éxito');
+                void exito('', 'Usuario actualizado con éxito');
             } else {
-                exito('', 'Usuario creado con éxito');
+                void exito('', 'Usuario creado con éxito');
             }
 
             onSave();
@@ -293,29 +317,23 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         }
     };
 
-    const fechaMaxima = new Date();
-    fechaMaxima.setFullYear(fechaMaxima.getFullYear() - 15);
-    const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
-
-    const edadCalculada = formData.fecha_nacimiento
-        ? calcularEdad(formData.fecha_nacimiento)
-        : null;
-
     // =====================================================
     // RENDER (portal)
     // =====================================================
     return createPortal(
-        <div
-            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:p-4"
-            onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
-            }}
-        >
+        <div className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:p-4">
+            <button
+                type="button"
+                className="absolute inset-0 h-full w-full cursor-default"
+                onClick={onClose}
+                aria-label="Cerrar modal"
+                tabIndex={-1}
+            />
             <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-usuario"
-                className="anim-scale flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
+                className="relative z-10 anim-scale flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
             >
                 <span
                     aria-hidden="true"
@@ -443,6 +461,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             >
                                 <option value="Cliente">{getRolDisplay('Cliente')}</option>
                                 <option value="Empleado">{getRolDisplay('Empleado')}</option>
+                                <option value="Beneficiario">Beneficiario</option>
                                 <option value="Admin">{getRolDisplay('Admin')}</option>
                             </select>
                         </div>
@@ -493,42 +512,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         <>
                             <h3 className={`${tituloSeccion} pt-3`}>
                                 <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
-                                Datos personales
+                                Datos del donante
                             </h3>
-
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                    <label htmlFor="modal-ci" className={etiquetaCampo}>CI / NIT</label>
-                                    <input
-                                        id="modal-ci"
-                                        type="text" name="ci_nit"
-                                        inputMode="numeric"
-                                        value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
-                                        maxLength={15}
-                                        className={claseInput(errores.ci_nit, touched.ci_nit)}
-                                    />
-                                    <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
-                                </div>
-                                <div>
-                                    <label htmlFor="modal-fecha-nacimiento" className={etiquetaCampo}>Fecha de nacimiento</label>
-                                    <input
-                                        id="modal-fecha-nacimiento"
-                                        type="date" name="fecha_nacimiento"
-                                        value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
-                                        max={fechaMaximaStr}
-                                        className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
-                                    />
-                                    {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
-                                        <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
-                                    ) : (
-                                        <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
-                                            {edadCalculada !== null ? (
-                                                <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
-                                            ) : '\u00A0'}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
 
                             <div>
                                 <label htmlFor="modal-calle" className={etiquetaCampo}>Calle / Avenida</label>
@@ -577,43 +562,127 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 Datos de voluntariado
                             </h3>
 
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
-                                    <label htmlFor="modal-fecha-contratacion" className={etiquetaCampo}>Fecha de incorporación *</label>
+                                    <label htmlFor="modal-habilidades" className={etiquetaCampo}>Habilidades *</label>
                                     <input
-                                        id="modal-fecha-contratacion"
-                                        type="date" name="fecha_contratacion"
-                                        value={formData.fecha_contratacion} onChange={handleChange} onBlur={handleBlur}
-                                        className={claseInput(errores.fecha_contratacion, touched.fecha_contratacion)}
+                                        id="modal-habilidades"
+                                        type="text" name="habilidades"
+                                        value={formData.habilidades} onChange={handleChange} onBlur={handleBlur}
+                                        placeholder="Ej: Logística, Primeros auxilios"
+                                        maxLength={300}
+                                        className={claseInput(errores.habilidades, touched.habilidades)}
                                     />
-                                    <FieldError error={errores.fecha_contratacion} touched={touched.fecha_contratacion} />
+                                    <FieldError error={errores.habilidades} touched={touched.habilidades} />
                                 </div>
                                 <div>
-                                    <label htmlFor="modal-cargo" className={etiquetaCampo}>Cargo *</label>
-                                    <input
-                                        id="modal-cargo"
-                                        type="text" name="cargo"
-                                        value={formData.cargo} onChange={handleChange} onBlur={handleBlur}
-                                        placeholder="Ej: Coordinador de voluntariado"
-                                        maxLength={100}
-                                        className={claseInput(errores.cargo, touched.cargo)}
-                                    />
-                                    <FieldError error={errores.cargo} touched={touched.cargo} />
-                                </div>
-                                <div>
-                                    <label htmlFor="modal-turno" className={etiquetaCampo}>Turno *</label>
+                                    <label htmlFor="modal-disponibilidad" className={etiquetaCampo}>Disponibilidad *</label>
                                     <select
-                                        id="modal-turno"
-                                        name="turno"
-                                        value={formData.turno}
+                                        id="modal-disponibilidad"
+                                        name="disponibilidad"
+                                        value={formData.disponibilidad}
                                         onChange={handleChange}
                                         className={claseSelect}
                                     >
                                         <option value="Mañana">Mañana</option>
                                         <option value="Tarde">Tarde</option>
                                         <option value="Noche">Noche</option>
+                                        <option value="Fines de semana">Fines de semana</option>
                                     </select>
                                 </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* === CAMPOS BENEFICIARIO === */}
+                    {esBeneficiario && (
+                        <>
+                            <h3 className={`${tituloSeccion} pt-3`}>
+                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
+                                Datos del beneficiario
+                            </h3>
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                    <label htmlFor="modal-tipo-benef" className={etiquetaCampo}>Tipo *</label>
+                                    <select
+                                        id="modal-tipo-benef"
+                                        name="tipo_beneficiario"
+                                        value={formData.tipo_beneficiario}
+                                        onChange={handleChange}
+                                        className={claseSelect}
+                                    >
+                                        <option value="Persona">Persona</option>
+                                        <option value="Familia">Familia</option>
+                                        <option value="Institucion">Institución</option>
+                                    </select>
+                                    <FieldError error={errores.tipo_beneficiario} touched={touched.tipo_beneficiario} />
+                                </div>
+                                <div>
+                                    <label htmlFor="modal-documento" className={etiquetaCampo}>Documento (CI / NIT) *</label>
+                                    <input
+                                        id="modal-documento"
+                                        type="text" name="ci_nit"
+                                        inputMode="numeric"
+                                        value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
+                                        maxLength={15}
+                                        className={claseInput(errores.ci_nit, touched.ci_nit)}
+                                    />
+                                    <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-direccion" className={etiquetaCampo}>Dirección *</label>
+                                <input
+                                    id="modal-direccion"
+                                    type="text" name="direccion"
+                                    value={formData.direccion} onChange={handleChange} onBlur={handleBlur}
+                                    maxLength={255}
+                                    className={claseInput(errores.direccion, touched.direccion)}
+                                />
+                                <FieldError error={errores.direccion} touched={touched.direccion} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-necesidad" className={etiquetaCampo}>Necesidad *</label>
+                                <input
+                                    id="modal-necesidad"
+                                    type="text" name="necesidad"
+                                    value={formData.necesidad} onChange={handleChange} onBlur={handleBlur}
+                                    placeholder="Ej: Alimentos, ropa, útiles escolares"
+                                    maxLength={150}
+                                    className={claseInput(errores.necesidad, touched.necesidad)}
+                                />
+                                <FieldError error={errores.necesidad} touched={touched.necesidad} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-descripcion" className={etiquetaCampo}>Descripción</label>
+                                <textarea
+                                    id="modal-descripcion"
+                                    name="descripcion"
+                                    rows={3}
+                                    value={formData.descripcion} onChange={handleChange} onBlur={handleBlur}
+                                    maxLength={2000}
+                                    className={claseInput(errores.descripcion, touched.descripcion)}
+                                />
+                                <FieldError error={errores.descripcion} touched={touched.descripcion} />
+                            </div>
+
+                            <div>
+                                <label htmlFor="modal-estado-benef" className={etiquetaCampo}>Estado de verificación</label>
+                                <select
+                                    id="modal-estado-benef"
+                                    name="estado_beneficiario"
+                                    value={formData.estado_beneficiario}
+                                    onChange={handleChange}
+                                    className={claseSelect}
+                                >
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Verificado">Verificado</option>
+                                    <option value="Rechazado">Rechazado</option>
+                                </select>
                             </div>
                         </>
                     )}
@@ -634,9 +703,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     onChange={handleChange} onBlur={handleBlur}
                                     className={claseInput(errores.nivel_acceso, touched.nivel_acceso)}
                                 >
-                                    <option value="Total">Total (SuperAdmin)</option>
-                                    <option value="Medio">Medio</option>
-                                    <option value="Bajo">Bajo</option>
+                                    <option value="GENERAL">General</option>
+                                    <option value="SUPERADMIN">Superadmin</option>
                                 </select>
                                 <FieldError error={errores.nivel_acceso} touched={touched.nivel_acceso} />
                             </div>

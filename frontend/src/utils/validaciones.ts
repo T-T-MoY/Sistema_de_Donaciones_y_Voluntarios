@@ -40,7 +40,7 @@ export const esSoloNumeros = (texto: any): boolean => {
  */
 export const esCorreoValido = (correo: any): boolean => {
     if (!correo || typeof correo !== 'string') return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim());
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(correo.trim());
 };
 
 /**
@@ -83,7 +83,7 @@ export const calcularEdad = (fechaNacimiento: string | Date | null | undefined):
     if (!fechaNacimiento) return null;
 
     const nac = new Date(fechaNacimiento);
-    if (isNaN(nac.getTime())) return null;
+    if (Number.isNaN(nac.getTime())) return null;
 
     const hoy = new Date();
     if (nac > hoy) return null;
@@ -108,7 +108,7 @@ export const esFechaNacimientoValida = (fechaNacimiento: string | Date | null | 
     }
 
     const nac = new Date(fechaNacimiento);
-    if (isNaN(nac.getTime())) {
+    if (Number.isNaN(nac.getTime())) {
         return { valido: false, error: 'Fecha de nacimiento inválida.' };
     }
 
@@ -245,25 +245,45 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
             }
             return '';
 
-        // Empleado
-        case 'fecha_contratacion':
-            if (!value) return 'La fecha de contratación es obligatoria.';
+        // Beneficiario
+        case 'tipo_beneficiario':
+            if (!['Persona', 'Familia', 'Institucion'].includes(value)) return 'Seleccioná un tipo válido.';
             return '';
 
-        case 'cargo':
-            if (!value || !value.trim()) return 'El cargo es obligatorio.';
-            if (value.trim().length < 3) return 'Mínimo 3 caracteres.';
-            if (value.trim().length > 100) return 'Máximo 100 caracteres.';
+        case 'direccion':
+            if (!value || !String(value).trim()) return 'La dirección es obligatoria.';
+            if (String(value).trim().length > 255) return 'Máximo 255 caracteres.';
             return '';
 
-        case 'turno':
-            if (!value) return 'El turno es obligatorio.';
-            if (!['Mañana', 'Tarde', 'Noche'].includes(value)) return 'Turno inválido.';
+        case 'necesidad':
+            if (!value || !String(value).trim()) return 'La necesidad es obligatoria.';
+            if (String(value).trim().length > 150) return 'Máximo 150 caracteres.';
+            return '';
+
+        case 'descripcion':
+            if (value && String(value).trim().length > 2000) return 'Máximo 2000 caracteres.';
+            return '';
+
+        // Voluntario
+        case 'habilidades': {
+            const lista = String(value || '')
+                .split(',')
+                .map((h) => h.trim())
+                .filter((h) => h.length > 0);
+            if (lista.length === 0) return 'Indicá al menos una habilidad (separadas por comas).';
+            if (lista.length > 20) return 'Máximo 20 habilidades.';
+            if (lista.some((h) => h.length > 60)) return 'Cada habilidad puede tener máximo 60 caracteres.';
+            return '';
+        }
+
+        case 'disponibilidad':
+            if (!value || !String(value).trim()) return 'La disponibilidad es obligatoria.';
+            if (String(value).trim().length > 100) return 'Máximo 100 caracteres.';
             return '';
 
         case 'antiguedad':
             if (value !== undefined && value !== '' && value !== null) {
-                if (isNaN(Number(value)) || Number(value) < 0) return 'Debe ser un número mayor o igual a 0.';
+                if (Number.isNaN(Number(value)) || Number(value) < 0) return 'Debe ser un número mayor o igual a 0.';
                 if (Number(value) > 100) return 'Valor demasiado alto.';
             }
             return '';
@@ -271,7 +291,7 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
         // Admin
         case 'nivel_acceso':
             if (!value) return 'El nivel de acceso es obligatorio.';
-            if (!['Total', 'Medio', 'Bajo'].includes(value)) return 'Nivel inválido.';
+            if (!['SUPERADMIN', 'GENERAL'].includes(value)) return 'Nivel inválido.';
             return '';
 
         // Dirección (opcionales)
@@ -340,12 +360,19 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
 
     // === CAMPOS ESPECÍFICOS DEL ROL ===
     if (rol === 'Empleado') {
-        ['fecha_contratacion', 'cargo', 'turno'].forEach((campo) => {
+        ['habilidades', 'disponibilidad'].forEach((campo) => {
             const err = validarCampo(campo, formData[campo], formData);
             if (err) errores[campo] = err;
         });
         const errAnti = validarCampo('antiguedad', formData.antiguedad, formData);
         if (errAnti) errores.antiguedad = errAnti;
+    }
+
+    if (rol === 'Beneficiario') {
+        ['ci_nit', 'tipo_beneficiario', 'direccion', 'necesidad', 'descripcion'].forEach((campo) => {
+            const err = validarCampo(campo, formData[campo], formData);
+            if (err) errores[campo] = err;
+        });
     }
 
     if (rol === 'Admin' || rol === 'Administrador') {

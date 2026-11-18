@@ -185,7 +185,7 @@ const Registro = () => {
                 edad
             });
             exito('', 'Registro completado');
-            navigate('/login');
+            void navigate('/login');
         } catch (err: any) {
             if (err.response?.data?.error) {
                 setError(err.response.data.error);
@@ -316,7 +316,7 @@ const Registro = () => {
                                 <ThemeToggle />
                             </div>
 
-                            <form onSubmit={handleSubmit} className="mt-4 space-y-3" noValidate>
+                            <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-3" noValidate>
 
                                 {/* FILA 1: NOMBRES + PATERNO + MATERNO */}
                                 <div className="grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-3">

@@ -77,17 +77,21 @@ const ConfirmModal = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div
-      className="anim-fade fixed inset-0 z-[60] flex items-center justify-center bg-night/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top,0px))] backdrop-blur-md"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !cargando) onCancel();
-      }}
-    >
+    <div className="anim-fade fixed inset-0 z-[60] flex items-center justify-center bg-night/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top,0px))] backdrop-blur-md">
+      <button
+        type="button"
+        className="absolute inset-0 h-full w-full cursor-default"
+        onClick={() => {
+          if (!cargando) onCancel();
+        }}
+        aria-label="Cerrar modal"
+        tabIndex={-1}
+      />
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="titulo-confirm-modal"
-        className="anim-scale max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-surface-elevated shadow-deep"
+        className="relative z-10 anim-scale max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-surface-elevated shadow-deep"
       >
         <span
           aria-hidden="true"

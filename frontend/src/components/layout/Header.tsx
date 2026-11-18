@@ -21,8 +21,8 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const rolActual = usuario?.rol || 'Usuario';
 
   const handleLogout = (): void => {
-    logout();
-    navigate('/login');
+    void logout();
+    void navigate('/login');
   };
 
   // Cerrar dropdown al hacer click fuera
