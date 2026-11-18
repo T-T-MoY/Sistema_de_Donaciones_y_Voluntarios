@@ -22,7 +22,7 @@
 
 | Servicio | URL |
 |---|---|
-| **Frontend** | https://sistema-de-donaciones-y-voluntarios-6qezhebag-yuners1.vercel.app |
+| **Frontend** | https://sistema-de-donaciones-y-voluntarios.vercel.app/ |
 | **Backend API** | https://sistema-de-donaciones-y-voluntarios.onrender.com/api |
 | **Health check** | https://sistema-de-donaciones-y-voluntarios.onrender.com/api/health |
 
