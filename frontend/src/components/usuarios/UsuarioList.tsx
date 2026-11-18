@@ -454,7 +454,7 @@ export const UsuarioList = ({
         {!isPreview && (
           <button
             onClick={abrirModalNuevo}
-            className="press inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift dark:bg-linear-to-r dark:from-[#be185d] dark:to-[#9d174d] dark:text-white dark:hover:from-[#9d174d] dark:hover:to-[#831843] dark:hover:text-white sm:w-auto"
+            className="press inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift sm:w-auto"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M12 4v16m8-8H4" />

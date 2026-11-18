@@ -244,8 +244,8 @@ const Registro = () => {
                         </div>
                     </div>
 
-                    {/* COLUMNA DERECHA: tarjeta de registro */}
-                    <div className="mx-auto w-full max-w-[480px] lg:max-w-[540px]">
+                    {/* COLUMNA DERECHA: tarjeta de registro (ANCHO AJUSTADO) */}
+                    <div className="mx-auto w-full max-w-[480px] lg:max-w-[580px]">
                         <div className="anim-rise relative overflow-hidden rounded-[1.75rem] border border-border bg-surface-elevated p-6 shadow-deep sm:p-8">
                             <span
                                 aria-hidden="true"
@@ -269,7 +269,7 @@ const Registro = () => {
                                 Completá tus datos para empezar a participar.
                             </p>
 
-                            <form onSubmit={handleSubmit} className="mt-7 space-y-1" noValidate>
+                            <form onSubmit={handleSubmit} className="mt-7 space-y-4" noValidate>
 
                                 {/* NOMBRE */}
                                 <div>
@@ -291,7 +291,7 @@ const Registro = () => {
                                 </div>
 
                                 {/* APELLIDOS */}
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className={etiquetaCampo} htmlFor="registro-paterno">
                                             Apellido paterno *
@@ -320,7 +320,7 @@ const Registro = () => {
                                             value={formData.materno}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            placeholder="Herrera (opcional)"
+                                            placeholder="Opcional"
                                             maxLength={50}
                                             className={claseInput(errores.materno, touched.materno)}
                                         />
@@ -329,7 +329,7 @@ const Registro = () => {
                                 </div>
 
                                 {/* CI/NIT Y TELÉFONO */}
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className={etiquetaCampo} htmlFor="registro-ci">
                                             CI / NIT *
@@ -395,13 +395,13 @@ const Registro = () => {
                                 </div>
 
                                 {/* DIRECCIÓN */}
-                                <div className="pt-4">
+                                <div className="pt-2">
                                     <h3 className={tituloSeccion}>
                                         <span className="h-px w-5 bg-accent" />
                                         Dirección
                                     </h3>
 
-                                    <div className="mt-4 space-y-1">
+                                    <div className="mt-4 space-y-4">
                                         <div>
                                             <label className={etiquetaCampo} htmlFor="registro-calle">
                                                 Calle / Avenida
@@ -420,7 +420,7 @@ const Registro = () => {
                                             <FieldError error={errores.calle} touched={touched.calle} />
                                         </div>
 
-                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className={etiquetaCampo} htmlFor="registro-zona">
                                                     Zona / Barrio
@@ -460,13 +460,13 @@ const Registro = () => {
                                 </div>
 
                                 {/* CUENTA */}
-                                <div className="pt-4">
+                                <div className="pt-2">
                                     <h3 className={tituloSeccion}>
                                         <span className="h-px w-5 bg-accent" />
                                         Cuenta
                                     </h3>
 
-                                    <div className="mt-4 space-y-1">
+                                    <div className="mt-4 space-y-4">
                                         <div>
                                             <label className={etiquetaCampo} htmlFor="registro-correo">
                                                 Correo electrónico *

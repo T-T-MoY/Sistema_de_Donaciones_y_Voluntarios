@@ -148,46 +148,44 @@
 }
 
 /* =========================================================
-   MODO OSCURO — MENOS AZUL, MÁS CONTRASTE Y FUCSIA PROTAGONISTA
+   MODO OSCURO — AZUL MARINO UNIFICADO + GUINDO SUTIL
    ========================================================= */
 .dark {
   color-scheme: dark;
 
-  /* Acentos: fucsia brillante para texto e íconos.
-     Las superficies fucsia usan texto oscuro para mantener contraste. */
-  --brand-primary: #e879f9;
-  --brand-primary-hover: #d946ef;
-  --brand-primary-active: #c026d3;
-  --brand-primary-soft: #3b123f;
-  --brand-on-primary: #0b1120;
+  /* Acciones principales: azul de la misma familia que el modo claro */
+  --brand-primary: #3b6ea8;
+  --brand-primary-hover: #4a82c0;
+  --brand-primary-active: #325d8d;
+  --brand-primary-soft: #16283f;
+  --brand-on-primary: #ffffff;
 
-  /* Acentos complementarios: Turquesa / Celeste (#3b92b0) */
-  --brand-accent: #3b92b0;
-  --brand-accent-hover: #4eaac9;
-  --brand-accent-active: #2c738c;
-  --brand-accent-soft: #14303d;
-  --brand-on-accent: #e0f4f9;
-  --brand-accent-text: #a8dceb;
+  /* Guindo / vino: solo para acentos sutiles */
+  --brand-accent: #9f1239;
+  --brand-accent-hover: #be123c;
+  --brand-accent-active: #881337;
+  --brand-accent-soft: #2b0a14;
+  --brand-on-accent: #ffffff;
+  --brand-accent-text: #e7a6b7;
 
-  /* Superficies: fondo profundo y tarjetas claramente elevadas */
-  --brand-surface: #1e293b;          /* Tarjetas (slate-800) */
-  --brand-surface-elevated: #334155; /* Elementos elevados / dropdowns (slate-700) */
-  --brand-surface-sunken: #0b1120;   /* Fondo general mucho más profundo */
-  --brand-surface-inset: #0f172a;    /* Inputs y contenedores hundidos (slate-900) */
+  /* Superficies: una sola familia azul marino, sin negros puros */
+  --brand-surface: #14233a;          /* Sidebar y tarjetas */
+  --brand-surface-elevated: #1d2f4d; /* Header, dropdowns y tarjetas elevadas */
+  --brand-surface-sunken: #0d1a2b;   /* Fondo general */
+  --brand-surface-inset: #0a1524;    /* Inputs y zonas hundidas */
 
-  --brand-border: #334155;
-  --brand-border-strong: #475569;
-  --brand-ring: #e879f9;
+  --brand-border: #223350;
+  --brand-border-strong: #334a70;
+  --brand-ring: #4a82c0;
 
   --brand-text: #f8fafc;
-  --brand-text-muted: #94a3b8;
-  --brand-text-subtle: #64748b;
+  --brand-text-muted: #9fb0cc;
+  --brand-text-subtle: #7185a6;
 
-  /* Titulares: rosado medio, que alterna con el celeste del
-     modo claro sobre las mismas superficies navy */
-  --brand-title-1: #fbe0ee;
-  --brand-title-2: #eb9fc6;
-  --brand-title-3: #c95f95;
+  /* Titulares: degradado azul, en sintonía con el modo claro */
+  --brand-title-1: #dbeafe;
+  --brand-title-2: #93c5fd;
+  --brand-title-3: #60a5fa;
 
   --brand-success: #3cb371;
   --brand-success-soft: #143826;
@@ -199,15 +197,15 @@
   --brand-info-soft: #173342;
 
   --elev-soft:
-    0 4px 6px -1px rgb(0 0 0 / 0.5),
-    0 2px 4px -2px rgb(0 0 0 / 0.5);
+    0 4px 6px -1px rgb(0 0 0 / 0.45),
+    0 2px 4px -2px rgb(0 0 0 / 0.45);
   --elev-lift:
-    0 8px 24px -6px rgb(0 0 0 / 0.6),
-    0 16px 40px -16px rgb(232 121 249 / 0.22);
+    0 8px 24px -6px rgb(0 0 0 / 0.55),
+    0 16px 40px -16px rgb(59 110 168 / 0.18);
   --elev-deep:
     0 10px 40px -15px rgb(0 0 0 / 0.85);
   --elev-glow:
-    0 0 25px rgb(232 121 249 / 0.3);
+    0 0 25px rgb(59 110 168 / 0.25);
 }
 
 /* =========================================================

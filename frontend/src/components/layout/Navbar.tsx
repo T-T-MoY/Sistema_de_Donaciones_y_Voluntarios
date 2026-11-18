@@ -117,7 +117,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
 
             <aside className={`
                 fixed left-0 top-0 z-50 flex h-dvh w-64 max-w-[85vw] flex-col
-                bg-surface-elevated dark:bg-night text-text dark:text-cream
+                bg-surface-elevated dark:bg-surface text-text dark:text-cream
                 transition-transform duration-300 ease-out-soft
                 ${abierto ? 'translate-x-0' : '-translate-x-full'} 
                 md:translate-x-0 md:max-w-none
