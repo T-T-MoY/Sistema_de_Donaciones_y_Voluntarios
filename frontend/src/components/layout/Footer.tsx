@@ -72,14 +72,12 @@ export const Footer: React.FC = () => {
         className="pointer-events-none absolute -bottom-32 right-[-5%] h-[420px] w-[420px] rounded-full bg-gold/[0.08] blur-[120px]"
       />
 
-      <div className="relative z-10 mx-auto max-w-[1240px] px-6 pb-8 pt-16">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
+      <div className="relative z-10 mx-auto max-w-[1240px] px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-16">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           {/* Marca */}
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold text-night">
-                <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
-              </span>
+              <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
               <span className="font-display text-base font-bold tracking-[-0.01em]">
                 Donaciones <span className="text-gold">&amp; Voluntariados</span>
               </span>
@@ -150,7 +148,7 @@ export const Footer: React.FC = () => {
                   >
                     {item.icon}
                   </svg>
-                  <span className="leading-relaxed">{item.texto}</span>
+                  <span className="min-w-0 break-words leading-relaxed">{item.texto}</span>
                 </li>
               ))}
             </ul>

@@ -35,6 +35,12 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         } else {
             root.classList.remove('dark');
         }
+
+        // La barra de estado del móvil sigue el tema de la app
+        // (no el del sistema), así que la actualizamos aquí.
+        const themeColor = window.document.querySelector('meta[name="theme-color"]');
+        themeColor?.setAttribute('content', theme === 'dark' ? '#263556' : '#e3f0f7');
+
         localStorage.setItem('theme', theme);
     }, [theme]);
 

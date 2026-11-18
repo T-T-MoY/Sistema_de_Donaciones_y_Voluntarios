@@ -158,7 +158,7 @@ const Registro = () => {
     const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
 
     return (
-        <div className="relative min-h-screen w-full overflow-hidden bg-night text-cream">
+        <div className="relative min-h-dvh w-full overflow-hidden bg-night text-cream">
             {/* =====================================================
                 FONDO CONTINUO — imagen a pantalla completa (Igual al Login)
                 ===================================================== */}
@@ -182,7 +182,7 @@ const Registro = () => {
                 className="motion-safe:animate-float-slow pointer-events-none absolute -top-40 right-[12%] h-[520px] w-[520px] rounded-full bg-gold/[0.12] blur-[140px]"
             />
 
-            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-5 py-6 sm:px-8 lg:px-10">
+            <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1280px] flex-col px-5 py-6 sm:px-8 lg:px-10">
                 {/* Barra superior (Igual al Login) */}
                 <header className="flex items-center justify-between">
                     <Link

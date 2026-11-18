@@ -72,14 +72,14 @@ export const LandingNavbar = () => {
     'inline-flex items-center gap-2 rounded-xl border border-dashed border-white/15 bg-white/[0.03] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-cream/40 select-none';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-night-line bg-night/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-night-line bg-night/90 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
       {/* Filo dorado */}
       <div
         aria-hidden="true"
         className="h-px w-full bg-linear-to-r from-transparent via-gold/70 to-transparent"
       />
 
-      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
+      <div className="mx-auto flex min-h-[76px] max-w-[1280px] items-center justify-between gap-4 px-5 md:px-8">
         {/* LOGO */}
         <Link
           to="/"
@@ -251,7 +251,7 @@ export const LandingNavbar = () => {
       {menuMovil && (
         <div
           id="menu-movil"
-          className="anim-fade border-t border-night-line bg-night-2/98 px-5 pb-6 pt-4 md:hidden"
+          className="anim-fade max-h-[calc(100dvh-76px)] overflow-y-auto overscroll-contain border-t border-night-line bg-night-2/98 px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-4 md:hidden"
         >
           <nav className="flex flex-col">
             {ENLACES.map((enlace) =>

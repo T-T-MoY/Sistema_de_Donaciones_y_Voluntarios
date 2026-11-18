@@ -105,11 +105,11 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
             )}
 
             <aside className={`
-                fixed left-0 top-0 z-50 flex h-screen w-64 flex-col
-                bg-night text-cream
+                fixed left-0 top-0 z-50 flex h-dvh w-[min(16rem,85vw)] flex-col
+                bg-night pt-[env(safe-area-inset-top,0px)] text-cream
                 transition-transform duration-300 ease-out-soft
                 ${abierto ? 'translate-x-0' : '-translate-x-full'} 
-                md:translate-x-0
+                md:w-64 md:translate-x-0
             `}>
                 {/* Filo dorado */}
                 <span
@@ -121,6 +121,18 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                     aria-hidden="true"
                     className="pointer-events-none absolute -left-24 top-24 h-56 w-56 rounded-full bg-gold/[0.10] blur-[90px]"
                 />
+
+                {/* Cerrar (solo móvil) */}
+                <button
+                    type="button"
+                    onClick={onCerrar}
+                    aria-label="Cerrar menú"
+                    className="press absolute right-3 top-[calc(1rem+env(safe-area-inset-top,0px))] z-20 rounded-xl border border-cream/15 bg-cream/[0.06] p-2 text-cream/70 hover:text-cream md:hidden"
+                >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
 
                 {/* Marca */}
                 <Link 
@@ -141,7 +153,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                 </Link>
 
                 {/* Navegación */}
-                <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-5">
+                <nav className="relative z-10 flex-1 overflow-y-auto overscroll-contain px-3 py-5">
                     <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-cream/35">
                         Navegación
                     </p>
@@ -211,7 +223,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                 </nav>
 
                 {/* Pie del sidebar */}
-                <div className="relative z-10 border-t border-cream/10 p-3">
+                <div className="relative z-10 border-t border-cream/10 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
                     <Link
                         to="/"
                         onClick={onCerrar}

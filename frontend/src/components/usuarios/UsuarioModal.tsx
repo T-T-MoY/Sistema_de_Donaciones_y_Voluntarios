@@ -298,7 +298,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     return createPortal(
         <div
-            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 p-4 backdrop-blur-md"
+            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md sm:p-4"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}
@@ -307,7 +307,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="titulo-modal-usuario"
-                className="anim-scale flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
+                className="anim-scale flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
             >
                 <span
                     aria-hidden="true"

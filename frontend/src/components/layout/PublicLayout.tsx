@@ -6,7 +6,7 @@ export default function PublicLayout() {
   return (
     <>
       <LandingNavbar />
-      <main className="min-h-screen">
+      <main className="min-h-dvh">
         <Outlet />
       </main>
       <Footer />

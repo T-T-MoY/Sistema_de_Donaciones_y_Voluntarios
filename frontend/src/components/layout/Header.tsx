@@ -46,7 +46,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
 
   return (
-    <header className="sticky top-0 z-30 flex h-[72px] items-center justify-between gap-4 border-b border-border bg-surface-elevated/90 px-4 backdrop-blur-xl md:px-8">
+    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-4 border-b border-border bg-surface-elevated/90 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl md:px-8">
 
       {/* Izquierda: hamburguesa + título */}
       <div className="flex min-w-0 items-center gap-3">

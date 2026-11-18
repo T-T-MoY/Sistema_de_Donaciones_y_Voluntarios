@@ -13,7 +13,7 @@ export default function AppLayout() {
   }, [location.pathname]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-sunken">
+    <div className="flex h-dvh overflow-hidden bg-surface-sunken">
       {/* Sidebar (fijo a la izquierda) */}
       <Navbar
         abierto={sidebarAbierto}
@@ -24,7 +24,7 @@ export default function AppLayout() {
       <div className="flex w-full flex-1 flex-col overflow-hidden md:ml-64">
         <Header onAbrirMenu={() => setSidebarAbierto(true)} />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:p-8">
           <div className="mx-auto w-full max-w-[1400px]">
             <Outlet />
           </div>
