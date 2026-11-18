@@ -1,0 +1,470 @@
+@import "tailwindcss";
+
+/* =========================================================
+   TEMA OSCURO POR CLASE
+   ========================================================= */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================
+   TOKENS DE DISEÑO — TAILWIND v4
+   ========================================================= */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Sora", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-active: var(--brand-primary-active);
+  --color-primary-soft: var(--brand-primary-soft);
+  --color-on-primary: var(--brand-on-primary);
+
+  --color-accent: var(--brand-accent);
+  --color-accent-hover: var(--brand-accent-hover);
+  --color-accent-soft: var(--brand-accent-soft);
+  --color-on-accent: var(--brand-on-accent);
+  --color-accent-text: var(--brand-accent-text);
+
+  --color-surface: var(--brand-surface);
+  --color-surface-elevated: var(--brand-surface-elevated);
+  --color-surface-sunken: var(--brand-surface-sunken);
+  --color-surface-inset: var(--brand-surface-inset);
+
+  --color-border: var(--brand-border);
+  --color-border-strong: var(--brand-border-strong);
+  --color-ring: var(--brand-ring);
+
+  --color-text: var(--brand-text);
+  --color-text-muted: var(--brand-text-muted);
+  --color-text-subtle: var(--brand-text-subtle);
+
+  --color-success: var(--brand-success);
+  --color-success-soft: var(--brand-success-soft);
+  --color-error: var(--brand-error);
+  --color-error-soft: var(--brand-error-soft);
+  --color-warning: var(--brand-warning);
+  --color-warning-soft: var(--brand-warning-soft);
+  --color-info: var(--brand-info);
+  --color-info-soft: var(--brand-info-soft);
+
+  /* ---------- Marca fija (superficies nocturnas) ----------
+     Hero, Login, Sidebar y las cards destacadas son navy
+     aunque el resto de la app esté en modo claro, así que
+     esta familia NO cambia con el tema.
+
+     El nombre `gold` es heredado: en esta paleta apunta al
+     celeste brillante de #3b92b0, que es el que contrasta
+     con el navy y el que usan los CTA del Hero. */
+  --color-night: #111726;
+  --color-night-2: #1a2438;
+  --color-night-3: #293a5e;
+  --color-night-line: #334770;
+  --color-cream: #e3f0f7;
+  --color-gold: #63c4e0;
+  --color-gold-bright: #8fd8ee;
+
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 2.5rem;
+
+  --shadow-soft: var(--elev-soft);
+  --shadow-lift: var(--elev-lift);
+  --shadow-deep: var(--elev-deep);
+  --shadow-glow: var(--elev-glow);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-soft: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-rise: rise-in 620ms var(--ease-out-soft) both;
+  --animate-fade: soft-fade 340ms var(--ease-out-soft) both;
+  --animate-modal-in: modal-in 280ms var(--ease-out-soft) both;
+  --animate-overlay-in: overlay-in 200ms ease-out both;
+  --animate-float-slow: float-slow 16s ease-in-out infinite alternate;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
+}
+
+/* =========================================================
+   MODO CLARO — COLORES PREDOMINANTES Y VIVOS (Cero blanco)
+   ========================================================= */
+:root {
+  color-scheme: light;
+
+  --brand-primary: #35649e;
+  --brand-primary-hover: #294e7c;
+  --brand-primary-active: #273b75;
+  --brand-primary-soft: #c2d7ed;
+  --brand-on-primary: #ffffff;
+
+  --brand-accent: #9a336f;
+  --brand-accent-hover: #7d2959;
+  --brand-accent-soft: #f2d1e5;
+  --brand-on-accent: #ffffff;
+  --brand-accent-text: #591b40;
+
+  --brand-surface: #d4e7f2;
+  --brand-surface-elevated: #e3f0f7;
+  --brand-surface-sunken: #b0d1e6;
+  --brand-surface-inset: #9bc2db;
+
+  --brand-border: #739ebc;
+  --brand-border-strong: #4f7999;
+  --brand-ring: #35649e;
+
+  --brand-text: #122136;
+  --brand-text-muted: #29476b;
+  --brand-text-subtle: #3f608a;
+
+  /* Titulares: acento celeste. Estos tres stops los consume
+     text-gold-gradient, así que el degradado de los titulares
+     alterna de color con el tema (rosado en modo oscuro). */
+  --brand-title-1: #a7e4f5;
+  --brand-title-2: #63c4e0;
+  --brand-title-3: #3b92b0;
+
+  --brand-success: #237a4b;
+  --brand-success-soft: #c8f2d8;
+  --brand-error: #a82e4a;
+  --brand-error-soft: #f7d4dc;
+  --brand-warning: #b87014;
+  --brand-warning-soft: #faebd0;
+  --brand-info: #3b92b0;
+  --brand-info-soft: #bde4f2;
+
+  --elev-soft:
+    0 1px 4px rgb(39 59 117 / 0.18),
+    0 4px 14px -4px rgb(59 146 176 / 0.22);
+  --elev-lift:
+    0 4px 20px -4px rgb(39 59 117 / 0.28),
+    0 12px 32px -12px rgb(154 51 111 / 0.2);
+  --elev-deep:
+    0 10px 30px -10px rgb(18 33 54 / 0.35);
+  --elev-glow:
+    0 0 20px rgb(154 51 111 / 0.35);
+}
+
+/* =========================================================
+   MODO OSCURO — AZUL MARINO UNIFICADO + GUINDO SUTIL
+   ========================================================= */
+.dark {
+  color-scheme: dark;
+
+  /* Acciones principales: azul de la misma familia que el modo claro */
+  --brand-primary: #3b6ea8;
+  --brand-primary-hover: #4a82c0;
+  --brand-primary-active: #325d8d;
+  --brand-primary-soft: #16283f;
+  --brand-on-primary: #ffffff;
+
+  /* Guindo / vino: solo para acentos sutiles */
+  --brand-accent: #9f1239;
+  --brand-accent-hover: #be123c;
+  --brand-accent-active: #881337;
+  --brand-accent-soft: #2b0a14;
+  --brand-on-accent: #ffffff;
+  --brand-accent-text: #e7a6b7;
+
+  /* Superficies: una sola familia azul marino, sin negros puros */
+  --brand-surface: #14233a;          /* Sidebar y tarjetas */
+  --brand-surface-elevated: #1d2f4d; /* Header, dropdowns y tarjetas elevadas */
+  --brand-surface-sunken: #0d1a2b;   /* Fondo general */
+  --brand-surface-inset: #0a1524;    /* Inputs y zonas hundidas */
+
+  --brand-border: #223350;
+  --brand-border-strong: #334a70;
+  --brand-ring: #4a82c0;
+
+  --brand-text: #f8fafc;
+  --brand-text-muted: #9fb0cc;
+  --brand-text-subtle: #7185a6;
+
+  /* Titulares: degradado azul, en sintonía con el modo claro */
+  --brand-title-1: #dbeafe;
+  --brand-title-2: #93c5fd;
+  --brand-title-3: #60a5fa;
+
+  --brand-success: #3cb371;
+  --brand-success-soft: #143826;
+  --brand-error: #e65c7b;
+  --brand-error-soft: #4a1c27;
+  --brand-warning: #f0ad4e;
+  --brand-warning-soft: #4a3512;
+  --brand-info: #3b92b0;
+  --brand-info-soft: #173342;
+
+  --elev-soft:
+    0 4px 6px -1px rgb(0 0 0 / 0.45),
+    0 2px 4px -2px rgb(0 0 0 / 0.45);
+  --elev-lift:
+    0 8px 24px -6px rgb(0 0 0 / 0.55),
+    0 16px 40px -16px rgb(59 110 168 / 0.18);
+  --elev-deep:
+    0 10px 40px -15px rgb(0 0 0 / 0.85);
+  --elev-glow:
+    0 0 25px rgb(59 110 168 / 0.25);
+}
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes soft-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes float-slow {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(18px, -22px, 0) scale(1.06); }
+  100% { transform: translate3d(-16px, 14px, 0) scale(0.97); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.82); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate3d(20px, -8px, 0) scale(0.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(20px, -6px, 0) scale(0.98); }
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+@layer base {
+  *, ::before, ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    /* Sin flash gris al tocar y sin pull-to-refresh robando el gesto */
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    /* Ninguna vista debe generar scroll horizontal en móvil */
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-surface-sunken);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Contenido multimedia nunca desborda el viewport móvil */
+  img, video, canvas, svg {
+    max-width: 100%;
+  }
+
+  /* iOS desborda los inputs de fecha dentro de grids/flex */
+  input[type='date'],
+  input[type='time'],
+  input[type='datetime-local'],
+  input[type='month'],
+  input[type='week'] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  a, button, [role='button'], input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a {
+    touch-action: manipulation;
+  }
+
+  /* Un control no se selecciona al mantener pulsado */
+  button, [role='button'] {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  input, select, textarea {
+    color-scheme: light;
+  }
+
+  .dark input, .dark select, .dark textarea {
+    color-scheme: dark;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+@utility anim-rise { animation: rise-in 620ms var(--ease-out-soft) both; }
+@utility anim-fade { animation: soft-fade 340ms var(--ease-out-soft) both; }
+@utility anim-scale { animation: modal-in 280ms var(--ease-out-soft) both; }
+@utility anim-toast { animation: toast-in 320ms var(--ease-out-soft) both; }
+@utility anim-toast-out { animation: toast-out 180ms ease-in both; }
+
+@utility press {
+  transition: transform 150ms var(--ease-out-soft), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 240ms var(--ease-out-soft), opacity 180ms ease;
+  &:active { transform: scale(0.97); }
+}
+
+@utility lift {
+  transition: transform 260ms var(--ease-out-soft), box-shadow 260ms var(--ease-out-soft), border-color 200ms ease, background-color 200ms ease;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover { transform: translateY(-4px); }
+  }
+}
+
+@utility grid-paper {
+  background-image:
+    linear-gradient(to right, rgb(53 100 158 / 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(53 100 158 / 0.12) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility grid-paper-light {
+  background-image:
+    linear-gradient(to right, rgb(59 146 176 / 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(59 146 176 / 0.15) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility dot-grid {
+  background-image: radial-gradient(rgb(154 51 111 / 0.25) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@utility glass-night {
+  background-color: rgb(30 41 66 / 0.65);
+  border: 1px solid rgb(51 71 112 / 0.4);
+  backdrop-filter: blur(14px);
+}
+
+/* Degradado de titular: celeste en modo claro y rosado medio
+   en oscuro, según --brand-title-* (el nombre se mantiene
+   porque así lo usan el Hero y las pantallas de acceso). */
+@utility text-gold-gradient {
+  background-image: linear-gradient(100deg, var(--brand-title-1) 0%, var(--brand-title-2) 50%, var(--brand-title-3) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility auth-photo {
+  background-image: url('/images/auth-complex.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+@utility marquee-track {
+  animation: marquee 38s linear infinite;
+  will-change: transform;
+}
+
+@utility marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 560ms var(--ease-out-soft), transform 560ms var(--ease-out-soft);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-d1 { --reveal-delay: 80ms; }
+  .reveal-d2 { --reveal-delay: 160ms; }
+  .reveal-d3 { --reveal-delay: 240ms; }
+  .reveal-d4 { --reveal-delay: 320ms; }
+  .reveal-d5 { --reveal-delay: 400ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* iOS hace zoom si el input tiene menos de 16px.
+   Se aplica por capacidad táctil, no por ancho de pantalla. */
+@media (pointer: coarse) {
+  input, select, textarea { font-size: 16px; }
+}

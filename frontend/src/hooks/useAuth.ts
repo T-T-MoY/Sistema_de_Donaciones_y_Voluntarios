@@ -1,0 +1,19 @@
+/**
+ * ============================================================================
+ * ARCHIVO: useAuth.ts
+ * HOOK: Acceso tipado al contexto de autenticación.
+ * ============================================================================
+ */
+
+import { useContext } from 'react';
+import { AuthContext, AuthContextType } from '../context/AuthContext';
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe usarse dentro de un AuthProvider');
+  }
+  return context;
+};
+
+export default useAuth;

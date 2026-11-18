@@ -1,0 +1,64 @@
+/**
+ * ============================================================================
+ * ARCHIVO: auth.types.ts
+ * PROPÓSITO: Tipos TypeScript para el flujo de autenticación.
+ * ============================================================================
+ */
+
+export interface LoginRequest {
+  correo: string;
+  contraseña: string;
+}
+
+export interface LoginResponse {
+  mensaje: string;
+  token: string;
+  usuario: {
+    id: number;
+    id_usuario: number;
+    nombre: string;
+    apellido: string;
+    correo: string;
+    telefono: string | null;
+    estado: string;
+    rol: string;
+  };
+}
+
+export interface RegistroRequest {
+  nombre: string;
+  paterno: string;
+  materno?: string;
+  correo: string;
+  telefono: string;
+  contraseña: string;
+  ci_nit?: string;
+  calle?: string;
+  zona?: string;
+  ciudad?: string;
+}
+
+export interface TokenPayload {
+  id: number;
+  id_usuario: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  rol: string;
+  iat?: number;
+  exp?: number;
+}
+
+export interface RecuperacionRequest {
+  correo: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  nuevaContraseña: string;
+}
+
+export interface ValidarTokenResponse {
+  valido: boolean;
+  correo: string;
+}
