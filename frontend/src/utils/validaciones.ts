@@ -245,20 +245,21 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
             }
             return '';
 
-        // Empleado
-        case 'fecha_contratacion':
-            if (!value) return 'La fecha de contratación es obligatoria.';
+        // Voluntario
+        case 'habilidades': {
+            const lista = String(value || '')
+                .split(',')
+                .map((h) => h.trim())
+                .filter((h) => h.length > 0);
+            if (lista.length === 0) return 'Indicá al menos una habilidad (separadas por comas).';
+            if (lista.length > 20) return 'Máximo 20 habilidades.';
+            if (lista.some((h) => h.length > 60)) return 'Cada habilidad puede tener máximo 60 caracteres.';
             return '';
+        }
 
-        case 'cargo':
-            if (!value || !value.trim()) return 'El cargo es obligatorio.';
-            if (value.trim().length < 3) return 'Mínimo 3 caracteres.';
-            if (value.trim().length > 100) return 'Máximo 100 caracteres.';
-            return '';
-
-        case 'turno':
-            if (!value) return 'El turno es obligatorio.';
-            if (!['Mañana', 'Tarde', 'Noche'].includes(value)) return 'Turno inválido.';
+        case 'disponibilidad':
+            if (!value || !String(value).trim()) return 'La disponibilidad es obligatoria.';
+            if (String(value).trim().length > 100) return 'Máximo 100 caracteres.';
             return '';
 
         case 'antiguedad':
@@ -271,7 +272,7 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
         // Admin
         case 'nivel_acceso':
             if (!value) return 'El nivel de acceso es obligatorio.';
-            if (!['Total', 'Medio', 'Bajo'].includes(value)) return 'Nivel inválido.';
+            if (!['SUPERADMIN', 'GENERAL'].includes(value)) return 'Nivel inválido.';
             return '';
 
         // Dirección (opcionales)
@@ -340,7 +341,7 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
 
     // === CAMPOS ESPECÍFICOS DEL ROL ===
     if (rol === 'Empleado') {
-        ['fecha_contratacion', 'cargo', 'turno'].forEach((campo) => {
+        ['habilidades', 'disponibilidad'].forEach((campo) => {
             const err = validarCampo(campo, formData[campo], formData);
             if (err) errores[campo] = err;
         });
