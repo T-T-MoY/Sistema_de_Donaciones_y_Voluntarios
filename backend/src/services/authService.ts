@@ -139,16 +139,13 @@ export const authService = {
     if (!usuario || !usuario.contraseña) {
       throw new AppError('Credenciales inválidas', 401);
     }
+    // Borrado lógico: la cuenta sigue en la BD, pero no puede iniciar sesión.
+    if (usuario.estado === 'Eliminado') {
+      throw new AppError('Credenciales inválidas', 401);
+    }
     if (usuario.activo === false) {
       throw new AppError('Tu cuenta ha sido desactivada', 403);
     }
-    // en login():
-    if (!usuario || !usuario.contraseña || usuario.estado === 'Eliminado') {
-      throw new AppError('Credenciales inválidas', 401);
-    }
-
-    // en la recuperación de contraseña:
-    if (!usuario || usuario.estado === 'Eliminado') return RESPUESTA;
 
     const hash = usuario.contraseña;
     const esHash = /^\$2[aby]\$/.test(hash);
@@ -187,6 +184,9 @@ export const authService = {
     // Respuesta idéntica exista o no (anti-enumeración)
     const RESPUESTA = { mensaje: 'Si el correo está registrado, te enviamos las instrucciones.' };
     if (!usuario) return RESPUESTA;
+
+    // Borrado lógico: no se envían instrucciones a cuentas eliminadas.
+    if (usuario.estado === 'Eliminado') return RESPUESTA;
 
     const token = crypto.randomBytes(32).toString('hex');
     const fechaExp = new Date(Date.now() + 60 * 60 * 1000); // 1 hora

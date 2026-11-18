@@ -153,14 +153,15 @@
 .dark {
   color-scheme: dark;
 
-  /* Botones principales: Fucsia brillante (#9a336f) como elemento principal distintivo */
-  --brand-primary: #9a336f;
-  --brand-primary-hover: #b53d83;
-  --brand-primary-active: #7d2959;
-  --brand-primary-soft: #421630;
-  --brand-on-primary: #fbe6f2;
+  /* Acentos: fucsia brillante para texto e íconos.
+     Las superficies fucsia usan texto oscuro para mantener contraste. */
+  --brand-primary: #e879f9;
+  --brand-primary-hover: #d946ef;
+  --brand-primary-active: #c026d3;
+  --brand-primary-soft: #3b123f;
+  --brand-on-primary: #0b1120;
 
-  /* Acentos: Turquesa / Celeste (#3b92b0) para complementar y resaltar */
+  /* Acentos complementarios: Turquesa / Celeste (#3b92b0) */
   --brand-accent: #3b92b0;
   --brand-accent-hover: #4eaac9;
   --brand-accent-active: #2c738c;
@@ -168,19 +169,19 @@
   --brand-on-accent: #e0f4f9;
   --brand-accent-text: #a8dceb;
 
-  /* Superficies: Menos azul saturado, usando tonos pizarra más sobrios y elegantes */
-  --brand-surface: #1e2942;          /* Tarjetas con tono oscuro equilibrado */
-  --brand-surface-elevated: #263556; /* Tarjetas elevadas */
-  --brand-surface-sunken: #111726;   /* Fondo general oscuro y profundo (sin saturar de azul) */
-  --brand-surface-inset: #293a5e;    /* Inputs y contenedores */
+  /* Superficies: fondo profundo y tarjetas claramente elevadas */
+  --brand-surface: #1e293b;          /* Tarjetas (slate-800) */
+  --brand-surface-elevated: #334155; /* Elementos elevados / dropdowns (slate-700) */
+  --brand-surface-sunken: #0b1120;   /* Fondo general mucho más profundo */
+  --brand-surface-inset: #0f172a;    /* Inputs y contenedores hundidos (slate-900) */
 
-  --brand-border: #334770;
-  --brand-border-strong: #4a6499;
-  --brand-ring: #9a336f;
+  --brand-border: #334155;
+  --brand-border-strong: #475569;
+  --brand-ring: #e879f9;
 
-  --brand-text: #f3f6fc;
-  --brand-text-muted: #abbad6;
-  --brand-text-subtle: #8095b8;
+  --brand-text: #f8fafc;
+  --brand-text-muted: #94a3b8;
+  --brand-text-subtle: #64748b;
 
   /* Titulares: rosado medio, que alterna con el celeste del
      modo claro sobre las mismas superficies navy */
@@ -198,15 +199,15 @@
   --brand-info-soft: #173342;
 
   --elev-soft:
-    0 1px 3px rgb(0 0 0 / 0.5),
-    0 6px 16px -8px rgb(154 51 111 / 0.25);
+    0 4px 6px -1px rgb(0 0 0 / 0.5),
+    0 2px 4px -2px rgb(0 0 0 / 0.5);
   --elev-lift:
-    0 4px 24px -6px rgb(0 0 0 / 0.6),
-    0 16px 40px -16px rgb(154 51 111 / 0.4);
+    0 8px 24px -6px rgb(0 0 0 / 0.6),
+    0 16px 40px -16px rgb(232 121 249 / 0.22);
   --elev-deep:
     0 10px 40px -15px rgb(0 0 0 / 0.85);
   --elev-glow:
-    0 0 25px rgb(154 51 111 / 0.45);
+    0 0 25px rgb(232 121 249 / 0.3);
 }
 
 /* =========================================================
@@ -246,6 +247,16 @@
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.55; transform: scale(0.82); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate3d(20px, -8px, 0) scale(0.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  to { opacity: 0; transform: translate3d(20px, -6px, 0) scale(0.98); }
 }
 
 /* =========================================================
@@ -357,6 +368,8 @@
 @utility anim-rise { animation: rise-in 620ms var(--ease-out-soft) both; }
 @utility anim-fade { animation: soft-fade 340ms var(--ease-out-soft) both; }
 @utility anim-scale { animation: modal-in 280ms var(--ease-out-soft) both; }
+@utility anim-toast { animation: toast-in 320ms var(--ease-out-soft) both; }
+@utility anim-toast-out { animation: toast-out 180ms ease-in both; }
 
 @utility press {
   transition: transform 150ms var(--ease-out-soft), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 240ms var(--ease-out-soft), opacity 180ms ease;

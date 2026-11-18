@@ -353,18 +353,11 @@ const Dashboard = () => {
             ? MODULOS_EMPLEADO
             : MODULOS_CLIENTE;
 
-    const iniciales = usuario?.nombre ? usuario.nombre.charAt(0).toUpperCase() : 'U';
-
     return (
         <div className="pb-10">
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="space-y-8">
 
-                {/* =========================================================
-                    COLUMNA PRINCIPAL
-                   ========================================================= */}
-                <div className="space-y-8">
-
-                    {/* 1. CABECERA PERSONAL */}
+                {/* 1. CABECERA PERSONAL */}
                     <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-5 text-cream shadow-lift sm:p-8 md:p-10">
                         <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
                         <div
@@ -498,119 +491,6 @@ const Dashboard = () => {
                             </Link>
                         </div>
                     </section>
-                </div>
-
-                {/* =========================================================
-                    PANEL LATERAL
-                   ========================================================= */}
-                <aside className="space-y-5 xl:sticky xl:top-4 xl:self-start">
-
-                    {/* Cuenta */}
-                    <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:100ms]">
-                        <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-text-subtle">
-                            Tu cuenta
-                        </p>
-
-                        <div className="mt-4 flex items-center gap-3">
-                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary font-display text-lg font-bold text-on-primary">
-                                {iniciales}
-                            </span>
-                            <div className="min-w-0">
-                                <p className="truncate font-display text-sm font-bold text-text">
-                                    {usuario?.nombre || 'Usuario'}
-                                </p>
-                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent-text">
-                                    {usuario?.rol || 'Usuario'}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-5 flex flex-col gap-2">
-                            <Link
-                                to="/perfil"
-                                className="press flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[12px] font-semibold text-text hover:border-accent/50 hover:bg-accent-soft"
-                            >
-                                Editar mi perfil
-                                <svg className="h-3.5 w-3.5 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                            </Link>
-
-                            {esAdmin && (
-                                <Link
-                                    to="/usuarios"
-                                    className="press flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[12px] font-semibold text-text hover:border-accent/50 hover:bg-accent-soft"
-                                >
-                                    Gestionar usuarios
-                                    <svg className="h-3.5 w-3.5 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Estado del sistema */}
-                    <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:160ms]">
-                        <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-text-subtle">
-                            Estado del sistema
-                        </p>
-
-                        <ul className="mt-4 space-y-3.5">
-                            {[
-                                { nombre: 'Autenticación', estado: 'Operativo' },
-                                { nombre: 'Donaciones', estado: 'Operativo' },
-                                { nombre: 'Voluntariados', estado: 'Operativo' },
-                                { nombre: 'Reportes', estado: 'En desarrollo', alerta: true },
-                            ].map((servicio) => (
-                                <li key={servicio.nombre} className="flex items-center justify-between gap-3">
-                                    <span className="text-[12.5px] font-medium text-text-muted">
-                                        {servicio.nombre}
-                                    </span>
-                                    <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-text-subtle">
-                                        <span
-                                            className={`h-1.5 w-1.5 rounded-full ${servicio.alerta ? 'bg-warning' : 'bg-success'}`}
-                                        />
-                                        {servicio.estado}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <div className="mt-5 rounded-xl bg-surface px-3.5 py-3">
-                            <p className="text-[11px] leading-relaxed text-text-subtle">
-                                Los módulos en desarrollo se habilitarán en la próxima versión de la
-                                plataforma.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Soporte */}
-                    <div className="anim-rise relative overflow-hidden rounded-2xl border border-cream/10 bg-night p-5 text-cream shadow-lift [animation-delay:220ms]">
-                        <div
-                            aria-hidden="true"
-                            className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold/20 blur-2xl"
-                        />
-                        <p className="relative text-[9.5px] font-bold uppercase tracking-[0.22em] text-cream/45">
-                            Soporte
-                        </p>
-                        <p className="relative mt-3 font-display text-sm font-bold leading-snug">
-                            ¿Necesitás ayuda con tu cuenta?
-                        </p>
-                        <p className="relative mt-1.5 text-[11.5px] leading-relaxed text-cream/60">
-                            Escribinos y te respondemos en horario de oficina.
-                        </p>
-                        <a
-                            href="#contacto"
-                            className="press relative mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-cream/20 bg-cream/[0.06] px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-cream hover:border-gold/50 hover:text-gold-bright"
-                        >
-                            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.9 5.26a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            Contactar soporte
-                        </a>
-                    </div>
-                </aside>
             </div>
         </div>
     );

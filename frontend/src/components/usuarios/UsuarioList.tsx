@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { usuarioApi } from '../../api/usuario.api';
 import { UsuarioCard } from './UsuarioCard';
 import UsuarioModal from './UsuarioModal';
@@ -71,6 +72,7 @@ export const UsuarioList = ({
   subtitle = 'Resumen general de las cuentas registradas.',
 }: UsuarioListProps) => {
   const { token } = useAuth();
+  const { exito, error: mostrarError } = useToast();
   const isPreview = modo === 'preview';
 
   // =====================================================
@@ -136,7 +138,7 @@ export const UsuarioList = ({
   const abrirModalEditar = (usuario: Usuario): void => {
     const id = obtenerId(usuario);
     if (id === undefined || id === null) {
-      alert('No se pudo identificar el usuario a editar.');
+      mostrarError('', 'No se pudo abrir el usuario');
       return;
     }
     setUsuarioIdEditar(Number(id));
@@ -178,6 +180,7 @@ export const UsuarioList = ({
       await usuarioApi.delete(id);
       setUsuarioAEliminar(null);
       await fetchUsuarios();
+      exito('', 'Usuario eliminado con éxito');
     } catch (err: any) {
       console.error('Error al eliminar usuario:', {
         status: err.response?.status,
@@ -200,9 +203,8 @@ export const UsuarioList = ({
         mensaje = 'El usuario no existe o ya fue eliminado previamente.';
       } else if (status === 409 || status === 500) {
         mensaje =
-          'No se puede eliminar este usuario porque tiene información asociada en el sistema ' +
-          '(pedidos, donaciones, historial, etc.).\n\n' +
-          'Sugerencia: cambia su estado a "Inactivo" en lugar de eliminarlo.';
+          'No se pudo completar el borrado lógico del usuario. ' +
+          'Revisá el estado del servidor o intentá nuevamente en unos minutos.';
       }
 
       setUsuarioAEliminar(null);
@@ -219,19 +221,13 @@ export const UsuarioList = ({
   const id = obtenerId(usuarioAEliminar);
   if (id === undefined || id === null || id === '') return;
 
-  const nombre = getNombreCompleto(usuarioAEliminar);
   setDesactivandoId(id);
 
   try {
     await usuarioApi.cambiarEstado(id, 'Inactivo');
     setUsuarioAEliminar(null);
     await fetchUsuarios();
-    setAviso({
-      titulo: 'Usuario desactivado',
-      mensaje:
-        `"${nombre}" ahora está Inactivo y conserva todo su historial. ` +
-        'Puedes reactivarlo cuando quieras desde "Editar".',
-    });
+    exito('', 'Usuario desactivado');
   } catch (err: any) {
     console.error('Error al desactivar usuario:', {
       status: err.response?.status,
@@ -458,7 +454,7 @@ export const UsuarioList = ({
         {!isPreview && (
           <button
             onClick={abrirModalNuevo}
-            className="press inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift sm:w-auto"
+            className="press inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift dark:bg-linear-to-r dark:from-[#be185d] dark:to-[#9d174d] dark:text-white dark:hover:from-[#9d174d] dark:hover:to-[#831843] dark:hover:text-white sm:w-auto"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M12 4v16m8-8H4" />
@@ -953,7 +949,7 @@ export const UsuarioList = ({
           usuarioId={usuarioIdEditar}
         />
       )}
-            {/* Modal de confirmación de eliminación */}
+            {/* Modal de confirmación de eliminación (borrado lógico) */}
       {!isPreview && (
         <ConfirmModal
           isOpen={usuarioAEliminar !== null}
@@ -961,18 +957,19 @@ export const UsuarioList = ({
           titulo="Eliminar usuario"
           mensaje={
             <>
-              ¿Estás seguro de eliminar a{' '}
+              ¿Marcar a{' '}
               <strong className="text-text">
                 {usuarioAEliminar ? getNombreCompleto(usuarioAEliminar) : ''}
               </strong>{' '}
-              de forma permanente? Esta acción no se puede deshacer.
+              como <strong className="text-text">Eliminado</strong>? Dejará de aparecer en el
+              listado y no podrá iniciar sesión.
             </>
           }
           advertencia={
             usuarioAEliminar && esActivo(usuarioAEliminar)
-              ? '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n' +
-                'Si solo quieres que deje de tener acceso, usa "Desactivar": conserva su historial y se puede revertir.'
-              : '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.'
+              ? 'Se aplica borrado lógico: el registro no se borra físicamente de la base de datos y conserva su historial.\n' +
+                'Si solo querés quitarle el acceso temporalmente, usá "Desactivar": es reversible.'
+              : 'Se aplica borrado lógico: el registro no se borra físicamente de la base de datos y conserva su historial.'
           }
           textoConfirmar="Sí, eliminar"
           textoCancelar="Cancelar"

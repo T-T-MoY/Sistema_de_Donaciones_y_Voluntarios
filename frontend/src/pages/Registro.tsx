@@ -4,6 +4,7 @@ import axios from 'axios';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import FieldError from '../components/ui/FieldError';
 import IconLogo from '../assets/logo.svg?react';
+import { useToast } from '../context/ToastContext';
 import {
     validarCampo,
     validarFormularioCompleto,
@@ -74,6 +75,7 @@ const Registro = () => {
     const [cargando, setCargando] = useState<boolean>(false);
 
     const navigate = useNavigate();
+    const { exito } = useToast();
 
     // =====================================================
     // HANDLERS
@@ -138,6 +140,7 @@ const Registro = () => {
                 ...formData,
                 edad
             });
+            exito('', 'Registro completado');
             navigate('/login');
         } catch (err: any) {
             if (err.response?.data?.error) {

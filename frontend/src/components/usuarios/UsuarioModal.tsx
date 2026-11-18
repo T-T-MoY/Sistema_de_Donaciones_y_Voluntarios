@@ -12,6 +12,7 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import api from '../../api/client';                       // ← +1 ../
 import FieldError from '../ui/FieldError';                    // ← +1 ../
+import { useToast } from '../../context/ToastContext';
 import {
     validarCampo,
     validarFormularioCompleto,
@@ -58,6 +59,7 @@ const claseSelect =
 // =====================================================
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
     const modoEdicion = Boolean(usuarioId);
+    const { exito } = useToast();
 
     const estadoInicial: FormData = {
         nombre: '',
@@ -274,6 +276,12 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 await api.put(`/usuarios/${usuarioId}`, payload);
             } else {
                 await api.post('/usuarios', payload);
+            }
+
+            if (modoEdicion) {
+                exito('', 'Usuario actualizado con éxito');
+            } else {
+                exito('', 'Usuario creado con éxito');
             }
 
             onSave();
