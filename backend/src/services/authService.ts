@@ -7,9 +7,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 
-import { usuarioRepository, normalizarRol } from '../repositories/usuarioRepository';
+import { usuarioRepository } from '../repositories/usuarioRepository';
+import { emailService } from './emailService';
 import { AppError } from '../utils/AppError';
 import {
   validarDatosUsuario,
@@ -18,21 +18,6 @@ import {
   esCiNitValido,
 } from '../utils/validaciones';
 import type { UsuarioResponse } from '../models/usuarioModel';
-
-// ---------- Nodemailer (SMTP) ----------
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: { rejectUnauthorized: false },
-});
-
-transporter.verify((error) => {
-  if (error) console.error('Error al configurar Nodemailer:', error.message);
-  else console.log('Nodemailer listo para enviar correos');
-});
 
 const construirDireccion = (
   calle?: string | null,
@@ -192,36 +177,11 @@ export const authService = {
     const fechaExp = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
     await usuarioRepository.guardarTokenRecuperacion(correoNorm, token, fechaExp);
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const link = `${frontendUrl}/reset-password?token=${token}`;
-
-    try {
-      await transporter.sendMail({
-        from: `"Donaciones y Voluntariado" <${process.env.EMAIL_USER}>`,
-        to: correo,
-        subject: 'Recuperación de contraseña — Donaciones y Voluntariado',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #1C3B34, #101010); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: #F6EADA; margin: 0; font-size: 24px;">Donaciones y Voluntariado</h1>
-            </div>
-            <div style="background: #FBF3E8; padding: 30px; border-radius: 0 0 12px 12px;">
-              <h2 style="color: #101010; margin-top: 0;">Recuperación de contraseña</h2>
-              <p style="color: #5A5350; line-height: 1.6;">Hola <strong>${usuario.nombre}</strong>,</p>
-              <p style="color: #5A5350; line-height: 1.6;">Recibimos una solicitud para restablecer tu contraseña:</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${link}" style="display: inline-block; background: #1C3B34; color: #F6EADA; padding: 14px 32px; text-decoration: none; border-radius: 10px; font-weight: bold;">Restablecer contraseña</a>
-              </div>
-              <p style="color: #5A5350; font-size: 14px;">O copiá este enlace:<br><span style="color: #1C3B34; word-break: break-all;">${link}</span></p>
-              <p style="color: #5A5350; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #E0D2BC;">⏰ Expira en <strong>1 hora</strong>.</p>
-            </div>
-          </div>
-        `,
-      });
-    } catch (mailError: any) {
-      console.error('No se pudo enviar el correo:', mailError?.message);
-      console.log('Enlace de recuperación (modo desarrollo):', link);
-    }
+    await emailService.enviarRecuperacionPassword(
+      correoNorm,
+      usuario.nombre,
+      token
+    );
 
     return RESPUESTA;
   },
