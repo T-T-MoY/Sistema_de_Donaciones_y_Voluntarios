@@ -405,7 +405,7 @@ export const UsuarioList = ({
     'w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text transition-[border-color,box-shadow] duration-200 hover:border-border-strong focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15';
 
   const botonPagina =
-    'press rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm text-text-muted hover:border-accent/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40';
+    'press inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm text-text-muted hover:border-accent/50 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-0 sm:min-w-0';
 
   const ESTADISTICAS = [
     {
@@ -458,7 +458,7 @@ export const UsuarioList = ({
         {!isPreview && (
           <button
             onClick={abrirModalNuevo}
-            className="press inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift"
+            className="press inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-on-primary shadow-soft hover:bg-primary-hover hover:shadow-lift sm:w-auto"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M12 4v16m8-8H4" />
@@ -474,7 +474,7 @@ export const UsuarioList = ({
           {ESTADISTICAS.map((stat) => (
             <div
               key={stat.etiqueta}
-              className="rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft transition-[border-color,box-shadow] duration-300 hover:border-accent/35 hover:shadow-lift"
+              className="rounded-2xl border border-border bg-surface-elevated p-4 shadow-soft transition-[border-color,box-shadow] duration-300 hover:border-accent/35 hover:shadow-lift sm:p-5"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[9.5px] font-bold uppercase tracking-[0.16em] text-text-muted">
@@ -499,7 +499,7 @@ export const UsuarioList = ({
       {/* ============================================ */}
       <div className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft">
         {!isPreview && (
-          <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-5 py-4 sm:px-6">
+          <div className="flex items-center justify-between gap-3 border-b border-border bg-surface px-4 py-4 sm:px-6">
             <h2 className="flex items-center gap-2.5 font-display text-sm font-bold text-text">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-soft text-primary">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -850,14 +850,14 @@ export const UsuarioList = ({
                     <div className="flex gap-2">
                       <button
                         onClick={() => abrirModalEditar(user)}
-                        className="press flex-1 rounded-xl border border-border bg-surface py-2 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-accent/50 hover:bg-accent-soft hover:text-text"
+                        className="press flex-1 rounded-xl border border-border bg-surface py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-accent/50 hover:bg-accent-soft hover:text-text"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => handleEliminar(user)}
                         disabled={estaEliminando}
-                        className="press flex-1 rounded-xl border border-border bg-surface py-2 text-[11.5px] font-bold uppercase tracking-[0.06em] text-error hover:border-error/40 hover:bg-error-soft disabled:cursor-not-allowed disabled:opacity-50"
+                        className="press flex-1 rounded-xl border border-border bg-surface py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] text-error hover:border-error/40 hover:bg-error-soft disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {estaEliminando ? 'Eliminando…' : 'Eliminar'}
                       </button>
@@ -908,7 +908,7 @@ export const UsuarioList = ({
                       <button
                         key={n}
                         onClick={() => setPaginaActual(n)}
-                        className={`press min-w-[36px] rounded-lg border px-2.5 py-1.5 text-sm font-bold ${
+                        className={`press inline-flex min-h-[38px] min-w-[38px] items-center justify-center rounded-lg border px-2.5 py-1.5 text-sm font-bold sm:min-h-0 sm:min-w-0 ${
                           paginaActual === n
                             ? 'border-primary bg-primary text-on-primary shadow-soft'
                             : 'border-border bg-surface text-text-muted hover:border-accent/50 hover:text-primary'
@@ -969,33 +969,6 @@ export const UsuarioList = ({
             </>
           }
           advertencia={
-            '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n' +
-            'En ese caso, considera cambiar su estado a "Inactivo" en lugar de borrarlo.'
-          }
-          textoConfirmar="Sí, eliminar"
-          textoCancelar="Cancelar"
-          cargando={eliminandoId !== null}
-          onConfirm={confirmarEliminacion}
-          onCancel={cancelarEliminacion}
-        />
-      )}
-
-            {/* Modal de confirmación de eliminación */}
-      {!isPreview && (
-        <ConfirmModal
-          isOpen={usuarioAEliminar !== null}
-          variante="peligro"
-          titulo="Eliminar usuario"
-          mensaje={
-            <>
-              ¿Estás seguro de eliminar a{' '}
-              <strong className="text-text">
-                {usuarioAEliminar ? getNombreCompleto(usuarioAEliminar) : ''}
-              </strong>{' '}
-              de forma permanente? Esta acción no se puede deshacer.
-            </>
-          }
-          advertencia={
             usuarioAEliminar && esActivo(usuarioAEliminar)
               ? '⚠️ Si el usuario tiene pedidos, donaciones o historial asociado, la eliminación podría fallar.\n' +
                 'Si solo quieres que deje de tener acceso, usa "Desactivar": conserva su historial y se puede revertir.'
@@ -1012,6 +985,20 @@ export const UsuarioList = ({
           }
           onConfirm={confirmarEliminacion}
           onCancel={cancelarEliminacion}
+        />
+      )}
+
+      {/* Modal de avisos / errores del sistema */}
+      {!isPreview && (
+        <ConfirmModal
+          isOpen={aviso !== null}
+          variante="info"
+          titulo={aviso?.titulo ?? 'Aviso'}
+          mensaje={aviso?.mensaje ?? ''}
+          mostrarCancelar={false}
+          textoConfirmar="Entendido"
+          onConfirm={() => setAviso(null)}
+          onCancel={() => setAviso(null)}
         />
       )}
     </div>

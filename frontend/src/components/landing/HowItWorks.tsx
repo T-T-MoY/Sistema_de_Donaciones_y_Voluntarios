@@ -44,7 +44,7 @@ export const HowItWorks: React.FC = () => {
   return (
     <section
       id="como-funciona"
-      className="relative isolate overflow-hidden bg-surface-sunken px-6 py-20 sm:py-24"
+      className="relative isolate overflow-hidden bg-surface-sunken py-20 pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))] sm:py-24"
     >
       <div aria-hidden="true" className="grid-paper pointer-events-none absolute inset-0 opacity-60" />
       <div

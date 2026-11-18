@@ -100,7 +100,7 @@ const PerfilSkeleton = () => (
             </div>
             <div className="space-y-4 rounded-2xl border border-border bg-surface-elevated p-6 lg:col-span-2 md:p-8">
                 <div className="h-4 w-40 animate-pulse rounded-full bg-border" />
-                <div className="h-3 w-64 animate-pulse rounded-full bg-border/70" />
+                <div className="h-3 w-full max-w-64 animate-pulse rounded-full bg-border/70" />
                 <div className="grid gap-4 pt-4 sm:grid-cols-2">
                     {[0, 1, 2, 3].map((i) => (
                         <div key={i} className="h-11 animate-pulse rounded-xl bg-surface-sunken" />
@@ -386,7 +386,7 @@ const Perfil = () => {
             {/* =====================================================
                 HERO DE AVATAR
                 ===================================================== */}
-            <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-6 text-cream shadow-lift md:p-8">
+            <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-5 text-cream shadow-lift sm:p-6 md:p-8">
                 <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
                 <div
                     aria-hidden="true"
@@ -394,7 +394,7 @@ const Perfil = () => {
                 />
 
                 <div className="relative z-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                    <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-4xl font-extrabold text-night shadow-deep">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-3xl font-extrabold text-night shadow-deep sm:h-24 sm:w-24 sm:text-4xl">
                         {iniciales}
                     </span>
 
@@ -768,11 +768,11 @@ const Perfil = () => {
                                 </div>
                             )}
 
-                            <div className="mt-6 flex flex-wrap items-center gap-3">
+                            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                                 <button
                                     type="submit"
                                     disabled={cargando}
-                                    className={`press inline-flex items-center justify-center gap-2.5 rounded-xl px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] shadow-soft
+                                    className={`press inline-flex w-full items-center justify-center gap-2.5 rounded-xl px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] shadow-soft sm:w-auto
                                     ${cargando
                                         ? 'cursor-wait bg-surface-inset text-text-subtle'
                                         : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'}`}
@@ -785,7 +785,7 @@ const Perfil = () => {
                                 <button
                                     type="button"
                                     onClick={() => window.location.reload()}
-                                    className="press rounded-xl border border-border bg-surface px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text"
+                                    className="press w-full rounded-xl border border-border bg-surface px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text sm:w-auto"
                                 >
                                     Cancelar
                                 </button>

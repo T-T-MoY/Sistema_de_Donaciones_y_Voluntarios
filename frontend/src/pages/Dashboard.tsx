@@ -229,7 +229,7 @@ const retardo = (i: number): string => RETARDOS[Math.min(i, RETARDOS.length - 1)
 // =====================================================
 const KpiCard = ({ kpi, index }: { kpi: Kpi; index: number }) => (
     <div
-        className={`anim-rise group relative overflow-hidden rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/40 hover:shadow-lift motion-safe:hover:-translate-y-0.5 ${retardo(index)}`}
+        className={`anim-rise group relative overflow-hidden rounded-2xl border border-border bg-surface-elevated p-4 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/40 hover:shadow-lift motion-safe:hover:-translate-y-0.5 sm:p-5 ${retardo(index)}`}
     >
         <div className="mb-3 flex items-center justify-between gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-text-muted">
@@ -246,8 +246,8 @@ const KpiCard = ({ kpi, index }: { kpi: Kpi; index: number }) => (
             {kpi.valor}
         </div>
 
-        <div className="mt-2 flex items-center justify-between gap-2">
-            <p className="text-xs text-text-muted">{kpi.detalle}</p>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="min-w-0 text-xs text-text-muted">{kpi.detalle}</p>
             <span
                 className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
                     kpi.tendencia === 'up'
@@ -268,7 +268,7 @@ const KpiCard = ({ kpi, index }: { kpi: Kpi; index: number }) => (
 
 const ModuloCard = ({ modulo, index }: { modulo: Modulo; index: number }) => (
     <div
-        className={`anim-rise group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface-elevated p-6 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/45 hover:shadow-lift motion-safe:hover:-translate-y-1 ${retardo(index)}`}
+        className={`anim-rise group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-out-soft hover:border-accent/45 hover:shadow-lift motion-safe:hover:-translate-y-1 sm:p-6 ${retardo(index)}`}
     >
         <span
             aria-hidden="true"
@@ -365,7 +365,7 @@ const Dashboard = () => {
                 <div className="space-y-8">
 
                     {/* 1. CABECERA PERSONAL */}
-                    <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-8 text-cream shadow-lift md:p-10">
+                    <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-5 text-cream shadow-lift sm:p-8 md:p-10">
                         <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
                         <div
                             aria-hidden="true"
@@ -398,10 +398,10 @@ const Dashboard = () => {
                                 </p>
                             </div>
 
-                            <div className="flex shrink-0 flex-wrap items-center gap-3">
+                            <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
                                 <Link
                                     to="/"
-                                    className="press inline-flex items-center gap-2.5 rounded-xl border border-cream/20 bg-cream/[0.06] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/85 backdrop-blur-md hover:border-cream/35 hover:bg-cream/[0.12] hover:text-cream"
+                                    className="press inline-flex w-full items-center justify-center gap-2.5 rounded-xl border border-cream/20 bg-cream/[0.06] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/85 backdrop-blur-md hover:border-cream/35 hover:bg-cream/[0.12] hover:text-cream sm:w-auto"
                                     title="Volver a la página principal"
                                 >
                                     <svg className="h-4 w-4 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -413,7 +413,7 @@ const Dashboard = () => {
                                 {esAdmin ? (
                                     <Link
                                         to="/usuarios"
-                                        className="press inline-flex items-center gap-2.5 rounded-xl bg-gold px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-night shadow-glow hover:bg-gold-bright"
+                                        className="press inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-gold px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-night shadow-glow hover:bg-gold-bright sm:w-auto"
                                     >
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -422,7 +422,7 @@ const Dashboard = () => {
                                     </Link>
                                 ) : (
                                     <span
-                                        className="pointer-events-none inline-flex select-none items-center gap-2.5 rounded-xl border border-cream/15 bg-cream/[0.04] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/45"
+                                        className="pointer-events-none inline-flex w-full select-none items-center justify-center gap-2.5 rounded-xl border border-cream/15 bg-cream/[0.04] px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/45 sm:w-auto"
                                         aria-disabled="true"
                                         title="Módulo en desarrollo"
                                     >
@@ -465,7 +465,7 @@ const Dashboard = () => {
                     </section>
 
                     {/* 4. BARRA INFORMATIVA */}
-                    <section className="anim-rise flex flex-col items-start justify-between gap-5 rounded-2xl border border-border bg-surface-elevated p-6 shadow-soft [animation-delay:200ms] md:flex-row md:items-center">
+                    <section className="anim-rise flex flex-col items-start justify-between gap-5 rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:200ms] sm:p-6 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary">
                                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -24,7 +24,7 @@ export default function AppLayout() {
       <div className="flex w-full flex-1 flex-col overflow-hidden md:ml-64">
         <Header onAbrirMenu={() => setSidebarAbierto(true)} />
 
-        <main className="flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:p-8">
+        <main className="flex-1 overflow-y-auto overscroll-contain p-4 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] md:pb-8 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))] md:pt-8">
           <div className="mx-auto w-full max-w-[1400px]">
             <Outlet />
           </div>

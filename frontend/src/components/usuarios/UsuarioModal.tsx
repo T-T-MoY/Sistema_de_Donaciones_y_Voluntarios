@@ -298,7 +298,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     return createPortal(
         <div
-            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] backdrop-blur-md sm:p-4"
+            className="anim-fade fixed inset-0 z-50 flex items-center justify-center bg-night/70 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] backdrop-blur-md sm:p-4"
             onClick={(e) => {
                 if (e.target === e.currentTarget) onClose();
             }}
@@ -315,7 +315,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 />
 
                 {/* Cabecera */}
-                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-6 py-4">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-4 sm:px-6">
                     <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
                             <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -352,7 +352,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 <form
                     id="form-usuario"
                     onSubmit={handleSubmit}
-                    className="flex-1 space-y-3 overflow-y-auto p-6"
+                    className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:p-6"
                     noValidate
                 >
                     {/* === DATOS BÁSICOS === */}
@@ -649,11 +649,11 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 </form>
 
                 {/* Pie con botones */}
-                <div className="flex shrink-0 justify-end gap-3 border-t border-border bg-surface px-6 py-4">
+                <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-border bg-surface px-4 py-4 sm:flex-row sm:justify-end sm:gap-3 sm:px-6">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="press rounded-xl border border-border bg-surface-elevated px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text"
+                        className="press w-full rounded-xl border border-border bg-surface-elevated px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text sm:w-auto"
                     >
                         Cancelar
                     </button>
@@ -661,7 +661,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         type="submit"
                         form="form-usuario"
                         disabled={cargando}
-                        className={`press inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] shadow-soft
+                        className={`press inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.06em] shadow-soft sm:w-auto
                             ${cargando
                                 ? 'cursor-wait bg-surface-inset text-text-subtle'
                                 : 'bg-primary text-on-primary hover:bg-primary-hover hover:shadow-lift'}`}

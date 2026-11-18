@@ -72,7 +72,7 @@ export const Footer: React.FC = () => {
         className="pointer-events-none absolute -bottom-32 right-[-5%] h-[420px] w-[420px] rounded-full bg-gold/[0.08] blur-[120px]"
       />
 
-      <div className="relative z-10 mx-auto max-w-[1240px] px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-16">
+      <div className="relative z-10 mx-auto max-w-[1240px] px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))] pt-14 sm:pt-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           {/* Marca */}
           <div className="min-w-0">

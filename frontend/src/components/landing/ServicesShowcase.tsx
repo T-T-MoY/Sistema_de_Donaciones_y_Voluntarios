@@ -69,7 +69,7 @@ const SERVICES = [
 
 export const ServicesShowcase: React.FC = () => {
   return (
-    <section id="servicios" className="relative isolate overflow-hidden bg-surface px-6 py-20 sm:py-24">
+    <section id="servicios" className="relative isolate overflow-hidden bg-surface py-20 pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))] sm:py-24">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 top-0 h-[440px] w-[440px] rounded-full bg-accent/[0.08] blur-[140px]"

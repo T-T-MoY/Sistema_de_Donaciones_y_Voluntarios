@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import IconLogo from '../../assets/logo.svg?react';
@@ -25,6 +26,16 @@ interface NavbarProps {
 // =====================================================
 const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
     const { usuario } = useAuth();
+
+    // Cerrar el panel móvil con la tecla ESC
+    useEffect(() => {
+        if (!abierto) return;
+        const alPresionar = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onCerrar();
+        };
+        document.addEventListener('keydown', alPresionar);
+        return () => document.removeEventListener('keydown', alPresionar);
+    }, [abierto, onCerrar]);
 
     const menuItems: MenuItem[] = [
         { 
@@ -105,56 +116,45 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
             )}
 
             <aside className={`
-                fixed left-0 top-0 z-50 flex h-dvh w-[min(16rem,85vw)] flex-col
-                bg-night pt-[env(safe-area-inset-top,0px)] text-cream
+                fixed left-0 top-0 z-50 flex h-dvh w-64 max-w-[85vw] flex-col
+                bg-surface-elevated dark:bg-night text-text dark:text-cream
                 transition-transform duration-300 ease-out-soft
                 ${abierto ? 'translate-x-0' : '-translate-x-full'} 
-                md:w-64 md:translate-x-0
+                md:translate-x-0 md:max-w-none
+                border-r border-border dark:border-r-0
             `}>
                 {/* Filo dorado */}
                 <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 right-0 w-px bg-linear-to-b from-transparent via-gold/40 to-transparent"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-px bg-linear-to-b from-transparent via-primary/40 dark:via-gold/40 to-transparent"
                 />
-                <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-30" />
+                <div aria-hidden="true" className="grid-paper dark:grid-paper-light pointer-events-none absolute inset-0 opacity-30" />
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute -left-24 top-24 h-56 w-56 rounded-full bg-gold/[0.10] blur-[90px]"
+                    className="pointer-events-none absolute -left-24 top-24 h-56 w-56 rounded-full bg-primary/[0.10] dark:bg-gold/[0.10] blur-[90px]"
                 />
-
-                {/* Cerrar (solo móvil) */}
-                <button
-                    type="button"
-                    onClick={onCerrar}
-                    aria-label="Cerrar menú"
-                    className="press absolute right-3 top-[calc(1rem+env(safe-area-inset-top,0px))] z-20 rounded-xl border border-cream/15 bg-cream/[0.06] p-2 text-cream/70 hover:text-cream md:hidden"
-                >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
 
                 {/* Marca */}
                 <Link 
                     to="/" 
                     onClick={onCerrar}
-                    className="press group relative z-10 flex items-center gap-3 border-b border-cream/10 px-5 py-5"
+                    className="press group relative z-10 flex items-center gap-3 border-b border-border dark:border-cream/10 px-5 pb-5 pt-[calc(1.25rem+env(safe-area-inset-top,0px))]"
                     title="Ir a la página principal / Home"
                 >
                     <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
                     <div className="flex min-w-0 flex-col leading-none">
-                        <span className="font-display text-[12.5px] font-bold tracking-[-0.01em] text-cream">
-                            Donaciones <span className="text-gold">&amp; Voluntariados</span>
+                        <span className="font-display text-[12.5px] font-bold tracking-[-0.01em] text-text dark:text-cream">
+                            Donaciones <span className="text-primary dark:text-gold">&amp; Voluntariados</span>
                         </span>
-                        <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.26em] text-cream/40">
+                        <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.26em] text-text-subtle dark:text-cream/40">
                             Plataforma de gestión
                         </span>
                     </div>
                 </Link>
 
                 {/* Navegación */}
-                <nav className="relative z-10 flex-1 overflow-y-auto overscroll-contain px-3 py-5">
-                    <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-cream/35">
+                <nav className="relative z-10 flex-1 overflow-y-auto px-3 py-5">
+                    <p className="mb-3 px-3 text-[9px] font-bold uppercase tracking-[0.28em] text-text-subtle dark:text-cream/35">
                         Navegación
                     </p>
 
@@ -163,7 +163,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                             <li key={item.path}>
                                 {item.enDesarrollo ? (
                                     <span
-                                        className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-cream/30"
+                                        className="flex cursor-not-allowed select-none items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-text-subtle/70 dark:text-cream/30"
                                         aria-disabled="true"
                                         title="Módulo en desarrollo"
                                     >
@@ -171,7 +171,7 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} />
                                         </svg>
                                         <span className="truncate">{item.name}</span>
-                                        <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-cream/20" />
+                                        <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-text-subtle/40 dark:bg-cream/20" />
                                     </span>
                                 ) : (
                                     <NavLink 
@@ -181,8 +181,8 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                                         className={({ isActive }) => `
                                             press group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] transition-colors duration-200
                                             ${isActive 
-                                                ? 'bg-cream/[0.08] font-semibold text-cream' 
-                                                : 'font-medium text-cream/60 hover:bg-cream/[0.05] hover:text-cream'
+                                                ? 'bg-primary-soft dark:bg-cream/[0.08] font-semibold text-text dark:text-cream' 
+                                                : 'font-medium text-text-muted dark:text-cream/60 hover:bg-surface dark:hover:bg-cream/[0.05] hover:text-text dark:hover:text-cream'
                                             }
                                         `}
                                     >
@@ -190,13 +190,13 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                                             <>
                                                 <span
                                                     aria-hidden="true"
-                                                    className={`absolute left-0 top-1/2 h-6 w-[2px] -translate-y-1/2 rounded-full bg-gold transition-opacity duration-200 ${
+                                                    className={`absolute left-0 top-1/2 h-6 w-[2px] -translate-y-1/2 rounded-full bg-primary dark:bg-gold transition-opacity duration-200 ${
                                                         isActive ? 'opacity-100' : 'opacity-0'
                                                     }`}
                                                 />
                                                 <svg
                                                     className={`h-[18px] w-[18px] shrink-0 transition-colors duration-200 ${
-                                                        isActive ? 'text-gold' : 'text-cream/45 group-hover:text-gold/80'
+                                                        isActive ? 'text-primary dark:text-gold' : 'text-text-subtle dark:text-cream/45 group-hover:text-primary dark:group-hover:text-gold/80'
                                                     }`}
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                                 >
@@ -211,23 +211,23 @@ const Navbar = ({ abierto, onCerrar }: NavbarProps) => {
                         ))}
                     </ul>
 
-                    <div className="mt-6 rounded-xl border border-cream/10 bg-cream/[0.04] p-3.5">
-                        <p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-cream/45">
-                            <span className="motion-safe:animate-pulse-dot h-1.5 w-1.5 rounded-full bg-gold" />
+                    <div className="mt-6 rounded-xl border border-border dark:border-cream/10 bg-surface dark:bg-cream/[0.04] p-3.5">
+                        <p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-text-subtle dark:text-cream/45">
+                            <span className="motion-safe:animate-pulse-dot h-1.5 w-1.5 rounded-full bg-primary dark:bg-gold" />
                             Versión en curso
                         </p>
-                        <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
+                        <p className="mt-2 text-[11px] leading-relaxed text-text-subtle dark:text-cream/45">
                             Los módulos marcados se habilitarán en la próxima entrega.
                         </p>
                     </div>
                 </nav>
 
                 {/* Pie del sidebar */}
-                <div className="relative z-10 border-t border-cream/10 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
+                <div className="relative z-10 border-t border-border dark:border-cream/10 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
                     <Link
                         to="/"
                         onClick={onCerrar}
-                        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.05] px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-cream/80 hover:border-gold/45 hover:text-gold-bright"
+                        className="press flex w-full items-center justify-center gap-2 rounded-xl border border-border-strong dark:border-cream/15 bg-surface dark:bg-cream/[0.05] px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-text-muted dark:text-cream/80 hover:border-primary/50 dark:hover:border-gold/45 hover:text-primary dark:hover:text-gold-bright"
                     >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

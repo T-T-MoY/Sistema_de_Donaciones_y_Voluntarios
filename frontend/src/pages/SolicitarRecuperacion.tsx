@@ -94,17 +94,18 @@ const SolicitarRecuperacion = () => {
                 className="motion-safe:animate-float-slow pointer-events-none absolute -top-40 right-[12%] h-[520px] w-[520px] rounded-full bg-gold/[0.12] blur-[140px]"
             />
 
-            <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1280px] flex-col px-5 py-6 sm:px-8 lg:px-10">
+            <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-[1280px] flex-col px-5 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] pt-[max(1.5rem,env(safe-area-inset-top,0px))] sm:px-8 lg:px-10">
 
                 {/* Barra superior */}
                 <header className="flex items-center justify-between">
                     <Link
                         to="/"
-                        className="group flex items-center gap-3 rounded-xl"
+                        className="group flex min-w-0 items-center gap-2.5 rounded-xl sm:gap-3"
                         title="Ir al inicio"
+                        aria-label="Donaciones y Voluntariados — Inicio"
                     >
-                        <IconLogo className="h-10 w-10 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg]" />
-                        <span className="flex flex-col leading-none">
+                        <IconLogo className="h-9 w-9 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg] sm:h-10 sm:w-10" />
+                        <span className="hidden min-w-0 flex-col leading-none sm:flex">
                             <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-cream">
                                 Donaciones <span className="text-gold">&amp; Voluntariados</span>
                             </span>
@@ -116,12 +117,13 @@ const SolicitarRecuperacion = () => {
 
                     <Link
                         to="/"
-                        className="press inline-flex items-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.03] px-3.5 py-2 text-[10.5px] font-bold uppercase tracking-[0.14em] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.07] hover:text-cream"
+                        aria-label="Volver al inicio"
+                        className="press inline-flex shrink-0 items-center gap-2 rounded-xl border border-cream/15 bg-cream/[0.03] p-2.5 text-[10.5px] font-bold uppercase tracking-[0.14em] text-cream/70 hover:border-cream/30 hover:bg-cream/[0.07] hover:text-cream sm:px-3.5 sm:py-2"
                     >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                        Volver
+                        <span className="hidden sm:inline">Volver</span>
                     </Link>
                 </header>
 

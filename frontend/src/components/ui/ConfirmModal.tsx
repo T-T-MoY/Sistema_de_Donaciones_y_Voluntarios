@@ -78,7 +78,7 @@ const ConfirmModal = ({
 
   return createPortal(
     <div
-      className="anim-fade fixed inset-0 z-[60] flex items-center justify-center bg-night/70 p-4 backdrop-blur-md"
+      className="anim-fade fixed inset-0 z-[60] flex items-center justify-center bg-night/70 p-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top,0px))] backdrop-blur-md"
       onClick={(e) => {
         if (e.target === e.currentTarget && !cargando) onCancel();
       }}
@@ -87,7 +87,7 @@ const ConfirmModal = ({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="titulo-confirm-modal"
-        className="anim-scale w-full max-w-md overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-deep"
+        className="anim-scale max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-surface-elevated shadow-deep"
       >
         <span
           aria-hidden="true"
@@ -96,7 +96,7 @@ const ConfirmModal = ({
           } via-accent/40 to-transparent`}
         />
 
-        <div className="px-6 pb-2 pt-6">
+        <div className="px-5 pb-2 pt-6 sm:px-6">
           <div className="flex items-start gap-4">
             <span
               className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
@@ -144,7 +144,7 @@ const ConfirmModal = ({
           )}
         </div>
 
-        <div className="flex flex-col-reverse gap-2 px-6 pb-6 pt-4 sm:flex-row sm:flex-wrap sm:justify-end">
+        <div className="flex flex-col-reverse gap-2 px-5 pb-6 pt-4 sm:flex-row sm:flex-wrap sm:justify-end sm:px-6">
           {mostrarCancelar && (
             <button
               ref={botonCancelarRef}

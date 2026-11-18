@@ -46,13 +46,13 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-4 border-b border-border bg-surface-elevated/90 px-4 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl md:px-8">
+    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-3 border-b border-border bg-surface-elevated/90 px-4 pt-[env(safe-area-inset-top,0px)] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] backdrop-blur-xl md:gap-4 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))]">
 
       {/* Izquierda: hamburguesa + título */}
       <div className="flex min-w-0 items-center gap-3">
         <button
           onClick={onAbrirMenu}
-          className="press rounded-xl border border-border bg-surface p-2 text-text-muted hover:border-accent/50 hover:text-text md:hidden"
+          className="press rounded-xl border border-border bg-surface p-2.5 text-text-muted hover:border-accent/50 hover:text-text md:hidden"
           aria-label="Abrir menú"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
