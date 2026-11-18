@@ -1,0 +1,46 @@
+# ============================================================
+# render.yaml — Infraestructura como código para Render.com
+# Despliega el backend Node/Express con TypeScript.
+# Docs: https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+  - type: web
+    name: donaciones-voluntariado-api
+    runtime: node
+    region: oregon          # Cambiar a frankfurt si prefieres Europa
+    plan: free              # Cambiar a "starter" para producción real
+
+    # Carpeta raíz del servicio dentro del repositorio
+    rootDir: backend
+
+    # Render ejecuta estas dos fases en orden
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+
+    # Variables de entorno → configúralas también en el panel de Render
+    # (las marcadas como sync:false NO se sincronizan desde este archivo
+    #  por seguridad; debes ingresarlas manualmente en el dashboard)
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: DATABASE_URL
+        sync: false          # Pega el connection string de Neon en el panel
+      - key: JWT_SECRET
+        sync: false          # Genera uno seguro: openssl rand -hex 64
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false          # URL de Vercel: https://tu-app.vercel.app
+
+    # Render Health Check — usa tu endpoint existente
+    healthCheckPath: /api/health
+
+    # El plan free "hiberna" el servicio tras 15 min de inactividad.
+    # El primer request tras la hibernación tarda ~30 s.
+    # Descomenta autoDeploy: false si quieres controlar los deploys manualmente.
+    # autoDeploy: false

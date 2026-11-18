@@ -44,11 +44,25 @@ export const app: Application = express();
 // ============================================================================
 
 // CORS
+// En producción, FRONTEND_URL debe apuntar al dominio de Vercel.
+// En desarrollo, acepta localhost:5173.
+const allowedOrigins = [
+  process.env.FRONTEND_URL,          // https://tu-app.vercel.app (Vercel)
+  'http://localhost:5173',            // Vite dev server
+  'http://localhost:4000',
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+    origin: (origin, callback) => {
+      // Permite peticiones sin Origin (Postman, Render health-checks, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS bloqueado para: ${origin}`));
+    },
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   })
 );
 
