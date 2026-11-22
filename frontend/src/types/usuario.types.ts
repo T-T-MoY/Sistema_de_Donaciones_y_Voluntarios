@@ -132,3 +132,22 @@ export const esActivo = (u: Usuario): boolean => {
   const est = getEstadoRaw(u).toLowerCase();
   return est === 'activo' || est === 'active' || est === 'habilitado';
 };
+
+// =====================================================
+// TIPOS DE UBICACIÓN Y MAPA
+// =====================================================
+export interface UbicacionUsuario {
+  id: number;
+  nombre: string;
+  lat: number | string;
+  lng: number | string;
+  direccion?: string | null;
+}
+
+export interface PuntoMapa {
+  id: number | string;
+  nombre: string;
+  lat: number;
+  lng: number;
+  direccion?: string | null;
+}

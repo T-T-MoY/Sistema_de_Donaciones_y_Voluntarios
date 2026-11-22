@@ -244,11 +244,9 @@ const Registro = () => {
                         <IconLogo className="h-9 w-9 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg] sm:h-10 sm:w-10" />
                         <span className="hidden min-w-0 flex-col leading-none sm:flex">
                             <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-cream">
-                                Donaciones <span className="text-gold">&amp; Voluntariados</span>
+                                Donaciones
                             </span>
-                            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-cream/45">
-                                Plataforma de gestión
-                            </span>
+                            <span className="font-display text-[13.5px] font-bold tracking-[-0.01em] text-gold">&amp; Voluntariados</span>
                         </span>
                     </Link>
 

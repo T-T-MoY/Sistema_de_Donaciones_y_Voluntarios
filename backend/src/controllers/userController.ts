@@ -83,3 +83,22 @@ export const obtenerUsuarioCompletoPorId = async (req: Request, res: Response, n
     next(err);
   }
 };
+
+// ---------- Ubicaciones geográficas (donantes / mapa) ----------
+export const obtenerUsuariosConUbicacion = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const ubicaciones = await usuarioService.obtenerUsuariosConUbicacion();
+    res.status(200).json(ubicaciones);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const actualizarMiUbicacion = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const resultado = await usuarioService.actualizarMiUbicacion(getUserId(req), req.body);
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};

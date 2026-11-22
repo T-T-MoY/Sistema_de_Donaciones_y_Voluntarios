@@ -11,6 +11,7 @@ import type {
   UsuarioData,
   RolData,
   RolUsuario,
+  UbicacionResponse,
 } from '../models/usuarioModel';
 
 // ---------- Helpers de mapeo / normalización (privados del repo) ----------
@@ -536,6 +537,45 @@ export const usuarioRepository = {
         tokensRecuperacion.delete(token);
       }
     }
+    return rows[0];
+  },
+
+  // ---------- Ubicaciones geográficas de donantes ----------
+
+  async obtenerUsuariosConUbicacion(): Promise<UbicacionResponse[]> {
+    const query = `
+      SELECT 
+        u.id_usuario AS id,
+        TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido, ''))) AS nombre,
+        u.apellido,
+        d.ubi_latitud AS lat,
+        d.ubi_longitud AS lng,
+        d.direccion
+      FROM donante d
+      JOIN usuario u ON u.id_usuario = d.id_usuario
+      WHERE d.ubi_latitud IS NOT NULL 
+        AND d.ubi_longitud IS NOT NULL
+        AND u.estado <> 'Eliminado'
+      ORDER BY u.id_usuario ASC
+    `;
+    const { rows } = await pool.query<UbicacionResponse>(query);
+    return rows;
+  },
+
+  async actualizarUbicacionDonante(
+    id_usuario: number | string,
+    latitud: number,
+    longitud: number
+  ): Promise<{ id_usuario: number; ubi_latitud: number; ubi_longitud: number }> {
+    const query = `
+      INSERT INTO donante (id_usuario, ubi_latitud, ubi_longitud)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (id_usuario) DO UPDATE SET
+        ubi_latitud = EXCLUDED.ubi_latitud,
+        ubi_longitud = EXCLUDED.ubi_longitud
+      RETURNING id_usuario, ubi_latitud, ubi_longitud
+    `;
+    const { rows } = await pool.query(query, [id_usuario, latitud, longitud]);
     return rows[0];
   },
 };

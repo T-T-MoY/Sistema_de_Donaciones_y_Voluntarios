@@ -17,6 +17,7 @@ import {
   validarDatosVoluntario,
   validarDatosAdministrador,
   normalizarHabilidades,
+  validarCoordenadas,
   ROLES_VALIDOS,
   RolSistema,
 } from '../utils/validaciones';
@@ -24,6 +25,7 @@ import type {
   UsuarioResponse,
   RolData,
   CrearUsuarioInput,
+  UbicacionResponse,
 } from '../models/usuarioModel';
 
 // ---------- Helpers ----------
@@ -374,5 +376,41 @@ export const usuarioService = {
     const usuario = await usuarioRepository.obtenerPorId(id);
     if (!usuario) throw new AppError('Usuario no encontrado', 404);
     return usuario;
+  },
+
+  // ---------- Ubicaciones geográficas de donantes ----------
+  async obtenerUsuariosConUbicacion(): Promise<UbicacionResponse[]> {
+    return await usuarioRepository.obtenerUsuariosConUbicacion();
+  },
+
+  async actualizarMiUbicacion(
+    id_usuario: number,
+    body: Record<string, any>
+  ): Promise<{ mensaje: string; ubicacion: { lat: number; lng: number } }> {
+    if (!id_usuario || Number.isNaN(Number(id_usuario))) {
+      throw new AppError('ID de usuario inválido', 400);
+    }
+
+    const lat = body.latitud ?? body.lat ?? body.ubi_latitud;
+    const lng = body.longitud ?? body.lng ?? body.ubi_longitud;
+
+    if (lat === undefined || lng === undefined || lat === null || lng === null) {
+      throw new AppError('Coordenadas (latitud y longitud) requeridas', 400);
+    }
+
+    const numLat = Number(lat);
+    const numLng = Number(lng);
+
+    const validacion = validarCoordenadas(numLat, numLng);
+    if (!validacion.valido) {
+      throw new AppError(validacion.error || 'Coordenadas geográficas inválidas', 400);
+    }
+
+    await usuarioRepository.actualizarUbicacionDonante(id_usuario, numLat, numLng);
+
+    return {
+      mensaje: 'Ubicación actualizada con éxito',
+      ubicacion: { lat: numLat, lng: numLng },
+    };
   },
 };

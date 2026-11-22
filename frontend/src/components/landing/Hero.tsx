@@ -45,7 +45,7 @@ export const Hero: React.FC = () => {
         className="pointer-events-none absolute -bottom-48 right-[-8%] h-[560px] w-[560px] rounded-full bg-accent/[0.12] blur-[140px] dark:bg-night-3/70"
       />
 
-      <div className="relative z-10 mx-auto grid max-w-[1280px] items-center gap-14 pb-20 pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))] pt-16 lg:grid-cols-[1.06fr_0.94fr] lg:gap-20 lg:pb-28 lg:pt-24">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] items-center gap-14 pb-20 pl-[max(1.5rem,env(safe-area-inset-left,0px))] pr-[max(1.5rem,env(safe-area-inset-right,0px))] pt-[calc(6rem+env(safe-area-inset-top,0px))] sm:pt-[calc(6.5rem+env(safe-area-inset-top,0px))] lg:grid-cols-[1.06fr_0.94fr] lg:gap-20 lg:pb-28 lg:pt-[calc(7.5rem+env(safe-area-inset-top,0px))]">
         {/* =====================================================
             MENSAJE
             ===================================================== */}

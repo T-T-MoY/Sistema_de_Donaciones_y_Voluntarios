@@ -38,6 +38,26 @@ export interface UsuarioRow {
   rol: RolUsuario;
 }
 
+/** Fila del SELECT de donantes con ubicación geográfica. */
+export interface UbicacionRow {
+  id_usuario: number;
+  nombre: string;
+  apellido: string | null;
+  ubi_latitud: string | number;
+  ubi_longitud: string | number;
+}
+
+/** Punto geográfico que consume el mapa del frontend. */
+export interface UbicacionResponse {
+  id: number;
+  nombre: string;
+  apellido?: string | null;
+  lat: number | string;
+  lng: number | string;
+  direccion?: string | null;
+}
+
+
 /** Objeto de dominio que devuelve el repositorio/servicio. */
 export interface UsuarioResponse {
   id_usuario: number;

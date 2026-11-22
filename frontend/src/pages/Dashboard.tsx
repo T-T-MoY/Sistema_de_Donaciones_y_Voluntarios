@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import UbicacionTest from '../components/mapa/UbicacionTest';
 
 // =====================================================
 // TIPOS
@@ -29,7 +30,22 @@ interface Modulo {
 // =====================================================
 // DATOS
 // =====================================================
-const KPIS: Kpi[] = [
+const ICONOS = {
+    usuarios: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
+    corazon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+    megafono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
+    documento: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+    grafico: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+    tendencia: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
+    check: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+    calendario: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+    reloj: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+    escudo: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+    perfil: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    mas: 'M12 4v16m8-8H4',
+} as const;
+
+const KPIS_ADMIN: Kpi[] = [
     {
         etiqueta: 'Campañas',
         valor: '12+',
@@ -65,6 +81,123 @@ const KPIS: Kpi[] = [
         tendencia: 'flat',
         icono: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z',
         acento: 'bg-info-soft text-info',
+    },
+];
+
+const KPIS_DONANTE: Kpi[] = [
+    {
+        etiqueta: 'Donaciones',
+        valor: '3',
+        detalle: 'Aportes realizados',
+        delta: '+1',
+        tendencia: 'up',
+        icono: ICONOS.corazon,
+        acento: 'bg-success-soft text-success',
+    },
+    {
+        etiqueta: 'Campañas',
+        valor: '2',
+        detalle: 'Apoyadas este año',
+        delta: '2026',
+        tendencia: 'flat',
+        icono: ICONOS.megafono,
+        acento: 'bg-primary-soft text-primary',
+    },
+    {
+        etiqueta: 'Impacto',
+        valor: '45',
+        detalle: 'Personas alcanzadas',
+        delta: '+12',
+        tendencia: 'up',
+        icono: ICONOS.tendencia,
+        acento: 'bg-warning-soft text-warning',
+    },
+    {
+        etiqueta: 'Voluntariados',
+        valor: '1',
+        detalle: 'Participación activa',
+        delta: 'Activo',
+        tendencia: 'flat',
+        icono: ICONOS.usuarios,
+        acento: 'bg-info-soft text-info',
+    },
+];
+
+const KPIS_BENEFICIARIO: Kpi[] = [
+    {
+        etiqueta: 'Solicitudes',
+        valor: '2',
+        detalle: 'En revisión',
+        delta: 'Activas',
+        tendencia: 'flat',
+        icono: ICONOS.documento,
+        acento: 'bg-info-soft text-info',
+    },
+    {
+        etiqueta: 'Ayudas recibidas',
+        valor: '1',
+        detalle: 'Aprobadas',
+        delta: '+1',
+        tendencia: 'up',
+        icono: ICONOS.check,
+        acento: 'bg-success-soft text-success',
+    },
+    {
+        etiqueta: 'Campañas',
+        valor: '4',
+        detalle: 'Disponibles',
+        delta: 'Abiertas',
+        tendencia: 'flat',
+        icono: ICONOS.megafono,
+        acento: 'bg-primary-soft text-primary',
+    },
+    {
+        etiqueta: 'Estado',
+        valor: 'Verificado',
+        detalle: 'Perfil completo',
+        delta: 'Activo',
+        tendencia: 'flat',
+        icono: ICONOS.escudo,
+        acento: 'bg-warning-soft text-warning',
+    },
+];
+
+const KPIS_VOLUNTARIO: Kpi[] = [
+    {
+        etiqueta: 'Postulaciones',
+        valor: '3',
+        detalle: 'Enviadas',
+        delta: '+1',
+        tendencia: 'up',
+        icono: ICONOS.usuarios,
+        acento: 'bg-primary-soft text-primary',
+    },
+    {
+        etiqueta: 'Horas donadas',
+        valor: '24 h',
+        detalle: 'Voluntariado',
+        delta: '+6 h',
+        tendencia: 'up',
+        icono: ICONOS.reloj,
+        acento: 'bg-warning-soft text-warning',
+    },
+    {
+        etiqueta: 'Actividades',
+        valor: '2',
+        detalle: 'Próximas en agenda',
+        delta: 'Agenda',
+        tendencia: 'flat',
+        icono: ICONOS.calendario,
+        acento: 'bg-info-soft text-info',
+    },
+    {
+        etiqueta: 'Convocatorias',
+        valor: '8',
+        detalle: 'Disponibles',
+        delta: '+3',
+        tendencia: 'up',
+        icono: ICONOS.megafono,
+        acento: 'bg-success-soft text-success',
     },
 ];
 
@@ -213,6 +346,213 @@ const MODULOS_CLIENTE: Modulo[] = [
     },
 ];
 
+const MODULOS_DONANTE: Modulo[] = [
+    {
+        to: '/campanas',
+        titulo: 'Explorar Campañas',
+        descripcion: 'Descubrí las campañas solidarias activas y elegí a quién querés apoyar con tu aporte.',
+        cta: 'Explorar Campañas',
+        icono: ICONOS.megafono,
+        iconoBg: 'bg-success-soft text-success',
+        badge: 'En vivo',
+        badgeClass: 'bg-success-soft text-success',
+        enDesarrollo: true,
+    },
+    {
+        to: '/donaciones',
+        titulo: 'Mis Donaciones',
+        descripcion: 'Consultá tus aportes, comprobantes y el historial completo de tus donaciones.',
+        cta: 'Ver Mis Donaciones',
+        icono: ICONOS.documento,
+        iconoBg: 'bg-primary-soft text-primary',
+        badge: 'Historial',
+        badgeClass: 'bg-primary-soft text-primary',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mi-impacto',
+        titulo: 'Mi Impacto',
+        descripcion: 'Mirá cuántas personas y campañas ayudaste y el alcance real de tus aportes.',
+        cta: 'Ver Mi Impacto',
+        icono: ICONOS.tendencia,
+        iconoBg: 'bg-warning-soft text-warning',
+        badge: 'Impacto',
+        badgeClass: 'bg-warning-soft text-warning',
+        enDesarrollo: true,
+    },
+    {
+        to: '/voluntariados',
+        titulo: 'Voluntariados',
+        descripcion: 'Sumate a convocatorias abiertas y participá como voluntario en tu comunidad.',
+        cta: 'Explorar Voluntariados',
+        icono: ICONOS.usuarios,
+        iconoBg: 'bg-info-soft text-info',
+        badge: 'Comunidad',
+        badgeClass: 'bg-info-soft text-info',
+        enDesarrollo: true,
+    },
+];
+
+const MODULOS_BENEFICIARIO: Modulo[] = [
+    {
+        to: '/solicitar-apoyo',
+        titulo: 'Solicitar Apoyo',
+        descripcion: 'Registrá una solicitud de ayuda indicando tus necesidades prioritarias.',
+        cta: 'Nueva Solicitud',
+        icono: ICONOS.mas,
+        iconoBg: 'bg-success-soft text-success',
+        badge: 'Nuevo',
+        badgeClass: 'bg-success-soft text-success',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mis-solicitudes',
+        titulo: 'Mis Solicitudes',
+        descripcion: 'Seguí el estado de tus solicitudes y revisá las respuestas recibidas.',
+        cta: 'Ver Mis Solicitudes',
+        icono: ICONOS.documento,
+        iconoBg: 'bg-primary-soft text-primary',
+        badge: 'Seguimiento',
+        badgeClass: 'bg-primary-soft text-primary',
+        enDesarrollo: true,
+    },
+    {
+        to: '/campanas',
+        titulo: 'Campañas Disponibles',
+        descripcion: 'Explorá las campañas activas de las que podés recibir apoyo junto a tu familia.',
+        cta: 'Ver Campañas',
+        icono: ICONOS.megafono,
+        iconoBg: 'bg-warning-soft text-warning',
+        badge: 'Abiertas',
+        badgeClass: 'bg-warning-soft text-warning',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mi-perfil-solidario',
+        titulo: 'Mi Perfil Solidario',
+        descripcion: 'Completá tus datos personales para agilizar la evaluación de tus solicitudes.',
+        cta: 'Completar Perfil',
+        icono: ICONOS.perfil,
+        iconoBg: 'bg-info-soft text-info',
+        badge: 'Perfil',
+        badgeClass: 'bg-info-soft text-info',
+        enDesarrollo: true,
+    },
+];
+
+const MODULOS_VOLUNTARIO: Modulo[] = [
+    {
+        to: '/convocatorias',
+        titulo: 'Convocatorias',
+        descripcion: 'Encontrá jornadas y actividades solidarias que necesitan voluntarios cerca de vos.',
+        cta: 'Ver Convocatorias',
+        icono: ICONOS.megafono,
+        iconoBg: 'bg-success-soft text-success',
+        badge: 'Abiertas',
+        badgeClass: 'bg-success-soft text-success',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mis-postulaciones',
+        titulo: 'Mis Postulaciones',
+        descripcion: 'Revisá las convocatorias a las que te postulaste y el estado de cada una.',
+        cta: 'Ver Postulaciones',
+        icono: ICONOS.check,
+        iconoBg: 'bg-primary-soft text-primary',
+        badge: 'Seguimiento',
+        badgeClass: 'bg-primary-soft text-primary',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mi-agenda',
+        titulo: 'Mi Agenda',
+        descripcion: 'Consultá tus próximas actividades, turnos y jornadas asignadas.',
+        cta: 'Ver Mi Agenda',
+        icono: ICONOS.calendario,
+        iconoBg: 'bg-warning-soft text-warning',
+        badge: 'Próximas',
+        badgeClass: 'bg-warning-soft text-warning',
+        enDesarrollo: true,
+    },
+    {
+        to: '/mis-horas',
+        titulo: 'Mis Horas',
+        descripcion: 'Seguí el registro de tus horas donadas y el impacto de tu participación.',
+        cta: 'Ver Mis Horas',
+        icono: ICONOS.reloj,
+        iconoBg: 'bg-info-soft text-info',
+        badge: 'Registro',
+        badgeClass: 'bg-info-soft text-info',
+        enDesarrollo: true,
+    },
+];
+
+// =====================================================
+// PANEL POR ROL
+// =====================================================
+interface PanelRol {
+    kpis: Kpi[];
+    modulos: Modulo[];
+    descripcion: string;
+    cta: { etiqueta: string; to?: string; icono: string };
+    seccionTitulo: string;
+    seccionSubtitulo: string;
+}
+
+const PANEL_ADMIN: PanelRol = {
+    kpis: KPIS_ADMIN,
+    modulos: MODULOS_ADMIN,
+    descripcion: 'Supervisá usuarios, beneficiarios y actividad de la plataforma en tiempo real.',
+    cta: { etiqueta: 'Ver usuarios', to: '/usuarios', icono: ICONOS.usuarios },
+    seccionTitulo: 'Módulos de gestión',
+    seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
+};
+
+const PANEL_EMPLEADO: PanelRol = {
+    kpis: KPIS_ADMIN,
+    modulos: MODULOS_EMPLEADO,
+    descripcion: 'Coordiná pagos, campañas y voluntariados de la plataforma.',
+    cta: { etiqueta: 'Verificar pagos', icono: ICONOS.check },
+    seccionTitulo: 'Módulos de gestión',
+    seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
+};
+
+const PANEL_DONANTE: PanelRol = {
+    kpis: KPIS_DONANTE,
+    modulos: MODULOS_DONANTE,
+    descripcion: 'Apoyá campañas solidarias y seguí el impacto de tus aportes.',
+    cta: { etiqueta: 'Donar ahora', icono: ICONOS.corazon },
+    seccionTitulo: 'Tus acciones como donante',
+    seccionSubtitulo: 'Estos módulos estarán disponibles próximamente.',
+};
+
+const PANEL_BENEFICIARIO: PanelRol = {
+    kpis: KPIS_BENEFICIARIO,
+    modulos: MODULOS_BENEFICIARIO,
+    descripcion: 'Gestioná tus solicitudes de apoyo y seguí el estado de cada una.',
+    cta: { etiqueta: 'Solicitar apoyo', icono: ICONOS.documento },
+    seccionTitulo: 'Tus acciones como beneficiario',
+    seccionSubtitulo: 'Estos módulos estarán disponibles próximamente.',
+};
+
+const PANEL_VOLUNTARIO: PanelRol = {
+    kpis: KPIS_VOLUNTARIO,
+    modulos: MODULOS_VOLUNTARIO,
+    descripcion: 'Encontrá convocatorias y organizá tu participación solidaria.',
+    cta: { etiqueta: 'Postularme', icono: ICONOS.usuarios },
+    seccionTitulo: 'Tus acciones como voluntario',
+    seccionSubtitulo: 'Estos módulos estarán disponibles próximamente.',
+};
+
+const PANEL_USUARIO: PanelRol = {
+    kpis: KPIS_ADMIN,
+    modulos: MODULOS_CLIENTE,
+    descripcion: 'Explorá campañas, donaciones y voluntariados de la comunidad.',
+    cta: { etiqueta: 'Explorar campañas', icono: ICONOS.megafono },
+    seccionTitulo: 'Tus módulos',
+    seccionSubtitulo: 'Estos módulos estarán disponibles próximamente.',
+};
+
 // Retardos escalonados sin estilos inline
 const RETARDOS = [
     '[animation-delay:60ms]',
@@ -344,14 +684,19 @@ const Dashboard = () => {
         year: 'numeric'
     });
 
-    const esAdmin = usuario?.rol === 'Administrador' || usuario?.rol === 'Admin';
-    const esEmpleado = usuario?.rol === 'Empleado';
+    const rolNormalizado = (usuario?.rol || '').toLowerCase();
 
-    const modulos = esAdmin
-        ? MODULOS_ADMIN
-        : esEmpleado
-            ? MODULOS_EMPLEADO
-            : MODULOS_CLIENTE;
+    const panel = rolNormalizado === 'administrador' || rolNormalizado === 'admin'
+        ? PANEL_ADMIN
+        : rolNormalizado === 'empleado'
+            ? PANEL_EMPLEADO
+            : rolNormalizado === 'donante'
+                ? PANEL_DONANTE
+                : rolNormalizado === 'beneficiario'
+                    ? PANEL_BENEFICIARIO
+                    : rolNormalizado === 'voluntario'
+                        ? PANEL_VOLUNTARIO
+                        : PANEL_USUARIO;
 
     return (
         <div className="pb-10">
@@ -359,6 +704,20 @@ const Dashboard = () => {
 
                 {/* 1. CABECERA PERSONAL */}
                     <section className="anim-rise relative overflow-hidden rounded-3xl border border-cream/10 bg-linear-to-br from-night-3 via-night-2 to-night p-5 text-cream shadow-lift sm:p-8 md:p-10">
+                        <img
+                            src="/images/auth-complex.jpg"
+                            alt=""
+                            aria-hidden="true"
+                            className="absolute inset-0 h-full w-full object-cover object-center opacity-85"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="absolute inset-0 bg-linear-to-r from-night/95 via-night/75 to-night/30"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="absolute inset-0 bg-linear-to-t from-night/85 via-night/15 to-night/50"
+                        />
                         <div aria-hidden="true" className="grid-paper-light pointer-events-none absolute inset-0 opacity-40" />
                         <div
                             aria-hidden="true"
@@ -386,8 +745,7 @@ const Dashboard = () => {
                                     <span className="font-semibold text-gold-bright">
                                         {usuario?.rol || 'Usuario'}
                                     </span>
-                                    . Supervisá usuarios, beneficiarios y actividad de la plataforma
-                                    en tiempo real.
+                                    . {panel.descripcion}
                                 </p>
                             </div>
 
@@ -403,15 +761,15 @@ const Dashboard = () => {
                                     <span>Ir al Home</span>
                                 </Link>
 
-                                {esAdmin ? (
+                                {panel.cta.to ? (
                                     <Link
-                                        to="/usuarios"
+                                        to={panel.cta.to}
                                         className="press inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-gold px-5 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-night shadow-glow hover:bg-gold-bright sm:w-auto"
                                     >
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={panel.cta.icono} />
                                         </svg>
-                                        <span>Ver usuarios</span>
+                                        <span>{panel.cta.etiqueta}</span>
                                     </Link>
                                 ) : (
                                     <span
@@ -419,8 +777,11 @@ const Dashboard = () => {
                                         aria-disabled="true"
                                         title="Módulo en desarrollo"
                                     >
+                                        <svg className="h-4 w-4 text-gold/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={panel.cta.icono} />
+                                        </svg>
+                                        <span>{panel.cta.etiqueta}</span>
                                         <span className="h-1.5 w-1.5 rounded-full bg-warning" />
-                                        En desarrollo
                                     </span>
                                 )}
                             </div>
@@ -429,7 +790,7 @@ const Dashboard = () => {
 
                     {/* 2. MÉTRICAS KPI */}
                     <section className="grid grid-cols-2 gap-4 md:gap-5 xl:grid-cols-4">
-                        {KPIS.map((kpi, i) => (
+                        {panel.kpis.map((kpi, i) => (
                             <KpiCard key={kpi.etiqueta} kpi={kpi} index={i} />
                         ))}
                     </section>
@@ -439,23 +800,30 @@ const Dashboard = () => {
                         <div className="anim-rise mb-6 flex flex-wrap items-end justify-between gap-3 [animation-delay:120ms]">
                             <div>
                                 <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-text">
-                                    Módulos de gestión
+                                    {panel.seccionTitulo}
                                 </h2>
                                 <p className="mt-1 text-sm text-text-muted">
-                                    Seleccioná un módulo para empezar a operar.
+                                    {panel.seccionSubtitulo}
                                 </p>
                             </div>
                             <span className="rounded-full border border-border bg-surface-elevated px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-text-muted shadow-soft">
-                                {modulos.length} {modulos.length === 1 ? 'módulo' : 'módulos'}
+                                {panel.modulos.length} {panel.modulos.length === 1 ? 'módulo' : 'módulos'}
                             </span>
                         </div>
 
                         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-                            {modulos.map((modulo, i) => (
+                            {panel.modulos.map((modulo, i) => (
                                 <ModuloCard key={modulo.to + modulo.titulo} modulo={modulo} index={i} />
                             ))}
                         </div>
                     </section>
+
+                    {/* SECCIÓN EXCLUSIVA PARA EL ROL DE DONANTE: UBICACIÓN TEST */}
+                    {rolNormalizado === 'donante' && (
+                        <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 sm:p-6 md:p-8 shadow-soft [animation-delay:160ms]">
+                            <UbicacionTest />
+                        </section>
+                    )}
 
                     {/* 4. BARRA INFORMATIVA */}
                     <section className="anim-rise flex flex-col items-start justify-between gap-5 rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:200ms] sm:p-6 md:flex-row md:items-center">

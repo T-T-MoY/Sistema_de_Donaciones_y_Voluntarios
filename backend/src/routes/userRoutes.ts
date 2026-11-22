@@ -7,7 +7,9 @@ import {
     cambiarEstadoUsuario, 
     actualizarUsuario, 
     eliminarUsuario, 
-    obtenerUsuarioCompletoPorId 
+    obtenerUsuarioCompletoPorId,
+    obtenerUsuariosConUbicacion,
+    actualizarMiUbicacion
 } from '../controllers/userController';
 import { verificarToken, esAdmin } from '../middlewares/authMiddleware';
 import multer, { FileFilterCallback } from 'multer';
@@ -46,6 +48,10 @@ const upload = multer({
 // Rutas de perfil (cualquier usuario autenticado)
 router.get('/perfil', verificarToken, obtenerPerfil);
 router.put('/perfil', verificarToken, upload.single('foto'), actualizarPerfil);
+
+// Rutas de ubicación geográfica (donantes / mapa)
+router.get('/ubicaciones', verificarToken, obtenerUsuariosConUbicacion);
+router.post('/mi-ubicacion', verificarToken, actualizarMiUbicacion);
 
 // Rutas CRUD de usuarios (solo administradores)
 router.get('/', verificarToken, esAdmin, listarUsuarios);

@@ -7,7 +7,7 @@
  */
 
 import api from './client';
-import type { Usuario } from '../types/usuario.types';
+import type { Usuario, UbicacionUsuario } from '../types/usuario.types';
 
 export const usuarioApi = {
   /**
@@ -80,6 +80,25 @@ export const usuarioApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
+    return res.data;
+  },
+
+  /**
+   * Obtiene la lista de usuarios donantes con ubicación geográfica.
+   */
+  getUbicaciones: async (): Promise<UbicacionUsuario[]> => {
+    const res = await api.get<UbicacionUsuario[]>('/usuarios/ubicaciones');
+    return res.data;
+  },
+
+  /**
+   * Actualiza la ubicación geográfica en vivo del usuario autenticado.
+   */
+  actualizarMiUbicacion: async (coords: {
+    latitud: number;
+    longitud: number;
+  }): Promise<{ mensaje: string; ubicacion: { lat: number; lng: number } }> => {
+    const res = await api.post('/usuarios/mi-ubicacion', coords);
     return res.data;
   },
 };

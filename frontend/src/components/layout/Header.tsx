@@ -46,7 +46,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-[72px] items-center justify-between gap-3 border-b border-border bg-surface-elevated/90 px-4 pt-[env(safe-area-inset-top,0px)] pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] backdrop-blur-xl md:gap-4 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))]">
+    <header className="sticky top-[max(0.75rem,env(safe-area-inset-top,0px))] z-30 mx-3 mt-[max(0.75rem,env(safe-area-inset-top,0px))] flex min-h-[72px] items-center justify-between gap-3 rounded-[20px] border border-border bg-surface-elevated/90 px-4 pl-[max(1rem,env(safe-area-inset-left,0px))] pr-[max(1rem,env(safe-area-inset-right,0px))] shadow-lift backdrop-blur-xl md:gap-4 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))]">
 
       {/* Izquierda: hamburguesa + título */}
       <div className="flex min-w-0 items-center gap-3">
