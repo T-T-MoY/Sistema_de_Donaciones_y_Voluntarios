@@ -4,11 +4,15 @@
  * PÁGINA: Gestión de Donaciones (/donaciones). Una sola pantalla con pestañas
  * según el rol: el Administrador ve Donaciones · Inventario y asignaciones · Reportes; el
  * resto de roles ve únicamente su historial.
+ *
+ * SPRINT 3 — Integración: si se llega desde /campanas con ?campanaId=X el modal
+ * de nueva donación se abre automáticamente con esa campaña pre-seleccionada.
  * ============================================================================
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
 import DonacionesTab from '../components/donaciones/DonacionesTab';
 import AsignacionesTab from '../components/donaciones/AsignacionesTab';
 import ReportesTab from '../components/donaciones/ReportesTab';
@@ -28,10 +32,21 @@ const PESTANAS: { id: Pestana; etiqueta: string }[] = [
 
 const DonacionesPage = () => {
   const { usuario } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [pestana, setPestana] = useState<Pestana>('donaciones');
+  const campanaIdDesdeUrl = searchParams.get('campanaId');
+  const [campanaIdInicial, setCampanaIdInicial] = useState<number | undefined>(
+    campanaIdDesdeUrl ? Number(campanaIdDesdeUrl) : undefined
+  );
+
+  useEffect(() => {
+    if (campanaIdDesdeUrl) setSearchParams({}, { replace: true });
+  }, []);
 
   const roles = usuario?.roles || [usuario?.rol || ''];
   const rol = (roles.includes('Administrador') ? 'Administrador' : roles.includes('Voluntario') ? 'Voluntario' : roles.includes('Beneficiario') ? 'Beneficiario' : 'Donante') as RolDonaciones;
+  const esAdmin = rol === 'Administrador';
+
   if (!ROLES_VALIDOS.includes(rol)) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
@@ -40,8 +55,6 @@ const DonacionesPage = () => {
       </div>
     );
   }
-
-  const esAdmin = rol === 'Administrador';
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 md:py-10">
@@ -75,7 +88,7 @@ const DonacionesPage = () => {
       )}
 
       <div role="tabpanel" id={`panel-${pestana}`} aria-labelledby={esAdmin ? `tab-${pestana}` : undefined}>
-        {pestana === 'donaciones' && <DonacionesTab rol={rol} />}
+        {pestana === 'donaciones' && <DonacionesTab rol={rol} campanaIdInicial={campanaIdInicial} onCampanaIdConsumido={() => setCampanaIdInicial(undefined)} />}
         {esAdmin && pestana === 'inventario' && (
           <div className="space-y-8">
             <InventarioTab />

@@ -45,6 +45,7 @@ export interface UsuarioRow {
   revisado_por_voluntario: number | null;
   motivo_rechazo_voluntario: string | null;
   fecha_registro_voluntario: Date | string | null;
+  es_admin?: boolean;
   rol: RolUsuario;
   roles: RolParticipacion[];
 }

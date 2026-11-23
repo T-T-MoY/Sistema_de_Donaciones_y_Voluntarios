@@ -154,6 +154,7 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       apellido: usuario.apellido,
       correo: usuario.correo,
       rol: usuario.rol,
+      roles: usuario.roles || [usuario.rol],
       es_coordinador: Boolean(usuario.es_coordinador),
       es_donante: Boolean(usuario.es_donante),
       estado_voluntario: usuario.estado_voluntario ?? null,
