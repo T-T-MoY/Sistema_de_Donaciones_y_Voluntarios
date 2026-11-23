@@ -12,6 +12,11 @@ declare global {
         apellido: string;
         correo: string;
         rol: string;
+        roles?: string[];
+        es_coordinador?: boolean;
+        es_donante?: boolean;
+        estado_voluntario?: string | null;
+        estado_beneficiario?: string | null;
       };
       file?: Express.Multer.File;
     }

@@ -154,6 +154,9 @@ export interface CrearUsuarioInput {
   telefono: string;
   contraseña: string;
   foto_url?: string | null;
+  calle?: string | null;
+  zona?: string | null;
+  ciudad?: string | null;
   rol?: string;
   estado_cuenta?: string | boolean;
   // Campos del subtipo
