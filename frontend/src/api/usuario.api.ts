@@ -7,7 +7,12 @@
  */
 
 import api from './client';
-import type { Usuario, UbicacionUsuario } from '../types/usuario.types';
+import type { 
+  Usuario, 
+  UbicacionUsuario,
+  SolicitudVoluntario,
+  SolicitudBeneficiario
+} from '../types/usuario.types';
 
 export const usuarioApi = {
   /**
@@ -99,6 +104,85 @@ export const usuarioApi = {
     longitud: number;
   }): Promise<{ mensaje: string; ubicacion: { lat: number; lng: number } }> => {
     const res = await api.post('/usuarios/mi-ubicacion', coords);
+    return res.data;
+  },
+
+  /**
+   * Obtiene la lista de solicitudes de voluntariado (coordinador o admin).
+   */
+  getSolicitudesVoluntarios: async (estado?: string): Promise<SolicitudVoluntario[]> => {
+    const res = await api.get<SolicitudVoluntario[]>('/usuarios/solicitudes/voluntarios', {
+      params: estado ? { estado } : undefined,
+    });
+    return res.data;
+  },
+
+  /**
+   * Aprueba o rechaza una solicitud de voluntariado.
+   */
+  revisarSolicitudVoluntario: async (
+    id: number | string,
+    payload: { estado: 'Aprobado' | 'Rechazado'; motivo_rechazo?: string }
+  ): Promise<{ id_usuario: number; estado: string }> => {
+    const res = await api.patch<{ id_usuario: number; estado: string }>(
+      `/usuarios/solicitudes/voluntarios/${id}`,
+      payload
+    );
+    return res.data;
+  },
+
+  /**
+   * Obtiene la lista de solicitudes de beneficiario (admin).
+   */
+  getSolicitudesBeneficiarios: async (estado?: string): Promise<SolicitudBeneficiario[]> => {
+    const res = await api.get<SolicitudBeneficiario[]>('/usuarios/solicitudes/beneficiarios', {
+      params: estado ? { estado } : undefined,
+    });
+    return res.data;
+  },
+
+  /**
+   * Verifica o rechaza una solicitud de beneficiario.
+   */
+  revisarSolicitudBeneficiario: async (
+    id: number | string,
+    payload: { estado: 'Verificado' | 'Rechazado'; motivo_rechazo?: string }
+  ): Promise<{ id_usuario: number; estado: string }> => {
+    const res = await api.patch<{ id_usuario: number; estado: string }>(
+      `/usuarios/solicitudes/beneficiarios/${id}`,
+      payload
+    );
+    return res.data;
+  },
+
+  /**
+   * Postula al usuario autenticado como voluntario.
+   */
+  postularVoluntario: async (payload: {
+    habilidades: string[] | string;
+    disponibilidad: string;
+  }): Promise<{ id_usuario: number; mensaje: string }> => {
+    const res = await api.post<{ id_usuario: number; mensaje: string }>(
+      '/usuarios/postular/voluntario',
+      payload
+    );
+    return res.data;
+  },
+
+  /**
+   * Postula al usuario autenticado como beneficiario.
+   */
+  postularBeneficiario: async (payload: {
+    tipo_beneficiario: string;
+    documento: string;
+    direccion: string;
+    necesidad: string;
+    descripcion?: string;
+  }): Promise<{ id_usuario: number; mensaje: string }> => {
+    const res = await api.post<{ id_usuario: number; mensaje: string }>(
+      '/usuarios/postular/beneficiario',
+      payload
+    );
     return res.data;
   },
 };

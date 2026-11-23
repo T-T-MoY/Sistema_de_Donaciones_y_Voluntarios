@@ -68,6 +68,13 @@ const badgeEstado = (activo: boolean): string =>
 
 const puntoEstado = (activo: boolean): string => (activo ? 'bg-success' : 'bg-error');
 
+const getAvatarUrl = (fotoUrl?: unknown): string | null => {
+  if (!fotoUrl || typeof fotoUrl !== 'string') return null;
+  if (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://')) return fotoUrl;
+  const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+  return `${baseUrl}${fotoUrl.startsWith('/') ? '' : '/'}${fotoUrl}`;
+};
+
 // =====================================================
 // BÚSQUEDA
 // =====================================================
@@ -803,9 +810,17 @@ export const UsuarioList = ({
 
                         <td className="min-w-0 px-3 py-4">
                           <div className="flex min-w-0 items-center gap-2.5">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-xs font-bold text-primary ring-1 ring-primary/15">
-                              {iniciales}
-                            </div>
+                            {getAvatarUrl(user.foto_url) ? (
+                              <img
+                                src={getAvatarUrl(user.foto_url)!}
+                                alt={nombreCompleto}
+                                className="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-border shadow-soft"
+                              />
+                            ) : (
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-xs font-bold text-primary ring-1 ring-primary/15">
+                                {iniciales}
+                              </div>
+                            )}
                             <span
                               className="truncate text-sm font-semibold text-text"
                               title={nombreCompleto}
@@ -882,9 +897,17 @@ export const UsuarioList = ({
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-[11px] font-bold tabular-nums text-text-subtle">
                         {numeroFila}
                       </span>
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15">
-                        {iniciales}
-                      </div>
+                      {getAvatarUrl(user.foto_url) ? (
+                        <img
+                          src={getAvatarUrl(user.foto_url)!}
+                          alt={nombreCompleto}
+                          className="h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-border shadow-soft"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15">
+                          {iniciales}
+                        </div>
+                      )}
                       <div className="min-w-0 flex-1">
                         <h3
                           className="truncate text-sm font-semibold text-text"

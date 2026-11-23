@@ -4,7 +4,7 @@
 -- =========================================================
 
 -- 1. TABLA BASE: USUARIO (12 registros)
-INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_creacion) VALUES
+INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_registro) VALUES
 -- Administradores (IDs 1 y 2)
 (1, 'Carla', 'Mamani Quispe', 'carla.admin@donacionesbo.org', '71234567', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-10 09:00:00'),
 (2, 'Jorge', 'Fernandez Rojas', 'jorge.admin@donacionesbo.org', '71234568', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-11 09:30:00'),
@@ -27,32 +27,46 @@ INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, e
 
 
 -- =========================================================
--- 2. HERENCIAS / SUBTIPOS POR ROL
+-- 2. SUBTIPOS POR ROL
 -- =========================================================
 
 -- ---------- ADMINISTRADOR ----------
-INSERT INTO administrador (id_usuario, nivel_acceso) VALUES
-(1, 'SUPERADMIN'),
-(2, 'GENERAL');
-
--- ---------- BENEFICIARIO ----------
-INSERT INTO beneficiario (id_usuario, tipo_beneficiario, documento, direccion, necesidad, descripcion, estado) VALUES
-(3, 'Persona', '5612345', 'Av. Buenos Aires #450, Zona Max Paredes, La Paz', 'Medicamentos e insumos médicos', 'Adulto mayor que requiere tratamiento mensual continuo.', 'Verificado'),
-(4, 'Familia', '6123456', 'Calle 4 #120, Villa Fátima, La Paz', 'Canasta familiar y ropa de abrigo', 'Familia de 5 integrantes afectada por pérdida de empleo.', 'Pendiente'),
-(5, 'Institucion', '1020304025', 'Av. Periférica #890, Zona Achachicala, La Paz', 'Alimentos no perecederos', 'Comedor popular infantil que atiende a 60 niños diariamente.', 'Verificado');
+INSERT INTO administrador (id_usuario) VALUES
+(1),
+(2);
 
 -- ---------- DONANTE ----------
+-- Todos los que se registran nacen como donantes (IDs 3 a 12),
+-- los que no dieron ubicación quedan con dirección y coordenadas NULL.
 INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
+(3,  NULL, NULL, NULL),
+(4,  NULL, NULL, NULL),
+(5,  NULL, NULL, NULL),
 (6, 'Av. Busch #123, Miraflores, La Paz', -16.50384500, -68.12153200),
 (7, 'Av. Arce #789, San Jorge, La Paz', -16.50912300, -68.12489100),
 (8, 'Av. Ballivián #56, Calacoto, La Paz', -16.54123400, -68.08567800),
-(9, 'Av. 6 de Agosto #300, Sopocachi, La Paz', -16.50765400, -68.12891000);
+(9, 'Av. 6 de Agosto #300, Sopocachi, La Paz', -16.50765400, -68.12891000),
+(10, NULL, NULL, NULL),
+(11, NULL, NULL, NULL),
+(12, NULL, NULL, NULL);
 
 -- ---------- VOLUNTARIO ----------
-INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, fecha_registro) VALUES
-(10, ARRAY['Logistica', 'Conduccion y Transporte', 'Carga'], 'Fines de semana', '2026-02-10 08:30:00'),
-(11, ARRAY['Primeros Auxilios', 'Atencion Social', 'Organizacion'], 'Tardes (14:00 - 19:00)', '2026-02-11 10:15:00'),
-(12, ARRAY['Cocina y Alimentacion', 'Inventario', 'Logistica'], 'Tiempo completo', '2026-02-12 17:00:00');
+-- Luis (10): coordinador, aprobado por el admin Carla (1)
+-- Valeria (11): aprobada por el coordinador Luis (10)
+-- Sebastian (12): Pendiente, para probar la aprobación
+INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, fecha_registro, es_coordinador, estado, revisado_por, fecha_revision) VALUES
+(10, ARRAY['Logistica', 'Conduccion y Transporte', 'Carga'], 'Fines de semana', '2026-02-10 08:30:00', TRUE, 'Aprobado', 1, '2026-02-10 12:00:00'),
+(11, ARRAY['Primeros Auxilios', 'Atencion Social', 'Organizacion'], 'Tardes (14:00 - 19:00)', '2026-02-11 10:15:00', FALSE, 'Aprobado', 10, '2026-02-12 09:00:00'),
+(12, ARRAY['Cocina y Alimentacion', 'Inventario', 'Logistica'], 'Tiempo completo', '2026-02-12 17:00:00', FALSE, 'Pendiente', NULL, NULL);
+
+-- ---------- BENEFICIARIO ----------
+-- Rosa (3): verificada por Carla (1)
+-- Hector (4): Pendiente, para probar la verificación
+-- Ana (5): verificada por Jorge (2)
+INSERT INTO beneficiario (id_usuario, tipo_beneficiario, documento, direccion, necesidad, descripcion, estado, revisado_por, fecha_revision) VALUES
+(3, 'Persona', '5612345', 'Av. Buenos Aires #450, Zona Max Paredes, La Paz', 'Medicamentos e insumos médicos', 'Adulto mayor que requiere tratamiento mensual continuo.', 'Verificado', 1, '2026-02-03 09:00:00'),
+(4, 'Familia', '6123456', 'Calle 4 #120, Villa Fátima, La Paz', 'Canasta familiar y ropa de abrigo', 'Familia de 5 integrantes afectada por pérdida de empleo.', 'Pendiente', NULL, NULL),
+(5, 'Institucion', '1020304025', 'Av. Periférica #890, Zona Achachicala, La Paz', 'Alimentos no perecederos', 'Comedor popular infantil que atiende a 60 niños diariamente.', 'Verificado', 2, '2026-02-04 10:30:00');
 
 
 -- =========================================================

@@ -28,3 +28,5 @@ npm-debug.log*
 scan-sonar.ps1
 backend/sonar-project.properties
 frontend/sonar-project.properties
+
+uploads/

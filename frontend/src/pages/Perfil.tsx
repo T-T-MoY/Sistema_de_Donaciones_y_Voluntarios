@@ -1,8 +1,9 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
+import { API_URL } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import FieldError from '../components/ui/FieldError';
-import UbicacionTest from '../components/mapa/UbicacionTest';
+import MiUbicacion from '../components/mapa/MiUbicacion';
 import {
     validarCampo,
     esContraseñaSegura,
@@ -58,6 +59,7 @@ interface PerfilResponse {
     materno?: string;
     correo?: string;
     telefono?: string;
+    foto_url?: string | null;
     ci_nit?: string | number;
     fecha_nacimiento?: string;
     calle?: string;
@@ -164,6 +166,9 @@ const Perfil = () => {
     const [cargandoInicial, setCargandoInicial] = useState<boolean>(true);
     const [pestana, setPestana] = useState<Pestana>('personal');
     const [coords, setCoords] = useState<Coordenadas | null>(null);
+    const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
+    const [previewFoto, setPreviewFoto] = useState<string | null>(null);
+    const inputFotoRef = useRef<HTMLInputElement>(null);
 
     // Datos específicos del rol
     const [datosRol, setDatosRol] = useState<DatosRol>({
@@ -175,7 +180,13 @@ const Perfil = () => {
         nivel_acceso: '',
         fecha_asignacion_cargo: ''
     });
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+    const apiUrl = API_URL;
+
+    useEffect(() => {
+        return () => {
+            if (previewFoto?.startsWith('blob:')) URL.revokeObjectURL(previewFoto);
+        };
+    }, [previewFoto]);
 
     // =====================================================
     // FLAGS DE ROL
@@ -222,6 +233,11 @@ const Perfil = () => {
                 const lng = aNumero(datos.ubi_longitud);
                 setCoords(lat !== null && lng !== null ? { lat, lng } : null);
 
+                if (datos.foto_url) {
+                    const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+                    setPreviewFoto(datos.foto_url.startsWith('http') ? datos.foto_url : `${baseUrl}${datos.foto_url}`);
+                }
+
                 setDatosRol({
                     rol: datos.rol || '',
                     fecha_contratacion: datos.fecha_contratacion
@@ -249,6 +265,22 @@ const Perfil = () => {
     // =====================================================
     // HANDLERS
     // =====================================================
+
+    const handleFotoSeleccionada = (e: ChangeEvent<HTMLInputElement>): void => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            setMensaje({ texto: 'Por favor seleccioná un archivo de imagen válido.', tipo: 'error' });
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            setMensaje({ texto: 'La imagen no debe superar los 5MB.', tipo: 'error' });
+            return;
+        }
+        setArchivoFoto(file);
+        setPreviewFoto(URL.createObjectURL(file));
+        setMensaje({ texto: 'Foto seleccionada. Guardá los cambios para actualizar tu perfil.', tipo: 'exito' });
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
@@ -373,14 +405,14 @@ const Perfil = () => {
 
             if (formData.passwordActual) dataToSend.append('passwordActual', formData.passwordActual);
             if (formData.passwordNueva) dataToSend.append('passwordNueva', formData.passwordNueva);
+            if (archivoFoto) dataToSend.append('foto', archivoFoto);
 
             const respuesta = await axios.put<PerfilUpdateResponse>(
-                `${import.meta.env.VITE_API_URL}/usuarios/perfil`,
+                `${apiUrl}/usuarios/perfil`,
                 dataToSend,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data'
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
@@ -389,6 +421,14 @@ const Perfil = () => {
 
             if (respuesta.data.token) {
                 login(respuesta.data.token);
+            }
+
+            const fotoGuardada = respuesta.data.perfil?.foto_url;
+            if (typeof fotoGuardada === 'string' && fotoGuardada) {
+                const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+                setPreviewFoto(/^https?:\/\//i.test(fotoGuardada) ? fotoGuardada : `${baseUrl}${fotoGuardada}`);
+                setArchivoFoto(null);
+                if (inputFotoRef.current) inputFotoRef.current.value = '';
             }
 
             setFormData(prev => ({
@@ -455,9 +495,34 @@ const Perfil = () => {
                 />
 
                 <div className="relative z-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-3xl font-extrabold text-night shadow-deep sm:h-24 sm:w-24 sm:text-4xl">
-                        {iniciales}
-                    </span>
+                    <div className="relative group">
+                        <div className="flex h-20 w-20 shrink-0 overflow-hidden items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-3xl font-extrabold text-night shadow-deep sm:h-24 sm:w-24 sm:text-4xl">
+                            {previewFoto ? (
+                                <img src={previewFoto} alt="Perfil" className="h-full w-full object-cover" />
+                            ) : (
+                                iniciales
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => inputFotoRef.current?.click()}
+                            title="Subir o cambiar foto de perfil"
+                            aria-label="Subir foto de perfil"
+                            className="press absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gold text-night shadow-lift transition hover:scale-110 hover:bg-gold-bright"
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <input
+                            ref={inputFotoRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFotoSeleccionada}
+                            className="hidden"
+                        />
+                    </div>
 
                     <div className="min-w-0 flex-1">
                         <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md">
@@ -830,7 +895,7 @@ const Perfil = () => {
                                 )}
 
                                 <div className="p-6 md:p-8">
-                                    <UbicacionTest />
+                                    <MiUbicacion coordenadas={coords} onActualizada={setCoords} />
                                 </div>
                             </div>
                         )}

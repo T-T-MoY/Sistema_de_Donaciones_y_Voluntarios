@@ -359,20 +359,30 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
     }
 
     // === CAMPOS ESPECÍFICOS DEL ROL ===
-    if (rol === 'Empleado') {
+    if (rol === 'Empleado' || rol === 'Voluntario') {
         ['habilidades', 'disponibilidad'].forEach((campo) => {
             const err = validarCampo(campo, formData[campo], formData);
             if (err) errores[campo] = err;
         });
-        const errAnti = validarCampo('antiguedad', formData.antiguedad, formData);
-        if (errAnti) errores.antiguedad = errAnti;
+        if (rol === 'Empleado' && formData.antiguedad !== undefined && formData.antiguedad !== '') {
+            const errAnti = validarCampo('antiguedad', formData.antiguedad, formData);
+            if (errAnti) errores.antiguedad = errAnti;
+        }
     }
 
     if (rol === 'Beneficiario') {
-        ['ci_nit', 'tipo_beneficiario', 'direccion', 'necesidad', 'descripcion'].forEach((campo) => {
+        ['ci_nit', 'tipo_beneficiario', 'necesidad'].forEach((campo) => {
             const err = validarCampo(campo, formData[campo], formData);
             if (err) errores[campo] = err;
         });
+        if (!formData.direccion && !formData.calle) {
+            const errDir = validarCampo('direccion', formData.direccion, formData);
+            if (errDir) errores.direccion = errDir;
+        }
+        if (formData.descripcion) {
+            const errDesc = validarCampo('descripcion', formData.descripcion, formData);
+            if (errDesc) errores.descripcion = errDesc;
+        }
     }
 
     if (rol === 'Admin' || rol === 'Administrador') {

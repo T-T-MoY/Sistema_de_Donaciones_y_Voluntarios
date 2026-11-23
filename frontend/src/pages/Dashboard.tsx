@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
-import UbicacionTest from '../components/mapa/UbicacionTest';
+import { usuarioApi } from '../api/usuario.api';
+import type { SolicitudVoluntario, SolicitudBeneficiario } from '../types/usuario.types';
 
 // =====================================================
 // TIPOS
@@ -665,10 +668,21 @@ const ModuloCard = ({ modulo, index }: { modulo: Modulo; index: number }) => (
 );
 
 // =====================================================
+// HELPER FOTO
+// =====================================================
+const getAvatarUrl = (fotoUrl?: string | null): string | null => {
+    if (!fotoUrl) return null;
+    if (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://')) return fotoUrl;
+    const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+    return `${baseUrl}${fotoUrl.startsWith('/') ? '' : '/'}${fotoUrl}`;
+};
+
+// =====================================================
 // COMPONENTE PRINCIPAL
 // =====================================================
 const Dashboard = () => {
     const { usuario } = useAuth();
+    const { exito, error } = useToast();
 
     const getSaludo = () => {
         const hora = new Date().getHours();
@@ -685,6 +699,137 @@ const Dashboard = () => {
     });
 
     const rolNormalizado = (usuario?.rol || '').toLowerCase();
+    const esCoordinador = Boolean(usuario?.es_coordinador) || rolNormalizado === 'coordinador';
+    const esAdmin = rolNormalizado === 'administrador' || rolNormalizado === 'admin';
+    const puedeAprobar = esCoordinador || esAdmin;
+
+    // Modales de postulación
+    const [modalVoluntarioAbierto, setModalVoluntarioAbierto] = useState<boolean>(false);
+    const [modalBeneficiarioAbierto, setModalBeneficiarioAbierto] = useState<boolean>(false);
+    const [habilidadesPostulacion, setHabilidadesPostulacion] = useState<string>('');
+    const [dispPostulacion, setDispPostulacion] = useState<string>('Fines de semana');
+    const [tipoBenefPostulacion, setTipoBenefPostulacion] = useState<string>('Persona');
+    const [docBenefPostulacion, setDocBenefPostulacion] = useState<string>('');
+    const [dirBenefPostulacion, setDirBenefPostulacion] = useState<string>('');
+    const [necesidadBenefPostulacion, setNecesidadBenefPostulacion] = useState<string>('');
+    const [descBenefPostulacion, setDescBenefPostulacion] = useState<string>('');
+    const [enviandoPostulacion, setEnviandoPostulacion] = useState<boolean>(false);
+
+    // Estado de solicitudes (para coordinadores y admin)
+    const [pestanaSolicitudes, setPestanaSolicitudes] = useState<'voluntarios' | 'beneficiarios'>('voluntarios');
+    const [filtroEstadoSol, setFiltroEstadoSol] = useState<string>('todos');
+    const [solicitudesVol, setSolicitudesVol] = useState<SolicitudVoluntario[]>([]);
+    const [solicitudesBen, setSolicitudesBen] = useState<SolicitudBeneficiario[]>([]);
+    const [cargandoSol, setCargandoSol] = useState<boolean>(false);
+    const [procesandoId, setProcesandoId] = useState<number | null>(null);
+
+    const cargarSolicitudes = async () => {
+        if (!puedeAprobar) return;
+        setCargandoSol(true);
+        try {
+            if (esCoordinador || esAdmin) {
+                const vols = await usuarioApi.getSolicitudesVoluntarios();
+                setSolicitudesVol(vols);
+            }
+            if (esAdmin) {
+                const bens = await usuarioApi.getSolicitudesBeneficiarios();
+                setSolicitudesBen(bens);
+            }
+        } catch (err) {
+            console.error('Error al cargar solicitudes', err);
+        } finally {
+            setCargandoSol(false);
+        }
+    };
+
+    useEffect(() => {
+        void cargarSolicitudes();
+    }, [puedeAprobar]);
+
+    const handleRevisarVoluntario = async (id: number, nuevoEstado: 'Aprobado' | 'Rechazado') => {
+        let motivo: string | undefined;
+        if (nuevoEstado === 'Rechazado') {
+            const respuesta = window.prompt('Ingrese el motivo de rechazo (opcional):');
+            if (respuesta === null) return;
+            motivo = respuesta.trim() || undefined;
+        }
+        setProcesandoId(id);
+        try {
+            await usuarioApi.revisarSolicitudVoluntario(id, { estado: nuevoEstado, motivo_rechazo: motivo });
+            void exito('', `Solicitud de voluntario ${nuevoEstado.toLowerCase()} con éxito.`);
+            await cargarSolicitudes();
+        } catch (err: any) {
+            void error('', err.response?.data?.error || 'Error al procesar solicitud');
+        } finally {
+            setProcesandoId(null);
+        }
+    };
+
+    const handleRevisarBeneficiario = async (id: number, nuevoEstado: 'Verificado' | 'Rechazado') => {
+        let motivo: string | undefined;
+        if (nuevoEstado === 'Rechazado') {
+            const respuesta = window.prompt('Ingrese el motivo de rechazo (opcional):');
+            if (respuesta === null) return;
+            motivo = respuesta.trim() || undefined;
+        }
+        setProcesandoId(id);
+        try {
+            await usuarioApi.revisarSolicitudBeneficiario(id, { estado: nuevoEstado, motivo_rechazo: motivo });
+            void exito('', `Solicitud de beneficiario ${nuevoEstado.toLowerCase()} con éxito.`);
+            await cargarSolicitudes();
+        } catch (err: any) {
+            void error('', err.response?.data?.error || 'Error al procesar solicitud');
+        } finally {
+            setProcesandoId(null);
+        }
+    };
+
+    const handlePostularVoluntario = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setEnviandoPostulacion(true);
+        try {
+            const habilidades = habilidadesPostulacion.split(',').map(s => s.trim()).filter(Boolean);
+            await usuarioApi.postularVoluntario({
+                habilidades: habilidades.length ? habilidades : ['General'],
+                disponibilidad: dispPostulacion
+            });
+            void exito('', '¡Tu postulación como voluntario ha sido enviada con éxito! Está en revisión.');
+            setModalVoluntarioAbierto(false);
+            setHabilidadesPostulacion('');
+        } catch (err: any) {
+            void error('', err.response?.data?.error || 'Error al enviar postulación');
+        } finally {
+            setEnviandoPostulacion(false);
+        }
+    };
+
+    const handlePostularBeneficiario = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!docBenefPostulacion || !dirBenefPostulacion || !necesidadBenefPostulacion) {
+            void error('', 'Completá los campos obligatorios (CI/NIT, dirección y necesidad)');
+            return;
+        }
+        setEnviandoPostulacion(true);
+        try {
+            await usuarioApi.postularBeneficiario({
+                tipo_beneficiario: tipoBenefPostulacion,
+                documento: docBenefPostulacion,
+                direccion: dirBenefPostulacion,
+                necesidad: necesidadBenefPostulacion,
+                descripcion: descBenefPostulacion || undefined
+            });
+            void exito('', '¡Tu solicitud como beneficiario ha sido enviada! El administrador la verificará.');
+            setModalBeneficiarioAbierto(false);
+            setDocBenefPostulacion('');
+            setDirBenefPostulacion('');
+            setNecesidadBenefPostulacion('');
+            setDescBenefPostulacion('');
+        } catch (err: any) {
+            void error('', err.response?.data?.error || 'Error al enviar solicitud');
+        } finally {
+            setEnviandoPostulacion(false);
+        }
+    };
 
     const panel = rolNormalizado === 'administrador' || rolNormalizado === 'admin'
         ? PANEL_ADMIN
@@ -818,10 +963,68 @@ const Dashboard = () => {
                         </div>
                     </section>
 
-                    {/* SECCIÓN EXCLUSIVA PARA EL ROL DE DONANTE: UBICACIÓN TEST */}
-                    {rolNormalizado === 'donante' && (
-                        <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 sm:p-6 md:p-8 shadow-soft [animation-delay:160ms]">
-                            <UbicacionTest />
+                    {/* Postulaciones accesibles para cualquier cuenta autenticada */}
+                    <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
+                        <div>
+                            <h2 className="font-display text-xl font-bold text-text">¿Querés participar de otra manera?</h2>
+                            <p className="mt-1 text-sm text-text-muted">Enviá una solicitud y el equipo correspondiente la revisará.</p>
+                        </div>
+                        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                            <button type="button" onClick={() => setModalVoluntarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a4 4 0 018 0v2zm7-13a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                Solicitar ser voluntario
+                            </button>
+                            <button type="button" onClick={() => setModalBeneficiarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface px-5 py-3 text-sm font-bold text-text hover:border-accent hover:bg-accent-soft">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                                Solicitar ser beneficiario
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* Revisión de solicitudes según permisos */}
+                    {puedeAprobar && (
+                        <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
+                            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                                <div>
+                                    <h2 className="font-display text-xl font-bold text-text">Revisión de solicitudes</h2>
+                                    <p className="mt-1 text-sm text-text-muted">{esAdmin ? 'Revisá postulaciones de voluntariado y solicitudes de beneficiarios.' : 'Revisá las solicitudes para incorporarse como voluntario.'}</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <button type="button" onClick={() => setPestanaSolicitudes('voluntarios')} className={`rounded-lg px-3 py-2 text-xs font-bold ${pestanaSolicitudes === 'voluntarios' ? 'bg-primary text-on-primary' : 'border border-border text-text-muted'}`}>
+                                        Voluntarios ({solicitudesVol.filter(s => s.estado === 'Pendiente').length})
+                                    </button>
+                                    {esAdmin && <button type="button" onClick={() => setPestanaSolicitudes('beneficiarios')} className={`rounded-lg px-3 py-2 text-xs font-bold ${pestanaSolicitudes === 'beneficiarios' ? 'bg-primary text-on-primary' : 'border border-border text-text-muted'}`}>
+                                        Beneficiarios ({solicitudesBen.filter(s => s.estado === 'Pendiente').length})
+                                    </button>}
+                                    <select aria-label="Filtrar solicitudes por estado" value={filtroEstadoSol} onChange={e => setFiltroEstadoSol(e.target.value)} className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text">
+                                        <option value="todos">Todos los estados</option><option value="Pendiente">Pendientes</option><option value="Aprobado">Aprobadas</option><option value="Verificado">Verificadas</option><option value="Rechazado">Rechazadas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {cargandoSol ? <p className="py-8 text-center text-sm text-text-muted">Cargando solicitudes…</p> : (
+                                <div className="mt-5 grid gap-3 lg:grid-cols-2">
+                                    {pestanaSolicitudes === 'voluntarios' ? solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
+                                        <article key={s.id_usuario} className="rounded-2xl border border-border bg-surface p-4">
+                                            <div className="flex items-start gap-3">
+                                                {getAvatarUrl(s.foto_url) ? <img src={getAvatarUrl(s.foto_url)!} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft font-bold text-primary">{s.nombre[0]}{s.apellido?.[0]}</div>}
+                                                <div className="min-w-0 flex-1"><h3 className="font-bold text-text">{s.nombre} {s.apellido}</h3><p className="truncate text-xs text-text-muted">{s.correo}</p><p className="mt-2 text-xs text-text-muted">Disponibilidad: {s.disponibilidad}</p><p className="text-xs text-text-muted">Habilidades: {s.habilidades?.join(', ') || 'General'}</p></div>
+                                                <span className="rounded-full bg-warning-soft px-2 py-1 text-[10px] font-bold text-warning">{s.estado}</span>
+                                            </div>
+                                            {s.estado === 'Pendiente' && <div className="mt-4 flex justify-end gap-2"><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarVoluntario(s.id_usuario, 'Rechazado')} className="rounded-lg border border-error/30 px-3 py-2 text-xs font-bold text-error disabled:opacity-50">Rechazar</button><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarVoluntario(s.id_usuario, 'Aprobado')} className="rounded-lg bg-success px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Aprobar</button></div>}
+                                        </article>
+                                    )) : solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
+                                        <article key={s.id_usuario} className="rounded-2xl border border-border bg-surface p-4">
+                                            <div className="flex items-start gap-3">
+                                                {getAvatarUrl(s.foto_url) ? <img src={getAvatarUrl(s.foto_url)!} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft font-bold text-primary">{s.nombre[0]}{s.apellido?.[0]}</div>}
+                                                <div className="min-w-0 flex-1"><h3 className="font-bold text-text">{s.nombre} {s.apellido}</h3><p className="truncate text-xs text-text-muted">{s.correo} · {s.tipo_beneficiario}</p><p className="mt-2 text-xs text-text-muted">Documento: {s.documento} · Necesidad: {s.necesidad}</p><p className="text-xs text-text-muted">Dirección: {s.direccion}</p>{s.descripcion && <p className="mt-1 text-xs text-text-subtle">{s.descripcion}</p>}</div>
+                                                <span className="rounded-full bg-warning-soft px-2 py-1 text-[10px] font-bold text-warning">{s.estado}</span>
+                                            </div>
+                                            {s.estado === 'Pendiente' && <div className="mt-4 flex justify-end gap-2"><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarBeneficiario(s.id_usuario, 'Rechazado')} className="rounded-lg border border-error/30 px-3 py-2 text-xs font-bold text-error disabled:opacity-50">Rechazar</button><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarBeneficiario(s.id_usuario, 'Verificado')} className="rounded-lg bg-success px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Verificar</button></div>}
+                                        </article>
+                                    ))}
+                                    {((pestanaSolicitudes === 'voluntarios' && solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0) || (pestanaSolicitudes === 'beneficiarios' && solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0)) && <p className="py-8 text-center text-sm text-text-muted lg:col-span-2">No hay solicitudes para mostrar.</p>}
+                                </div>
+                            )}
                         </section>
                     )}
 
@@ -859,6 +1062,27 @@ const Dashboard = () => {
                             </Link>
                         </div>
                     </section>
+
+                    {modalVoluntarioAbierto && <div className="anim-fade fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-night/70 p-4 backdrop-blur-sm" onMouseDown={e => { if (e.target === e.currentTarget) setModalVoluntarioAbierto(false); }}>
+                        <form onSubmit={e => void handlePostularVoluntario(e)} role="dialog" aria-modal="true" aria-labelledby="modal-voluntario-titulo" className="my-auto w-full max-w-lg space-y-4 rounded-2xl border border-border bg-surface-elevated p-5 shadow-deep sm:p-6">
+                            <div><h2 id="modal-voluntario-titulo" className="font-display text-xl font-bold text-text">Solicitud de voluntariado</h2><p className="mt-1 text-sm text-text-muted">El coordinador de voluntarios revisará tu postulación.</p></div>
+                            <label className="block text-sm font-semibold text-text">Habilidades <span className="font-normal text-text-muted">(separadas por coma)</span><input value={habilidadesPostulacion} onChange={e => setHabilidadesPostulacion(e.target.value)} maxLength={500} placeholder="Logística, primeros auxilios…" className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm" /></label>
+                            <label className="block text-sm font-semibold text-text">Disponibilidad<select value={dispPostulacion} onChange={e => setDispPostulacion(e.target.value)} className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm"><option>Fines de semana</option><option>Mañanas</option><option>Tardes</option><option>Tiempo completo</option><option>Flexible / A convenir</option></select></label>
+                            <div className="flex justify-end gap-2"><button type="button" onClick={() => setModalVoluntarioAbierto(false)} className="rounded-xl border border-border px-4 py-2 text-sm font-bold text-text-muted">Cancelar</button><button disabled={enviandoPostulacion} className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-50">{enviandoPostulacion ? 'Enviando…' : 'Enviar solicitud'}</button></div>
+                        </form>
+                    </div>}
+
+                    {modalBeneficiarioAbierto && <div className="anim-fade fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-night/70 p-4 backdrop-blur-sm" onMouseDown={e => { if (e.target === e.currentTarget) setModalBeneficiarioAbierto(false); }}>
+                        <form onSubmit={e => void handlePostularBeneficiario(e)} role="dialog" aria-modal="true" aria-labelledby="modal-beneficiario-titulo" className="my-auto w-full max-w-lg space-y-4 rounded-2xl border border-border bg-surface-elevated p-5 shadow-deep sm:p-6">
+                            <div><h2 id="modal-beneficiario-titulo" className="font-display text-xl font-bold text-text">Solicitud de apoyo</h2><p className="mt-1 text-sm text-text-muted">El administrador verificará la información.</p></div>
+                            <label className="block text-sm font-semibold text-text">Tipo<select value={tipoBenefPostulacion} onChange={e => setTipoBenefPostulacion(e.target.value)} className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm"><option value="Persona">Persona</option><option value="Familia">Familia</option><option value="Institucion">Institución</option></select></label>
+                            <label className="block text-sm font-semibold text-text">CI / NIT *<input required value={docBenefPostulacion} onChange={e => setDocBenefPostulacion(e.target.value)} maxLength={30} className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm" /></label>
+                            <label className="block text-sm font-semibold text-text">Dirección *<input required value={dirBenefPostulacion} onChange={e => setDirBenefPostulacion(e.target.value)} maxLength={255} className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm" /></label>
+                            <label className="block text-sm font-semibold text-text">Necesidad principal *<input required value={necesidadBenefPostulacion} onChange={e => setNecesidadBenefPostulacion(e.target.value)} maxLength={150} className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm" /></label>
+                            <label className="block text-sm font-semibold text-text">Descripción<textarea value={descBenefPostulacion} onChange={e => setDescBenefPostulacion(e.target.value)} maxLength={1500} rows={3} className="mt-1.5 w-full resize-y rounded-xl border border-border bg-surface px-3 py-2.5 text-sm" /></label>
+                            <div className="flex justify-end gap-2"><button type="button" onClick={() => setModalBeneficiarioAbierto(false)} className="rounded-xl border border-border px-4 py-2 text-sm font-bold text-text-muted">Cancelar</button><button disabled={enviandoPostulacion} className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-50">{enviandoPostulacion ? 'Enviando…' : 'Enviar solicitud'}</button></div>
+                        </form>
+                    </div>}
             </div>
         </div>
     );

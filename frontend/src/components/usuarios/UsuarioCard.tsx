@@ -42,10 +42,18 @@ const getRolBadgeClass = (rol?: string): string => {
   return 'border-border bg-surface text-text-muted';
 };
 
+const getAvatarUrl = (fotoUrl?: string | null): string | null => {
+  if (!fotoUrl) return null;
+  if (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://')) return fotoUrl;
+  const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+  return `${baseUrl}${fotoUrl.startsWith('/') ? '' : '/'}${fotoUrl}`;
+};
+
 export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => {
   const estado = getEstado(usuario);
   const activo = esActivo(usuario);
   const id = obtenerId(usuario);
+  const foto = getAvatarUrl(usuario.foto_url as string | null);
 
   return (
     <div className="lift group relative overflow-hidden rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft hover:border-accent/45 hover:shadow-lift">
@@ -56,9 +64,17 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
 
       {/* Cabecera: avatar + nombre + correo */}
       <div className="mb-4 flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15 transition-colors duration-300 group-hover:bg-primary group-hover:text-on-primary">
-          {getIniciales(usuario)}
-        </div>
+        {foto ? (
+          <img
+            src={foto}
+            alt={getNombreCompleto(usuario)}
+            className="h-11 w-11 shrink-0 rounded-xl object-cover ring-1 ring-border shadow-soft"
+          />
+        ) : (
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15 transition-colors duration-300 group-hover:bg-primary group-hover:text-on-primary">
+            {getIniciales(usuario)}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <h3
             className="truncate font-display text-sm font-bold tracking-[-0.01em] text-text"

@@ -22,7 +22,7 @@ export const obtenerPerfil = async (req: Request, res: Response, next: NextFunct
 
 export const actualizarPerfil = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const resultado = await usuarioService.actualizarPerfil(getUserId(req), req.body);
+    const resultado = await usuarioService.actualizarPerfil(getUserId(req), req.body, req.file);
     res.status(200).json(resultado);
   } catch (err) {
     next(err);
@@ -97,6 +97,77 @@ export const obtenerUsuariosConUbicacion = async (_req: Request, res: Response, 
 export const actualizarMiUbicacion = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const resultado = await usuarioService.actualizarMiUbicacion(getUserId(req), req.body);
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- Solicitudes de Voluntarios (Coordinador / Admin) ----------
+export const obtenerSolicitudesVoluntarios = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const filtro = req.query.estado as string | undefined;
+    const solicitudes = await usuarioService.obtenerSolicitudesVoluntarios(filtro);
+    res.status(200).json(solicitudes);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const revisarSolicitudVoluntario = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { estado, motivo_rechazo } = req.body;
+    const resultado = await usuarioService.revisarSolicitudVoluntario(
+      req.params.id,
+      estado,
+      getUserId(req),
+      motivo_rechazo
+    );
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- Solicitudes de Beneficiarios (Admin) ----------
+export const obtenerSolicitudesBeneficiarios = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const filtro = req.query.estado as string | undefined;
+    const solicitudes = await usuarioService.obtenerSolicitudesBeneficiarios(filtro);
+    res.status(200).json(solicitudes);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const revisarSolicitudBeneficiario = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { estado, motivo_rechazo } = req.body;
+    const resultado = await usuarioService.revisarSolicitudBeneficiario(
+      req.params.id,
+      estado,
+      getUserId(req),
+      motivo_rechazo
+    );
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ---------- Postulaciones desde Dashboard ----------
+export const postularVoluntario = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const resultado = await usuarioService.postularVoluntario(getUserId(req), req.body);
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const postularBeneficiario = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const resultado = await usuarioService.postularBeneficiario(getUserId(req), req.body);
     res.status(200).json(resultado);
   } catch (err) {
     next(err);

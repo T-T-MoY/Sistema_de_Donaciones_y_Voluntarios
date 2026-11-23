@@ -16,8 +16,15 @@ import {
   esContraseñaSegura,
   esCorreoValido,
   esCiNitValido,
+  normalizarHabilidades,
 } from '../utils/validaciones';
-import type { UsuarioResponse } from '../models/usuarioModel';
+import type {
+  UsuarioResponse,
+  RolData,
+  RolUsuario,
+  RegistroInput,
+  RegistroResponse,
+} from '../models/usuarioModel';
 
 const construirDireccion = (
   calle?: string | null,
@@ -39,6 +46,8 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       apellido: usuario.apellido,
       correo: usuario.correo,
       rol: usuario.rol,
+      es_coordinador: Boolean(usuario.es_coordinador),
+      foto_url: usuario.foto_url,
     },
     process.env.JWT_SECRET as string,
     { expiresIn: '8h' }
@@ -48,19 +57,8 @@ const firmarToken = (usuario: UsuarioResponse): string =>
 // Servicio público
 // ============================================================================
 export const authService = {
-  // ---------- Registro público (Donante) ----------
-  async registrar(dto: {
-    nombre: string;
-    paterno: string;
-    materno?: string;
-    correo: string;
-    telefono: string | number;
-    contraseña: string;
-    ci_nit?: string;
-    calle?: string;
-    zona?: string;
-    ciudad?: string;
-  }): Promise<{ id_usuario: number }> {
+  // ---------- Registro público (Donante, Beneficiario, Voluntario) ----------
+  async registrar(dto: RegistroInput): Promise<RegistroResponse> {
     const validacion = validarDatosUsuario(dto);
     if (!validacion.valido) throw new AppError(validacion.error!, 400);
 
@@ -78,9 +76,76 @@ export const authService = {
     const existente = await usuarioRepository.obtenerPorCorreo(correo);
     if (existente) throw new AppError('El correo ya está registrado', 400);
 
+    // Normalizar el rol solicitado (por defecto Donante)
+    const rolRaw = (dto.rol || 'Donante').toLowerCase().trim();
+    if (rolRaw === 'admin' || rolRaw === 'administrador') {
+      throw new AppError('No está permitido registrarse como Administrador desde el formulario público.', 403);
+    }
+
+    let rol: RolUsuario = 'Donante';
+    if (rolRaw === 'beneficiario') {
+      rol = 'Beneficiario';
+    } else if (rolRaw === 'voluntario' || rolRaw === 'empleado') {
+      rol = 'Voluntario';
+    } else if (rolRaw === 'donante' || rolRaw === 'cliente' || !rolRaw) {
+      rol = 'Donante';
+    } else {
+      throw new AppError('Rol inválido. Los roles permitidos son: Donante, Beneficiario o Voluntario.', 400);
+    }
+
+    const direccion =
+      (dto.direccion && String(dto.direccion).trim()) ||
+      construirDireccion(dto.calle, dto.zona, dto.ciudad) ||
+      null;
+
+    let estadoCuenta = 'Activo';
+    let mensaje = 'Cuenta de donante creada con éxito';
+    const rolData: RolData = {};
+
+    if (rol === 'Donante') {
+      estadoCuenta = 'Activo';
+      mensaje = 'Cuenta de donante creada con éxito';
+      rolData.direccion = direccion;
+      rolData.ubi_latitud =
+        dto.ubi_latitud !== undefined && dto.ubi_latitud !== null && String(dto.ubi_latitud).trim() !== ''
+          ? Number(dto.ubi_latitud)
+          : null;
+      rolData.ubi_longitud =
+        dto.ubi_longitud !== undefined && dto.ubi_longitud !== null && String(dto.ubi_longitud).trim() !== ''
+          ? Number(dto.ubi_longitud)
+          : null;
+    } else if (rol === 'Beneficiario') {
+      estadoCuenta = 'Activo';
+      mensaje = 'Solicitud de beneficiario registrada con éxito. Tu cuenta está en revisión.';
+
+      const documento = (dto.documento || dto.ci_nit || '').toString().trim();
+      if (!documento) {
+        throw new AppError('El documento (CI / NIT) es obligatorio para el registro de beneficiario.', 400);
+      }
+      const ciExistente = await usuarioRepository.obtenerPorDocumento(documento);
+      if (ciExistente) {
+        throw new AppError('El documento (CI / NIT) ya está registrado por otro usuario.', 400);
+      }
+
+      rolData.tipo_beneficiario = dto.tipo_beneficiario?.trim() || 'Persona';
+      rolData.documento = documento;
+      rolData.direccion = direccion || 'Sin dirección especificada';
+      rolData.necesidad = dto.necesidad?.trim() || 'Solicitud de apoyo general';
+      rolData.descripcion = dto.descripcion?.trim() || null;
+      rolData.estado_beneficiario = 'Pendiente';
+    } else if (rol === 'Voluntario') {
+      // Para voluntario: solicitud pendiente hasta que el coordinador lo apruebe
+      estadoCuenta = 'Inactivo';
+      mensaje = 'Solicitud de voluntariado registrada con éxito. Tu cuenta está pendiente de aprobación por el coordinador.';
+
+      rolData.habilidades = dto.habilidades ? normalizarHabilidades(dto.habilidades) : ['General'];
+      rolData.disponibilidad =
+        (dto.disponibilidad && String(dto.disponibilidad).trim()) || 'A coordinar con el coordinador';
+    }
+
     const hash = await bcrypt.hash(dto.contraseña, 10);
 
-    return usuarioRepository.crearUsuario(
+    const nuevo = await usuarioRepository.crearUsuario(
       {
         nombre: dto.nombre.trim(),
         paterno: dto.paterno.trim(),
@@ -88,11 +153,18 @@ export const authService = {
         correo,
         telefono: String(dto.telefono).trim(),
         contraseña: hash,
-        estado_cuenta: 'Activo',
-        rol: 'Donante',
+        estado_cuenta: estadoCuenta,
+        rol,
       },
-      { direccion: construirDireccion(dto.calle, dto.zona, dto.ciudad) }
+      rolData
     );
+
+    return {
+      id_usuario: nuevo.id_usuario,
+      mensaje,
+      rol,
+      estado: estadoCuenta,
+    };
   },
 
   // ---------- Login ----------
@@ -107,6 +179,8 @@ export const authService = {
       telefono: string | null;
       estado: string;
       rol: string;
+      es_coordinador?: boolean;
+      foto_url?: string | null;
     };
   }> {
     const { correo, contraseña } = dto;
@@ -128,8 +202,11 @@ export const authService = {
     if (usuario.estado === 'Eliminado') {
       throw new AppError('Credenciales inválidas', 401);
     }
-    if (usuario.activo === false) {
-      throw new AppError('Tu cuenta ha sido desactivada', 403);
+    if (usuario.estado !== 'Activo' || usuario.activo === false) {
+      if (usuario.rol === 'Voluntario') {
+        throw new AppError('Tu solicitud de voluntariado está pendiente de aprobación por el coordinador.', 403);
+      }
+      throw new AppError('Tu cuenta se encuentra inactiva o en revisión. Contactá al soporte.', 403);
     }
 
     const hash = usuario.contraseña;
@@ -152,6 +229,8 @@ export const authService = {
         telefono: usuario.telefono,
         estado: usuario.estado,
         rol: usuario.rol,
+        es_coordinador: Boolean(usuario.es_coordinador),
+        foto_url: usuario.foto_url || null,
       },
     };
   },

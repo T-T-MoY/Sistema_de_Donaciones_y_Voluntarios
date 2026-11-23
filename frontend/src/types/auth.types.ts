@@ -36,6 +36,14 @@ export interface RegistroRequest {
   calle?: string;
   zona?: string;
   ciudad?: string;
+  direccion?: string;
+  rol?: string;
+  tipo_beneficiario?: string;
+  necesidad?: string;
+  descripcion?: string;
+  habilidades?: string[] | string;
+  disponibilidad?: string;
+  edad?: number | null;
 }
 
 export interface TokenPayload {

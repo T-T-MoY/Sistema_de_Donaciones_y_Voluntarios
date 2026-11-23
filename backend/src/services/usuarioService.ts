@@ -15,7 +15,6 @@ import {
   validarDatosBeneficiario,
   validarDatosDonante,
   validarDatosVoluntario,
-  validarDatosAdministrador,
   normalizarHabilidades,
   validarCoordenadas,
   ROLES_VALIDOS,
@@ -64,11 +63,6 @@ const construirRolData = (
   const data: RolData = {};
 
   if (rol === 'Administrador') {
-    data.nivel_acceso = valorDefinido(body.nivel_acceso)
-      ? String(body.nivel_acceso).trim().toUpperCase()
-      : (actual?.nivel_acceso ?? 'GENERAL');
-    const v = validarDatosAdministrador(data.nivel_acceso);
-    if (!v.valido) throw new AppError(v.error!, 400);
     return data;
   }
 
@@ -128,6 +122,9 @@ const construirRolData = (
   data.disponibilidad = valorDefinido(body.disponibilidad)
     ? String(body.disponibilidad).trim()
     : (actual?.disponibilidad ?? null);
+  data.es_coordinador = body.es_coordinador !== undefined
+    ? Boolean(body.es_coordinador)
+    : (actual?.es_coordinador ?? false);
   const v = validarDatosVoluntario({
     habilidades: data.habilidades || [],
     disponibilidad: data.disponibilidad || undefined,
@@ -145,6 +142,8 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       apellido: usuario.apellido,
       correo: usuario.correo,
       rol: usuario.rol,
+      es_coordinador: Boolean(usuario.es_coordinador),
+      foto_url: usuario.foto_url,
     },
     process.env.JWT_SECRET as string,
     { expiresIn: '8h' }
@@ -191,7 +190,8 @@ export const usuarioService = {
   // ---------- Actualizar perfil ----------
   async actualizarPerfil(
     id_usuario: number,
-    body: Record<string, any>
+    body: Record<string, any>,
+    file?: Express.Multer.File
   ): Promise<{ mensaje: string; token: string; perfil: UsuarioResponse }> {
     if (!id_usuario) throw new AppError('No autorizado', 401);
 
@@ -229,6 +229,13 @@ export const usuarioService = {
       usuarioActual as unknown as Record<string, any>
     );
 
+    let foto_url: string | undefined;
+    if (file) {
+      foto_url = `/uploads/perfiles/${file.filename}`;
+    } else if (body.foto_url !== undefined) {
+      foto_url = String(body.foto_url).trim();
+    }
+
     const perfil = await usuarioRepository.actualizarPerfil(
       id_usuario,
       {
@@ -238,6 +245,7 @@ export const usuarioService = {
         correo: String(correo).toLowerCase().trim(),
         telefono: String(telefono).trim(),
         contraseña: hashNueva,
+        foto_url,
         rol: usuarioActual.rol,
       },
       rolData
@@ -256,7 +264,7 @@ export const usuarioService = {
   async crearUsuario(body: CrearUsuarioInput): Promise<{ mensaje: string; id_usuario: number }> {
     // `estado` se lee con cast seguro: si CrearUsuarioInput no lo declara,
     // la intersección lo aporta y el acceso sigue tipado.
-    const { nombre, paterno, materno, correo, telefono, contraseña, rol } = body;
+    const { nombre, paterno, materno, correo, telefono, contraseña, rol, foto_url } = body;
     const estado = (body as CrearUsuarioInput & { estado?: string | boolean }).estado;
 
     const rolNormalizado = normalizarRolUI(rol);
@@ -291,6 +299,7 @@ export const usuarioService = {
         correo: correoNorm,
         telefono: String(telefono).trim(),
         contraseña: hash,
+        foto_url: foto_url || null,
         estado_cuenta: estado ?? 'Activo',
         rol: rolNormalizado,
       },
@@ -307,7 +316,7 @@ export const usuarioService = {
   ): Promise<{ mensaje: string }> {
     if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
 
-    const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado } = body;
+    const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado, foto_url } = body;
 
     const rolNormalizado = normalizarRolUI(rol);
     if (!rolNormalizado) {
@@ -353,6 +362,7 @@ export const usuarioService = {
         correo: String(correo).toLowerCase().trim(),
         telefono: String(telefono).trim(),
         contraseña: hashNueva,
+        foto_url: foto_url !== undefined ? String(foto_url).trim() || null : undefined,
         estado_cuenta: estado || 'Activo',
         rol: rolNormalizado,
       },
@@ -412,5 +422,82 @@ export const usuarioService = {
       mensaje: 'Ubicación actualizada con éxito',
       ubicacion: { lat: numLat, lng: numLng },
     };
+  },
+
+  // ---------- Solicitudes de Voluntarios ----------
+  async obtenerSolicitudesVoluntarios(filtroEstado?: string) {
+    return await usuarioRepository.obtenerSolicitudesVoluntarios(filtroEstado);
+  },
+
+  async revisarSolicitudVoluntario(
+    id_voluntario: number | string,
+    nuevoEstado: string,
+    revisorId: number,
+    motivoRechazo?: string
+  ) {
+    const estadoNorm = (nuevoEstado || '').toLowerCase().trim();
+    if (!['aprobado', 'rechazado'].includes(estadoNorm)) {
+      throw new AppError('El estado debe ser "Aprobado" o "Rechazado".', 400);
+    }
+    const estadoFinal = estadoNorm === 'aprobado' ? 'Aprobado' : 'Rechazado';
+    if (Number(id_voluntario) === revisorId) {
+      throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
+    }
+    return await usuarioRepository.revisarSolicitudVoluntario(
+      id_voluntario,
+      estadoFinal,
+      revisorId,
+      motivoRechazo
+    );
+  },
+
+  // ---------- Solicitudes de Beneficiarios ----------
+  async obtenerSolicitudesBeneficiarios(filtroEstado?: string) {
+    return await usuarioRepository.obtenerSolicitudesBeneficiarios(filtroEstado);
+  },
+
+  async revisarSolicitudBeneficiario(
+    id_beneficiario: number | string,
+    nuevoEstado: string,
+    revisorId: number,
+    motivoRechazo?: string
+  ) {
+    const estadoNorm = (nuevoEstado || '').toLowerCase().trim();
+    if (!['verificado', 'rechazado'].includes(estadoNorm)) {
+      throw new AppError('El estado debe ser "Verificado" o "Rechazado".', 400);
+    }
+    const estadoFinal = estadoNorm === 'verificado' ? 'Verificado' : 'Rechazado';
+    if (Number(id_beneficiario) === revisorId) {
+      throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
+    }
+    return await usuarioRepository.revisarSolicitudBeneficiario(
+      id_beneficiario,
+      estadoFinal,
+      revisorId,
+      motivoRechazo
+    );
+  },
+
+  // ---------- Postulaciones desde Dashboard ----------
+  async postularVoluntario(id_usuario: number, body: Record<string, any>) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const habilidades = body.habilidades ? normalizarHabilidades(body.habilidades) : ['General'];
+    const disponibilidad = String(body.disponibilidad || 'A convenir').trim();
+    return await usuarioRepository.postularVoluntario(id_usuario, habilidades, disponibilidad);
+  },
+
+  async postularBeneficiario(id_usuario: number, body: Record<string, any>) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const { tipo_beneficiario, documento, direccion, necesidad, descripcion } = body;
+    if (!documento || !direccion || !necesidad) {
+      throw new AppError('Documento (CI/NIT), dirección y necesidad son requeridos.', 400);
+    }
+    return await usuarioRepository.postularBeneficiario(id_usuario, {
+      tipo_beneficiario: tipo_beneficiario || 'Persona',
+      documento: String(documento).trim(),
+      direccion: String(direccion).trim(),
+      necesidad: String(necesidad).trim(),
+      descripcion: descripcion ? String(descripcion).trim() : null,
+    });
   },
 };

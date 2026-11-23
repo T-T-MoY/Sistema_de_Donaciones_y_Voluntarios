@@ -8,7 +8,7 @@
 // =====================================================
 // ROLES Y ESTADOS
 // =====================================================
-export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador' | 'Beneficiario';
+export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador' | 'Beneficiario' | 'Coordinador';
 export type Estado = 'Activo' | 'Inactivo';
 export type Turno = 'Mañana' | 'Tarde' | 'Noche';
 export type NivelAcceso = 'SUPERADMIN' | 'GENERAL';
@@ -26,6 +26,7 @@ export interface Usuario {
   materno?: string;
   correo?: string;
   telefono?: string;
+  foto_url?: string | null;
   rol?: string;
   estado?: string;
   estado_cuenta?: string;
@@ -38,6 +39,11 @@ export interface Usuario {
   cargo?: string | null;
   turno?: Turno | null;
   nivel_acceso?: NivelAcceso | null;
+  es_coordinador?: boolean;
+  estado_voluntario?: string | null;
+  estado_beneficiario?: string | null;
+  habilidades?: string[];
+  disponibilidad?: string | null;
   [key: string]: unknown;
 }
 
@@ -66,6 +72,8 @@ export interface UsuarioFormData {
   descripcion: string;
   estado_beneficiario: string;
   nivel_acceso: NivelAcceso;
+  es_coordinador?: boolean;
+  foto_url?: string | null;
 }
 
 // =====================================================
@@ -122,9 +130,11 @@ export const getEstado = (u: Usuario): string => {
  */
 export const getRolDisplay = (rol?: string | null): string => {
   const lower = (rol || '').toLowerCase().trim();
+  if (lower === 'coordinador') return 'Coordinador Voluntario';
   if (lower === 'cliente' || lower === 'donante') return 'Donante';
   if (lower === 'empleado' || lower === 'voluntario') return 'Voluntario';
   if (lower === 'admin' || lower === 'administrador') return 'Administrador';
+  if (lower === 'beneficiario') return 'Beneficiario';
   return rol?.trim() || '';
 };
 
@@ -150,4 +160,43 @@ export interface PuntoMapa {
   lat: number;
   lng: number;
   direccion?: string | null;
+}
+
+// =====================================================
+// TIPOS DE SOLICITUDES Y POSTULACIONES
+// =====================================================
+export interface SolicitudVoluntario {
+  id_usuario: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono: string | null;
+  foto_url: string | null;
+  habilidades: string[];
+  disponibilidad: string;
+  fecha_registro: string;
+  estado: 'Pendiente' | 'Aprobado' | 'Rechazado';
+  es_coordinador: boolean;
+  revisado_por: number | null;
+  nombre_revisor?: string | null;
+  motivo_rechazo: string | null;
+}
+
+export interface SolicitudBeneficiario {
+  id_usuario: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  telefono: string | null;
+  foto_url: string | null;
+  tipo_beneficiario: 'Persona' | 'Familia' | 'Institucion' | string;
+  documento: string;
+  direccion: string;
+  necesidad: string;
+  descripcion: string | null;
+  fecha_registro: string;
+  estado: 'Pendiente' | 'Verificado' | 'Rechazado';
+  revisado_por: number | null;
+  nombre_revisor?: string | null;
+  motivo_rechazo: string | null;
 }

@@ -46,7 +46,26 @@ function RecenterMap({ center, zoom }: { center: [number, number]; zoom?: number
   const map = useMap();
   useEffect(() => {
     map.setView(center, zoom ?? map.getZoom(), { animate: true });
-  }, [center, zoom, map]);
+  }, [center[0], center[1], zoom, map]);
+  return null;
+}
+
+/** Leaflet necesita recalcular el canvas cuando un mapa pasa de una pestaña oculta a visible. */
+function ResizeMap() {
+  const map = useMap();
+
+  useEffect(() => {
+    const container = map.getContainer();
+    const invalidate = () => {
+      requestAnimationFrame(() => map.invalidateSize({ pan: false, debounceMoveend: true }));
+    };
+
+    invalidate();
+    const observer = new ResizeObserver(invalidate);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [map]);
+
   return null;
 }
 
@@ -93,6 +112,7 @@ export const Mapa = ({
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
       >
+        <ResizeMap />
         <RecenterMap center={centroActivo} zoom={zoom} />
 
         <TileLayer
@@ -136,10 +156,10 @@ export const Mapa = ({
               <div className="p-1 text-night">
                 <div className="flex items-center gap-1.5 font-bold text-sm text-emerald-700">
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Tu ubicación en vivo
+                  Mi ubicación
                 </div>
                 <p className="mt-1 text-xs text-night/70">
-                  Transmitiendo posición en tiempo real para donaciones.
+                  Ubicación guardada en mi perfil.
                 </p>
                 <div className="mt-2 text-[10.5px] font-mono text-emerald-800 font-semibold border-t border-night/10 pt-1">
                   Lat: {miUbicacion.lat.toFixed(5)} · Lng: {miUbicacion.lng.toFixed(5)}

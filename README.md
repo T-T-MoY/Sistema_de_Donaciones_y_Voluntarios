@@ -2,7 +2,7 @@
 
 # 🤝 Sistema de Donaciones y Voluntariados
 
-**Plataforma para conectar donantes, voluntarios y beneficiarios:** autenticación por roles, gestión de usuarios, donaciones en especie, campañas solidarias y trazabilidad de la ayuda, con interfaz accesible en modo claro y oscuro.
+**Plataforma para conectar donantes, voluntarios y beneficiarios.** Actualmente implementa autenticación, gestión de usuarios y solicitudes de participación; campañas, donaciones y trazabilidad integral siguen en desarrollo. Interfaz accesible en modo claro y oscuro.
 
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -70,11 +70,11 @@ Una plataforma web para gestionar el ciclo completo de la ayuda solidaria:
 | Autenticación | ✅ Implementado | Registro público de donante, login JWT, sesión con expiración, cierre por inactividad |
 | Recuperación de contraseña | ✅ Implementado | Solicitud por correo, token de 1 hora, validación y reset |
 | Gestión de usuarios | ✅ Implementado | CRUD admin, roles, subtipos, activar/desactivar, borrado lógico, filtros y paginación |
-| Perfil propio | ✅ Implementado (parcial) | Datos personales, contraseña; la foto se sube pero **no se persiste** en BD |
-| Dashboard | 🟡 UI implementada | KPIs y tarjetas estáticas; módulos de negocio deshabilitados |
+| Perfil propio | ✅ Implementado | Datos personales, contraseña, foto persistida en `usuario.foto_url` y ubicación propia del donante |
+| Dashboard | 🟡 Parcialmente implementado | Postulaciones y bandejas de aprobación; KPIs de muestra y módulos de negocio deshabilitados |
 | Campañas | ⛔ Pendiente | Solo tarjetas "En desarrollo" |
 | Donaciones y pagos QR | ⛔ Pendiente | Sin tablas ni endpoints |
-| Voluntariados | ⛔ Pendiente | Sin tablas ni endpoints |
+| Gestión de convocatorias y turnos de voluntariado | ⛔ Pendiente | La postulación y aprobación del rol Voluntario sí existen; faltan convocatorias, asignaciones y asistencia |
 | Reportes / exportaciones | ⛔ Pendiente | Dependencias instaladas (`xlsx`, `jspdf`, `@nivo/*`) pero sin uso |
 
 ### 1.3 Principios de diseño del sistema
@@ -117,17 +117,15 @@ cd backend
 npm install
 npm run dev
 
-# 5. Frontend (terminal 2)
+# 5. Frontend (terminal 2; API_URL tiene fallback local)
 cd frontend
 npm install
-"VITE_API_URL=http://localhost:4000/api" | Set-Content .env
 npm run dev
 
 # 6. Abrir http://localhost:5173
 ```
 
-> En macOS/Linux, el paso 5 se reemplaza por:
-> `echo "VITE_API_URL=http://localhost:4000/api" > frontend/.env`
+> Para configurar otra URL de API, crear `frontend/.env` con `VITE_API_URL`. En desarrollo local, el cliente compartido usa `http://localhost:4000/api` como fallback; recuperación de contraseña usa la URL configurada.
 
 ### 2.3 URLs
 
@@ -163,7 +161,7 @@ Si el health check responde y el login devuelve un `token`, el entorno está ope
 
 ### 3.1 Lo que está listo para usar
 
-- Registro público (siempre crea rol **Donante**).
+- Registro público con selección de rol: **Donante**, **Beneficiario** o **Voluntario**. Las solicitudes de voluntariado quedan pendientes de aprobación; las de beneficiario quedan pendientes de verificación.
 - Login con JWT y validación de cuenta activa.
 - Recuperación de contraseña con envío por SMTP (Gmail).
 - Panel de administración de usuarios:
@@ -173,7 +171,9 @@ Si el health check responde y el login devuelve un `token`, el entorno está ope
   - paginación en cliente (5/10/20/50),
   - crear, editar, activar/desactivar y eliminar (borrado lógico),
   - formulario específico por rol.
-- Perfil propio con actualización de datos y contraseña.
+- Perfil propio con actualización de datos, contraseña y foto (archivo guardado en `backend/uploads/perfiles` y ruta persistida en `usuario.foto_url`).
+- Ubicación propia para cuentas donantes, guardada en `donante.ubi_latitud`/`ubi_longitud` y visible en el mapa del perfil.
+- Postulación desde el Dashboard para ser voluntario o beneficiario, más bandejas de revisión: coordinador/admin para voluntariado y admin para beneficiarios.
 - Tema claro/oscuro persistente.
 - Landing pública con secciones informativas.
 - Docker Compose para base de datos, backend y frontend.
@@ -181,16 +181,13 @@ Si el health check responde y el login devuelve un `token`, el entorno está ope
 
 ### 3.2 Lo que existe solo como UI
 
-- Dashboard con KPIs y módulos "En desarrollo".
-- Sidebar con enlaces deshabilitados.
-- Tarjetas de campañas/donaciones/voluntariados/reportes.
+- Dashboard con KPIs de muestra y tarjetas de campañas/donaciones/reportes aún deshabilitadas.
+- Sidebar con seis módulos e iconos; solo Gestión de Usuarios tiene una pantalla operativa. Los módulos 2–6 aparecen como enlaces de desarrollo sin rutas registradas.
 
 ### 3.3 Lo que no existe todavía
 
-- Tablas de campañas, donaciones, pagos, comprobantes, postulaciones, turnos y reportes.
-- Endpoints para esos dominios.
+- Tablas y endpoints de campañas, donaciones, pagos, comprobantes, convocatorias, asignaciones/turnos y reportes.
 - Notificaciones en tiempo real.
-- Carga y persistencia de fotos de perfil.
 - Tests automatizados, linter y pipeline CI.
 - OpenAPI/Swagger y colección Postman versionada.
 
@@ -200,34 +197,32 @@ Si el health check responde y el login devuelve un `token`, el entorno está ope
 
 ### 4.1 Nombres canónicos
 
-El sistema usa **cuatro roles canónicos** en base de datos y JWT:
+El sistema tiene cuatro subtipos en las tablas de roles. En las respuestas y el JWT puede aparecer **Coordinador**, que es un voluntario aprobado con `es_coordinador = true`:
 
-| Rol canónico (BD/JWT) | Alias aceptados de entrada | Alias heredado del frontend | Tabla de subtipo |
+| Rol canónico (API/JWT) | Alias aceptados de entrada | Alias heredado del frontend | Tabla de subtipo |
 |---|---|---|---|
 | `Administrador` | `admin`, `administrador` | `Admin` | `administrador` |
+| `Coordinador` | `coordinador` | `Coordinador` | `voluntario` (`es_coordinador = true`) |
 | `Beneficiario` | `beneficiario` | `Beneficiario` | `beneficiario` |
 | `Donante` | `donante`, `cliente` | `Cliente` | `donante` |
 | `Voluntario` | `voluntario`, `empleado` | `Empleado` | `voluntario` |
 
-> [!WARNING]
-> El frontend antiguo usa `Cliente`/`Empleado` en varios formularios y componentes. El backend los traduce, pero **todo código nuevo debe usar los nombres canónicos**. Esta duplicidad es deuda técnica (ver sección 18).
+El administrador crea coordinadores desde el formulario de usuario al seleccionar el rol de voluntario y activar la opción de coordinador. El esquema exige que todo coordinador esté aprobado.
 
 ### 4.2 Matriz de permisos
 
-| Acción | Público | Donante | Voluntario | Beneficiario | Admin GENERAL | Admin SUPERADMIN |
+| Acción | Público | Donante | Voluntario | Coordinador | Beneficiario | Administrador |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Ver landing | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Registrarse (solo Donante) | ✅ | — | — | — | — | — |
-| Login / recuperar contraseña | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Ver y editar perfil propio | — | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Ver dashboard | — | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Listar usuarios | — | — | — | — | ✅ | ✅ |
-| Crear / editar usuarios | — | — | — | — | ✅ | ✅ |
-| Activar / desactivar | — | — | — | — | ✅ | ✅ |
-| Eliminar (lógico) | — | — | — | — | ✅ | ✅ |
+| Registrarse como Donante, Beneficiario o Voluntario | ✅ | — | — | — | — | — |
+| Ver y editar perfil propio / foto | — | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Enviar solicitud de voluntariado o beneficiario | — | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Revisar solicitudes de voluntariado | — | — | — | ✅ | — | ✅ |
+| Revisar solicitudes de beneficiario | — | — | — | — | — | ✅ |
+| Listar, crear, editar y desactivar usuarios | — | — | — | — | — | ✅ |
+| Eliminar usuario (lógico) | — | — | — | — | — | ✅ |
 
-> [!NOTE]
-> Hoy `SUPERADMIN` y `GENERAL` **tienen los mismos permisos**. El nivel se guarda, pero no se aplica en rutas. Si un módulo futuro requiere distinción, debe implementarse en middleware.
+El esquema actual no tiene niveles `SUPERADMIN`/`GENERAL`; todas las cuentas de administrador usan el mismo middleware.
 
 ### 4.3 Estados de cuenta
 
@@ -249,7 +244,13 @@ Independiente del estado de cuenta:
 
 `Pendiente` → `Verificado` | `Rechazado`
 
-Se edita desde el panel admin; por ahora es informativo y no bloquea operaciones.
+Se revisa en la bandeja del Dashboard para administradores. La solicitud pendiente de beneficiario se crea con la cuenta activa; el estado de verificación se guarda por separado.
+
+### 4.5 Estado de voluntariado
+
+`Pendiente` → `Aprobado` | `Rechazado`
+
+El coordinador de voluntarios o un administrador revisa la solicitud desde el Dashboard. El registro público crea la cuenta inactiva hasta su aprobación; rechazarla la mantiene inactiva. Un coordinador debe estar aprobado y no puede revisar su propia solicitud.
 
 ---
 
@@ -461,7 +462,7 @@ Sistema de Donaciones y Voluntariados/
 │   ├── package.json
 │   ├── tsconfig.json
 │   ├── sonar-project.properties
-│   ├── docs/usuarios.http       # vacío actualmente
+│   ├── docs/usuarios.http       # reservado; actualmente vacío
 │   ├── uploads/                 # volumen de archivos (runtime)
 │   └── src/
 │       ├── server.ts            # único app.listen + graceful shutdown
@@ -525,6 +526,7 @@ Sistema de Donaciones y Voluntariados/
         ├── components/
         │   ├── landing/         # Hero, HowItWorks, ServicesShowcase
         │   ├── layout/          # PublicLayout, AppLayout, Navbar, Header, Footer, LandingNavbar
+        │   ├── mapa/            # MiUbicacion, mapa Leaflet y utilidades
         │   ├── usuarios/        # UsuarioList, UsuarioCard, UsuarioModal
         │   ├── guards/          # RutasProtegidas, RutasAdmin
         │   └── ui/              # ConfirmModal, FieldError, Reveal, ThemeToggle
@@ -553,10 +555,10 @@ Sistema de Donaciones y Voluntariados/
 
 ```mermaid
 erDiagram
-    USUARIO ||--o| ADMINISTRADOR : "hereda"
-    USUARIO ||--o| BENEFICIARIO : "hereda"
-    USUARIO ||--o| DONANTE : "hereda"
-    USUARIO ||--o| VOLUNTARIO : "hereda"
+    USUARIO ||--o| ADMINISTRADOR : "puede ser"
+    USUARIO ||--o| BENEFICIARIO : "puede solicitar"
+    USUARIO ||--o| DONANTE : "puede ser"
+    USUARIO ||--o| VOLUNTARIO : "puede solicitar"
 
     USUARIO {
         serial id_usuario PK
@@ -565,12 +567,12 @@ erDiagram
         varchar correo UK
         varchar telefono
         varchar password
+        varchar foto_url
         varchar estado
-        timestamp fecha_creacion
+        timestamp fecha_registro
     }
     ADMINISTRADOR {
         int id_usuario PK,FK
-        varchar nivel_acceso
     }
     BENEFICIARIO {
         int id_usuario PK,FK
@@ -580,6 +582,9 @@ erDiagram
         varchar necesidad
         text descripcion
         varchar estado
+        int revisado_por FK
+        timestamp fecha_revision
+        text motivo_rechazo
     }
     DONANTE {
         int id_usuario PK,FK
@@ -592,10 +597,15 @@ erDiagram
         text_array habilidades
         varchar disponibilidad
         timestamp fecha_registro
+        boolean es_coordinador
+        varchar estado
+        int revisado_por FK
+        timestamp fecha_revision
+        text motivo_rechazo
     }
 ```
 
-**Regla:** un usuario tiene exactamente un rol y, por tanto, **una sola fila de subtipo**. Al cambiar de rol desde el panel admin se eliminan las filas de los subtipos que no correspondan.
+Las tablas de subtipo permiten que un usuario acumule participaciones. El formulario de alta/edición del administrador mantiene un solo rol por usuario y limpia los demás subtipos al cambiarlo; las postulaciones desde el Dashboard pueden agregar o actualizar el subtipo voluntario o beneficiario sin quitar el de donante.
 
 ### 8.2 Tablas
 
@@ -609,8 +619,9 @@ erDiagram
 | `correo` | `VARCHAR(150)` | NOT NULL, UNIQUE |
 | `telefono` | `VARCHAR(20)` | opcional |
 | `password` | `VARCHAR(255)` | NOT NULL (hash bcrypt) |
+| `foto_url` | `VARCHAR(500)` | opcional; ruta de la foto de perfil |
 | `estado` | `VARCHAR(20)` | NOT NULL, default `Activo`; CHECK `Activo`/`Inactivo`/`Eliminado` |
-| `fecha_creacion` | `TIMESTAMP` | NOT NULL, default `CURRENT_TIMESTAMP` |
+| `fecha_registro` | `TIMESTAMP` | NOT NULL, default `CURRENT_TIMESTAMP` |
 
 > El esquema guarda **un solo apellido**. La API lo divide en `paterno` y `materno` por el primer espacio y los vuelve a unir al escribir. Ver limitaciones en 18.3.
 
@@ -619,7 +630,6 @@ erDiagram
 | Columna | Tipo | Restricciones |
 |---|---|---|
 | `id_usuario` | `INT` | PK, FK → `usuario` ON DELETE CASCADE |
-| `nivel_acceso` | `VARCHAR(30)` | default `GENERAL`; CHECK `SUPERADMIN`/`GENERAL` |
 
 #### `beneficiario`
 
@@ -632,6 +642,9 @@ erDiagram
 | `necesidad` | `VARCHAR(150)` | NOT NULL |
 | `descripcion` | `TEXT` | opcional |
 | `estado` | `VARCHAR(20)` | default `Pendiente`; CHECK `Pendiente`/`Verificado`/`Rechazado` |
+| `revisado_por` | `INT` | FK a `usuario`; se limpia al borrar al revisor |
+| `fecha_revision` | `TIMESTAMP` | opcional |
+| `motivo_rechazo` | `TEXT` | opcional |
 
 #### `donante`
 
@@ -650,11 +663,16 @@ erDiagram
 | `habilidades` | `TEXT[]` | NOT NULL, default `{}` |
 | `disponibilidad` | `VARCHAR(100)` | NOT NULL |
 | `fecha_registro` | `TIMESTAMP` | default `CURRENT_TIMESTAMP` |
+| `es_coordinador` | `BOOLEAN` | NOT NULL, default `false`; requiere estado `Aprobado` |
+| `estado` | `VARCHAR(20)` | default `Pendiente`; CHECK `Pendiente`/`Aprobado`/`Rechazado` |
+| `revisado_por` | `INT` | FK a `usuario`; no puede ser el mismo voluntario |
+| `fecha_revision` | `TIMESTAMP` | opcional |
+| `motivo_rechazo` | `TEXT` | opcional |
 
 ### 8.3 Índices
 
 ```sql
-idx_usuario_correo            -- búsqueda por correo
+usuario.correo                -- UNIQUE (crea índice automáticamente)
 idx_usuario_estado            -- filtros por estado
 idx_beneficiario_documento    -- unicidad operativa / búsqueda
 idx_beneficiario_estado       -- verificación de beneficiarios
@@ -790,7 +808,7 @@ Viven en `backend/src/utils/validaciones.ts` y se invocan desde los servicios.
 | `estado_beneficiario` | `Pendiente`, `Verificado`, `Rechazado` |
 | `habilidades` | Al menos 1, máx. 20, cada una ≤ 60 caracteres; acepta string separado por comas o array |
 | `disponibilidad` | Obligatoria, máx. 100 |
-| `nivel_acceso` | `SUPERADMIN` o `GENERAL` |
+| `nivel_acceso` | Validación heredada; no existe como columna en `administrador` |
 | Coordenadas | Latitud -90..90, longitud -180..180; si una viene, ambas |
 
 > El login solo exige contraseña de **6+ caracteres** por compatibilidad histórica, no la política completa. Ver 18.3.
@@ -829,8 +847,7 @@ Errores Multer → `Archivo inválido o demasiado grande (máx. 5MB).`
 - Límite: **5 MB**.
 - Servido públicamente en `GET /uploads/...`.
 
-> [!CAUTION]
-> El archivo se guarda, pero **no se actualiza ninguna columna en la base de datos** (no existe `foto_url`). El hook `useFotoPerfil` consulta `foto_url` y siempre recibe `undefined`. La foto no se muestra. Ver 18.3.
+La ruta del archivo se guarda en `usuario.foto_url` y se sirve desde `/uploads`. El nombre actual se construye con `Date.now()` y el filtro valida el MIME declarado por el cliente.
 
 ### 9.8 Correo
 
@@ -888,13 +905,21 @@ Checklist de calidad:
 | Método | Ruta | Auth | Rol | Descripción |
 |---|---|---|:---:|---|
 | `GET` | `/api/health` | No | — | Estado del backend |
-| `POST` | `/api/auth/registrar` | No | — | Registro público (Donante) |
+| `POST` | `/api/auth/registrar` | No | — | Registro público de Donante, Beneficiario o Voluntario |
 | `POST` | `/api/auth/login` | No | — | Login, devuelve JWT |
 | `POST` | `/api/auth/solicitar-recuperacion` | No | — | Envía correo de recuperación |
 | `GET` | `/api/auth/validar-token/:token` | No | — | Valida token de recuperación |
 | `POST` | `/api/auth/reset-password` | No | — | Cambia contraseña con token |
 | `GET` | `/api/usuarios/perfil` | Sí | Cualquiera | Perfil propio |
 | `PUT` | `/api/usuarios/perfil` | Sí | Cualquiera | Actualiza perfil (multipart) |
+| `GET` | `/api/usuarios/ubicaciones` | Sí | Cualquiera | Lista donantes con coordenadas guardadas |
+| `POST` | `/api/usuarios/mi-ubicacion` | Sí | Cualquiera | Guarda las coordenadas propias |
+| `POST` | `/api/usuarios/postular/voluntario` | Sí | Cualquiera | Envía/actualiza la solicitud de voluntariado |
+| `POST` | `/api/usuarios/postular/beneficiario` | Sí | Cualquiera | Envía/actualiza la solicitud de beneficiario |
+| `GET` | `/api/usuarios/solicitudes/voluntarios` | Sí | Coordinador o Admin | Lista solicitudes; acepta `?estado=` |
+| `PATCH` | `/api/usuarios/solicitudes/voluntarios/:id` | Sí | Coordinador o Admin | Aprueba o rechaza una solicitud |
+| `GET` | `/api/usuarios/solicitudes/beneficiarios` | Sí | Admin | Lista solicitudes; acepta `?estado=` |
+| `PATCH` | `/api/usuarios/solicitudes/beneficiarios/:id` | Sí | Admin | Verifica o rechaza una solicitud |
 | `GET` | `/api/usuarios` | Sí | Admin | Lista usuarios no eliminados |
 | `POST` | `/api/usuarios` | Sí | Admin | Crea usuario con cualquier rol |
 | `GET` | `/api/usuarios/:id` | Sí | Admin | Detalle de usuario |
@@ -906,7 +931,7 @@ Checklist de calidad:
 
 #### `POST /api/auth/registrar`
 
-Registro público. **Siempre crea un Donante**, aunque se envíen otros campos.
+Registro público. Acepta `rol: "Donante"`, `rol: "Beneficiario"` o `rol: "Voluntario"`; si se omite, usa Donante. El registro de Administrador está bloqueado. Beneficiario requiere documento; tipo, necesidad y dirección tienen valores por defecto en el servicio. Voluntario permite omitir habilidades y disponibilidad, que reciben valores por defecto.
 
 ```json
 {
@@ -916,6 +941,7 @@ Registro público. **Siempre crea un Donante**, aunque se envíen otros campos.
   "correo": "ana.perez@example.com",
   "telefono": "71234567",
   "contraseña": "Passw123",
+  "rol": "Donante",
   "ci_nit": "12345678",
   "calle": "Av. Arce 123",
   "zona": "Sopocachi",
@@ -926,10 +952,25 @@ Registro público. **Siempre crea un Donante**, aunque se envíen otros campos.
 **201**
 
 ```json
-{ "mensaje": "Cuenta de donante creada con éxito" }
+{
+  "id_usuario": 13,
+  "mensaje": "Cuenta de donante creada con éxito",
+  "rol": "Donante",
+  "estado": "Activo"
+}
 ```
 
-Errores: `400` validación, correo duplicado, CI/NIT inválido.
+El formulario de registro solicita los datos específicos de cada rol. En la API, el beneficiario se crea con verificación pendiente y la cuenta activa; el voluntario queda inactivo hasta su aprobación. Errores: `400` validación/correo o documento duplicado, `403` si se intenta registrar un administrador.
+
+#### Postulaciones y revisiones
+
+Las postulaciones hechas desde el Dashboard requieren JWT. `POST /api/usuarios/postular/voluntario` acepta `habilidades` y `disponibilidad` (opcionales; usa `General` y `A convenir` por defecto). `POST /api/usuarios/postular/beneficiario` requiere `documento`, `direccion` y `necesidad`; `tipo_beneficiario` usa `Persona` por defecto y `descripcion` es opcional. Estas rutas agregan/actualizan el subtipo y dejan su estado en `Pendiente`.
+
+Las bandejas aceptan filtro opcional `?estado=Pendiente`. Para revisar se envía `PATCH /api/usuarios/solicitudes/voluntarios/:id` con `{ "estado": "Aprobado" }` o `{ "estado": "Rechazado", "motivo_rechazo": "..." }`; coordinadores aprobados y administradores tienen acceso. Beneficiarios usan `PATCH /api/usuarios/solicitudes/beneficiarios/:id` con estado `Verificado` o `Rechazado`, solo para administradores. El revisor no puede revisar su propia solicitud.
+
+#### Ubicación propia
+
+`POST /api/usuarios/mi-ubicacion` recibe `{ "latitud": -16.5, "longitud": -68.1 }` (también acepta `lat`/`lng`) y actualiza las coordenadas del usuario autenticado en su subtipo donante. `GET /api/usuarios/ubicaciones` devuelve donantes con coordenadas para el mapa y requiere autenticación.
 
 ---
 
@@ -1039,7 +1080,6 @@ El token se elimina después del cambio. La nueva contraseña pasa la política 
   "fecha_registro": "2026-02-05T15:00:00.000Z",
   "fecha_creacion": "2026-02-05T15:00:00.000Z",
   "rol": "Donante",
-  "nivel_acceso": null,
   "tipo_beneficiario": null,
   "documento": null,
   "ci_nit": null,
@@ -1056,6 +1096,8 @@ El token se elimina después del cambio. La nueva contraseña pasa la política 
 ```
 
 > `pg` devuelve `DECIMAL` como string; por eso `ubi_latitud`/`ubi_longitud` pueden llegar como texto. Los tipos del frontend aceptan `number | string | null`.
+>
+> `fecha_creacion` aparece como alias de compatibilidad en algunas respuestas; el nombre real de la columna es `fecha_registro`.
 
 ---
 
@@ -1072,11 +1114,10 @@ El token se elimina después del cambio. La nueva contraseña pasa la política 
 | `telefono` | ✅ | 8 dígitos |
 | `passwordActual` | Solo si cambia contraseña | |
 | `passwordNueva` | Solo si cambia contraseña | Política completa |
-| `foto` | ❌ | Imagen ≤ 5 MB (no persiste en BD) |
+| `foto` | ❌ | Imagen ≤ 5 MB; guarda su ruta en `usuario.foto_url` |
 | `direccion` o `calle`+`zona`+`ciudad` | Según rol | Donante |
 | `tipo_beneficiario`, `documento`/`ci_nit`, `direccion`, `necesidad`, `descripcion`, `estado_beneficiario` | Beneficiario | |
 | `habilidades`, `disponibilidad` | Voluntario | `habilidades` puede ser string con comas |
-| `nivel_acceso` | Administrador | `SUPERADMIN`/`GENERAL` |
 | `ubi_latitud`, `ubi_longitud` | ❌ | Donante, ambas o ninguna |
 
 **200**
@@ -1127,10 +1168,10 @@ Campos por rol:
 
 | Rol | Campos específicos |
 |---|---|
-| `Administrador` | `nivel_acceso` (`SUPERADMIN`/`GENERAL`, default `GENERAL`) |
+| `Administrador` | Sin campos adicionales en el esquema actual |
 | `Beneficiario` | `tipo_beneficiario`, `documento` (5–15 dígitos, único), `direccion`, `necesidad`, `descripcion?`, `estado_beneficiario` |
 | `Donante` | `direccion?`, `ubi_latitud?`, `ubi_longitud?` |
-| `Voluntario` | `habilidades` (string con comas o array), `disponibilidad` |
+| `Voluntario` | `habilidades` (string con comas o array), `disponibilidad`; `es_coordinador` se configura desde la gestión administrativa y exige estado aprobado |
 
 Acepta alias de rol (`Cliente`, `Empleado`, `Admin`).
 
@@ -1262,7 +1303,7 @@ curl -s -X POST http://localhost:4000/api/usuarios \
 3. `Header` muestra nombre y rol.
 4. Al recargar, `AuthContext` valida `exp`.
 5. A los 15 min sin actividad, `logout()` y redirección a `/login`.
-6. Ante `401/403` de cualquier request, el interceptor de Axios cierra sesión.
+6. Ante `401` o `403` de una llamada hecha por el cliente Axios compartido, el interceptor elimina el token y redirige a `/login` (incluye respuestas 403 por permisos).
 
 ### 11.5 Capa API
 
@@ -1278,8 +1319,8 @@ api/usuario.api.ts→ CRUD admin + perfil
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 ```
 
-> [!WARNING]
-> Varias pantallas (`Login`, `Registro`, `Perfil`, `ResetPassword`, `SolicitarRecuperacion`, `useFotoPerfil`) usan `axios` directamente y algunas **no tienen fallback** para `VITE_API_URL`. Si falta la variable, esas llamadas fallan. Definí siempre `frontend/.env`. La meta es centralizar todo en `api/client.ts`.
+> [!NOTE]
+> Login, Registro, Perfil, `useFotoPerfil` y las llamadas del cliente compartido usan fallback local. `SolicitarRecuperacion` y `ResetPassword` todavía construyen la URL desde `VITE_API_URL` directamente; definí `frontend/.env` si vas a usar esos flujos fuera de la configuración local por defecto.
 
 ### 11.6 Obtención de datos
 
@@ -1305,6 +1346,7 @@ Patrón actual:
 | `UsuarioList` | Tabla desktop + cards móvil, búsqueda, filtros, paginación, acciones |
 | `UsuarioCard` | Tarjeta de usuario para móvil/preview |
 | `UsuarioModal` | Alta/edición con campos condicionados por rol |
+| `MiUbicacion` / `Mapa` | Selección y visualización de la ubicación propia del donante con Leaflet |
 | `ConfirmModal` | Confirmaciones destructivas e informativas |
 | `Navbar` | Sidebar fijo desktop / drawer móvil, filtrado por rol |
 | `Header` | Título de ruta, menú de perfil, tema, logout |
@@ -1542,13 +1584,13 @@ Reglas:
 |---|---|---|---|
 | `/` | Landing | ✅ | Hero, pasos, roles, servicios, cinta animada |
 | `/login` | Login | ✅ | Fondo fotográfico, panel, toggle de tema |
-| `/registro` | Registro | ✅ | Solo crea Donante; medidor de contraseña |
+| `/registro` | Registro | ✅ | Crea Donante, Beneficiario o Voluntario; solicitudes sujetas a revisión |
 | `/solicitar-recuperacion` | Recuperación | ✅ | Envío de correo |
 | `/reset-password?token=` | Nueva contraseña | ✅ | Valida token al entrar |
-| `/dashboard` | Dashboard | 🟡 | KPIs estáticos; módulos de negocio deshabilitados |
-| `/perfil` | Perfil | ✅ | Datos, contraseña; foto no persiste |
+| `/dashboard` | Dashboard | 🟡 | Postulaciones y bandejas de revisión; KPIs estáticos y módulos futuros deshabilitados |
+| `/perfil` | Perfil | ✅ | Datos, contraseña, foto y ubicación propia del donante |
 | `/usuarios` | Admin de usuarios | ✅ | Solo admin; tabla + cards + modal |
-| `/campanas`, `/donaciones`, `/voluntariados`, `/reportes`, etc. | Módulos futuros | ⛔ | Enlaces deshabilitados; no hay rutas registradas |
+| `/campanas`, `/donaciones`, `/voluntarios`, `/beneficios`, `/reportes` | Módulos futuros del sidebar | ⛔ | Se muestran con iconos como módulos en desarrollo; no hay rutas registradas |
 
 > El fallback `*` redirige a `/`. Si un equipo agrega tarjetas con enlaces a rutas no registradas, el usuario terminará en la landing.
 
@@ -1600,7 +1642,7 @@ FRONTEND_URL=http://localhost:5173
 VITE_API_URL=http://localhost:4000/api
 ```
 
-También podés usar `VITE_API_URL=/api` para aprovechar el proxy de Vite (`vite.config.ts` redirige `/api` a `http://localhost:4000`).
+También podés usar `VITE_API_URL=/api` para aprovechar el proxy de Vite (`vite.config.ts` redirige `/api` a `http://localhost:4000`). El proxy solo cubre `/api`; las fotos servidas bajo `/uploads` requieren que el navegador pueda acceder directamente al host del backend.
 
 > [!CAUTION]
 > Nunca commitees `.env` ni credenciales. `.gitignore` ya los excluye, pero verificá `git status` antes de cada commit. Si un secreto estuvo expuesto, **rotalo**.
@@ -1687,8 +1729,8 @@ Antes de desplegar:
 
 | Rol | Correo | Contraseña | Estado |
 |---|---|---|---|
-| Administrador (SUPERADMIN) | `carla.admin@donacionesbo.org` | `Passw123` | Activo |
-| Administrador (GENERAL) | `jorge.admin@donacionesbo.org` | `Passw123` | Activo |
+| Administrador | `carla.admin@donacionesbo.org` | `Passw123` | Activo |
+| Administrador | `jorge.admin@donacionesbo.org` | `Passw123` | Activo |
 | Beneficiario (Persona) | `rosa.chambi@gmail.com` | `Passw123` | Activo |
 | Beneficiario (Familia) | `hector.poma@gmail.com` | `Passw123` | Activo |
 | Beneficiario (Institución) | `comedor.esperanza@gmail.com` | `Passw123` | Activo |
@@ -1701,7 +1743,7 @@ Antes de desplegar:
 | Voluntario | `sebastian.vega@gmail.com` | `Passw123` | Activo |
 
 > [!WARNING]
-> Credenciales solo para desarrollo local. No las uses en entornos reales. El comentario de `02_inserts.sql` que menciona `123456` está desactualizado.
+> Credenciales solo para desarrollo local. No las uses en entornos reales. El comentario de `02_inserts.sql` indica `123456`, pero la contraseña correspondiente al hash es `Passw123`.
 
 ---
 
@@ -1885,9 +1927,8 @@ Una funcionalidad está terminada cuando:
 
 | Problema | Impacto | Acción |
 |---|---|---|
-| Foto de perfil no persiste | El usuario sube foto y no se ve | Agregar `foto_url` a `usuario`, guardar ruta y limpiar archivo anterior |
-| Roles duplicados (`Cliente`/`Donante`, `Empleado`/`Voluntario`) | Bugs de navegación y filtros | Unificar en roles canónicos y eliminar alias legacy |
-| Navbar no muestra módulos a Donante/Voluntario | Menú casi vacío | Filtrar con roles canónicos |
+| Roles canónicos y alias heredados conviven | Compatibilidad y filtros más complejos | Retirar alias gradualmente y mantener normalización en un solo punto |
+| Administración conserva campos de nivel heredados en algunos formularios/tipos | El esquema `administrador` solo contiene `id_usuario` | Retirar campos `nivel_acceso` residuales del frontend y validadores |
 | Llamadas Axios dispersas | Comportamiento inconsistente | Centralizar todo en `api/client.ts` |
 | Listado sin paginación de servidor | Escala mal | Agregar `?page=&limit=&q=&rol=&estado=` |
 | Sin OpenAPI/Swagger | Integración manual | Generar OpenAPI 3 y publicarlo |
@@ -1901,25 +1942,24 @@ Una funcionalidad está terminada cuando:
 ### 18.3 Inconsistencias conocidas (leer antes de tocar)
 
 1. **Contraseña de seed:** el comentario dice `123456`; el hash real es `Passw123`.
-2. **Foto:** se sube a `uploads/perfiles` pero no se guarda en BD; `foto_url` no existe.
-3. **`useFotoPerfil`:** usa `VITE_API_URL` sin fallback y consulta en cada cambio de ruta.
-4. **Login:** acepta contraseñas en texto plano si el registro no es un hash bcrypt.
-5. **Roles:** el backend devuelve `Donante`/`Voluntario`; el modal y el navbar usan `Cliente`/`Empleado`.
-6. **Dashboard:** los módulos de Donante/Voluntario están todos "En desarrollo" y el navbar filtra con los roles legacy `Cliente`/`Empleado`, por lo que a un usuario con rol canónico `Donante`/`Voluntario` **el menú lateral le queda vacío** (ni siquiera "Inicio").
-7. **Rutas no registradas:** las tarjetas apuntan a `/donaciones`, `/gestion-campanas`, etc., que caen en el fallback `/`.
-8. **Error 404:** usa `{ success, message }`, distinto de `{ error }`.
-9. **`req.usuario`:** el middleware usa `(req as any).usuario` aunque existe `express.d.ts`; se puede tipar mejor.
-10. **`asyncHandler`, `usuarioValidator`, `esAdminOEmpleado`, `esCliente`:** código sin uso.
-11. **`GET /api/usuarios`:** devuelve todos los usuarios y el frontend pagina en memoria.
-12. **`PUT /api/usuarios/:id`:** el cambio de rol borra subtipos, pero no valida todas las transiciones.
-13. **Sin refresh token:** el JWT dura 8 h y no se renueva salvo al actualizar perfil.
-14. **Sin versión de API:** cualquier cambio incompatible afecta a todos los clientes.
+2. **Foto:** el perfil guarda la ruta en `usuario.foto_url`; las imágenes se sirven estáticamente bajo `/uploads`.
+3. **URLs de API:** `SolicitarRecuperacion` y `ResetPassword` usan `VITE_API_URL` directamente, mientras Login/Registro/Perfil y el cliente común tienen fallback local.
+4. **Login:** acepta contraseñas en texto plano si el valor almacenado no es un hash bcrypt; eliminar el fallback y migrar datos legados.
+5. **Roles:** se mantienen alias de compatibilidad como `Cliente`/`Donante` y `Empleado`/`Voluntario`; revisar normalización al tocar filtros/guards.
+6. **Rutas futuras:** campañas, donaciones, voluntariados y reportes todavía no tienen páginas/rutas registradas; los enlaces de esos módulos están deshabilitados.
+7. **Error 404:** usa `{ success, message }`, distinto de `{ error }`.
+8. **`req.usuario`:** revisar el tipado del middleware frente a `express.d.ts`.
+9. **Código sin uso:** verificar `asyncHandler`, `usuarioValidator`, `esAdminOEmpleado` y `esCliente` antes de retirarlos.
+10. **`GET /api/usuarios`:** devuelve todos los usuarios y el frontend pagina en memoria.
+11. **`PUT /api/usuarios/:id`:** revisar las transiciones de subtipo al cambiar el rol.
+12. **Sin refresh token:** el JWT dura 8 h y no se renueva salvo al actualizar perfil.
+13. **Sin versión de API:** cualquier cambio incompatible afecta a todos los clientes.
 
 ### 18.4 Roadmap sugerido
 
 | Fase | Objetivo | Entregables |
 |---|---|---|
-| 1 | Endurecer núcleo | Rate limit, helmet, tokens en BD, quitar plaintext, unificar 403, foto persistida |
+| 1 | Endurecer núcleo | Rate limit, helmet, tokens en BD, quitar plaintext y unificar manejo de 403 |
 | 2 | Unificar contrato | Roles canónicos, cliente HTTP único, OpenAPI, tests base, CI |
 | 3 | Campañas | Esquema, CRUD, estados, metas, asociación con beneficiarios |
 | 4 | Donaciones | Registro, comprobantes, verificación manual/QR, historial |
@@ -1938,14 +1978,15 @@ Una funcionalidad está terminada cuando:
 | `CORS policy` en el navegador | `FRONTEND_URL` no coincide con el origen | Ajustar `FRONTEND_URL` en `.env` y reiniciar backend |
 | Login devuelve 401 con credenciales correctas | Usuario inactivo/eliminado o contraseña distinta | Revisar estado y usar `Passw123` del seed |
 | Todo request autenticado redirige a login | Interceptor recibe 403 (permisos, no sesión) | Revisar rol; corregir interceptor (deuda P0) |
-| `VITE_API_URL` undefined | Falta `frontend/.env` | Crear con `VITE_API_URL=http://localhost:4000/api` y reiniciar Vite |
+| Las llamadas de recuperación usan una URL `undefined` | Esas dos pantallas no usan el fallback del cliente compartido | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite |
+| La recuperación de contraseña falla con URL `undefined` | `SolicitarRecuperacion`/`ResetPassword` necesitan `VITE_API_URL` explícita | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite |
 | El correo de recuperación no llega | Credenciales SMTP inválidas o Gmail bloqueó | Usar contraseña de aplicación; revisar consola del backend |
 | El enlace de recuperación expiró | Token de 1 h o backend reiniciado | Solicitar uno nuevo |
 | `npm install` falla con `bcrypt` en Windows | Falta toolchain nativa | Instalar Visual Studio Build Tools o usar Docker |
 | El puerto 4000/5173 está ocupado | Otro proceso lo usa | Cambiar `PORT`/puerto de Vite o detener el proceso |
 | `docker compose up` reconstruye lento | `npm install` dentro del contenedor | Usar caché de capas; no copiar `node_modules` |
 | Sonar no conecta | `--network host` en Docker Desktop | Usar `host.docker.internal:9000` |
-| La foto de perfil no aparece | No se persiste `foto_url` | Implementar la columna y el guardado (deuda P1) |
+| La foto de perfil no aparece | Ruta `/uploads` no accesible, URL de API incorrecta o archivo inválido/mayor a 5 MB | Verificar respuesta de perfil, archivo en `backend/uploads/perfiles` y URL base del backend |
 | El nombre se parte mal | `paterno`/`materno` derivados de un solo `apellido` | Cambiar el esquema (deuda P1) |
 | `tsc` falla por variables no usadas | `noUnusedLocals`/`noUnusedParameters` activos | Eliminar imports/variables o justificar |
 | El build de Docker del frontend no refleja cambios | Volumen montado + Vite dev | Reiniciar contenedor o usar modo local |

@@ -24,10 +24,15 @@ export const authApi = {
   },
 
   /**
-   * Registra una nueva cuenta de donante / voluntario.
+   * Registra una nueva cuenta de donante / beneficiario / voluntario.
    */
-  registrar: async (data: RegistroRequest): Promise<{ mensaje: string }> => {
-    const res = await api.post<{ mensaje: string }>('/auth/registrar', data);
+  registrar: async (
+    data: RegistroRequest
+  ): Promise<{ mensaje: string; id_usuario?: number; rol?: string; estado?: string }> => {
+    const res = await api.post<{ mensaje: string; id_usuario?: number; rol?: string; estado?: string }>(
+      '/auth/registrar',
+      data
+    );
     return res.data;
   },
 
