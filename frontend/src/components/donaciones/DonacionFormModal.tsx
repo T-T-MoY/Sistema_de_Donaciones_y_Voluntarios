@@ -680,8 +680,8 @@ const DonacionFormModal = ({ isOpen, modo, donacion, campanaIdInicial, onClose, 
                     </label>
                     {/* Sprint 3: banner cuando viene de una campaña específica */}
                     {campanaIdInicial && !edicion && (
-                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800">
-                        <svg className="h-4 w-4 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div className="mb-2 flex items-center gap-2 rounded-xl border border-success/40 bg-success-soft px-3 py-2 text-xs font-semibold text-success">
+                        <svg className="h-4 w-4 shrink-0 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Tu donación está pre-asignada a la campaña seleccionada. Puedes cambiar el destino si lo deseas.
@@ -707,7 +707,7 @@ const DonacionFormModal = ({ isOpen, modo, donacion, campanaIdInicial, onClose, 
                       </select>
                     )}
                     {valores.campana_id ? (
-                      <p className="mt-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                      <p className="mt-1.5 text-xs font-semibold text-success dark:text-success flex items-center gap-1.5">
                         <span>🎯</span> Esta donación se asignará directamente a la campaña seleccionada.
                       </p>
                     ) : (

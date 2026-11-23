@@ -314,7 +314,7 @@ const DonacionDetalleModal = ({ donacionId, rol, onClose, onCambio }: Props) => 
                 {detalle.referencia_pago && <Dato etiqueta="Referencia">{detalle.referencia_pago}</Dato>}
                 <Dato etiqueta="Destino">
                   {detalle.campana_id ? (
-                    <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+                    <span className="font-semibold text-success dark:text-success">
                       🎯 {detalle.campana_nombre ? `Campaña "${detalle.campana_nombre}"` : `Campaña n.º ${detalle.campana_id}`}
                     </span>
                   ) : (

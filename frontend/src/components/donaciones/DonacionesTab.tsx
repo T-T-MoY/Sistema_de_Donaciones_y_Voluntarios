@@ -353,7 +353,7 @@ const DonacionesTab = ({ rol, campanaIdInicial, onCampanaIdConsumido }: Props) =
                       </td>
                       <td className="px-3 py-3">
                         {d.campana_id ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title={`Campaña: ${d.campana_nombre || `#${d.campana_id}`}`}>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft dark:bg-success-soft/60 px-2.5 py-0.5 text-xs font-semibold text-success dark:text-success border border-success/25 dark:border-success/30" title={`Campaña: ${d.campana_nombre || `#${d.campana_id}`}`}>
                             🎯 {d.campana_nombre || `Campaña #${d.campana_id}`}
                           </span>
                         ) : (
@@ -394,7 +394,7 @@ const DonacionesTab = ({ rol, campanaIdInicial, onCampanaIdConsumido }: Props) =
                       <div className="flex items-center gap-2">
                         <p className="font-semibold tabular-nums text-text">{d.codigo}</p>
                         {d.campana_id ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft dark:bg-success-soft/60 px-2 py-0.5 text-[10px] font-bold text-success dark:text-success">
                             🎯 {d.campana_nombre || `Campaña #${d.campana_id}`}
                           </span>
                         ) : (
