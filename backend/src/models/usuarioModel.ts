@@ -159,6 +159,7 @@ export interface CrearUsuarioInput {
   zona?: string | null;
   ciudad?: string | null;
   rol?: string;
+  roles?: string[];
   estado_cuenta?: string | boolean;
   // Campos del subtipo
   nivel_acceso?: string | null;

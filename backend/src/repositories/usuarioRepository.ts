@@ -341,13 +341,14 @@ export const usuarioRepository = {
 
   async crearUsuario(
     usuarioData: UsuarioData,
-    rolData: RolData
+    rolData: RolData,
+    rolesData?: Array<{ rol: RolUsuario; data: RolData }>
   ): Promise<{ id_usuario: number }> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
 
-      const rol = normalizarRol(usuarioData.rol);
+      const roles = rolesData?.length ? rolesData : [{ rol: normalizarRol(usuarioData.rol), data: rolData }];
 
       const { rows } = await client.query<{ id_usuario: number }>(
         `INSERT INTO usuario (nombre, apellido, correo, telefono, password, foto_url, estado)
@@ -365,7 +366,7 @@ export const usuarioRepository = {
       );
 
       const id_usuario = rows[0].id_usuario;
-      if (rol === 'Administrador') await insertarSubtipo(client, id_usuario, rol, rolData);
+      for (const item of roles) await insertarSubtipo(client, id_usuario, item.rol, item.data);
 
       await client.query('COMMIT');
       return { id_usuario };
@@ -458,7 +459,9 @@ export const usuarioRepository = {
   async actualizarUsuario(
     id_usuario: number | string,
     usuarioData: UsuarioData,
-    rolData: RolData
+    rolData: RolData,
+    rolesData?: Array<{ rol: RolUsuario; data: RolData }>,
+    rolesToRemove: RolUsuario[] = []
   ): Promise<{ id_usuario: number | string }> {
     const client = await pool.connect();
     try {
@@ -489,10 +492,24 @@ export const usuarioRepository = {
 
       await client.query(query, values);
 
-      const rol = normalizarRol(usuarioData.rol);
+      for (const rol of rolesToRemove) {
+        if (rol === 'Coordinador') {
+          await client.query('UPDATE voluntario SET es_coordinador = FALSE WHERE id_usuario = $1', [id_usuario]);
+        } else {
+          const tablaPorRol: Partial<Record<RolUsuario, string>> = {
+            Administrador: 'administrador',
+            Beneficiario: 'beneficiario',
+            Donante: 'donante',
+            Voluntario: 'voluntario',
+          };
+          const tabla = tablaPorRol[rol];
+          if (tabla) await client.query(`DELETE FROM ${tabla} WHERE id_usuario = $1`, [id_usuario]);
+        }
+      }
 
       // Cambiar datos de un subtipo nunca elimina los demás roles del usuario.
-      if (rol !== 'Usuario') await actualizarSubtipo(client, id_usuario, rol, rolData);
+      const roles = rolesData?.length ? rolesData : [{ rol: normalizarRol(usuarioData.rol), data: rolData }];
+      for (const item of roles) await actualizarSubtipo(client, id_usuario, item.rol, item.data);
 
       await client.query('COMMIT');
       return { id_usuario };

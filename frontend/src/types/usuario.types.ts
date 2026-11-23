@@ -58,6 +58,7 @@ export interface UsuarioFormData {
   telefono: string;
   contraseña: string;
   rol: Rol;
+  roles: Rol[];
   estado: Estado;
   ci_nit: string;
   fecha_nacimiento: string;
@@ -127,7 +128,7 @@ export const getEstado = (u: Usuario): string => {
  */
 export const getRolDisplay = (rol?: string | null): string => {
   const lower = (rol || '').toLowerCase().trim();
-  if (lower === 'coordinador') return 'Coordinador Voluntario';
+  if (lower === 'coordinador') return 'Coord.';
   if (lower === 'cliente' || lower === 'donante') return 'Donante';
   if (lower === 'empleado' || lower === 'voluntario') return 'Voluntario';
   if (lower === 'admin' || lower === 'administrador') return 'Administrador';
@@ -137,7 +138,11 @@ export const getRolDisplay = (rol?: string | null): string => {
 
 export const getRolesDisplay = (roles?: string[] | null, rol?: string | null): string[] => {
   const lista = roles?.length ? roles : rol ? [rol] : [];
-  return [...new Set(lista.map((r) => getRolDisplay(r)).filter(Boolean))];
+  const tieneCoordinador = lista.some((r) => r.toLowerCase().trim() === 'coordinador');
+  return [...new Set(lista
+    .filter((r) => !(tieneCoordinador && ['voluntario', 'empleado'].includes(r.toLowerCase().trim())))
+    .map((r) => getRolDisplay(r))
+    .filter(Boolean))];
 };
 
 export const esActivo = (u: Usuario): boolean => {

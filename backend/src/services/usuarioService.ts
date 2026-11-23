@@ -51,6 +51,15 @@ const normalizarRolUI = (rol?: string | null): RolSistema | null => {
   return null;
 };
 
+const normalizarRolesUI = (roles: unknown, rol: unknown): RolSistema[] => {
+  const valores = Array.isArray(roles) ? roles : [rol];
+  const normalizados = [...new Set(valores.map((valor) => normalizarRolUI(String(valor ?? ''))).filter((valor): valor is RolSistema => Boolean(valor)))];
+  // Coordinador conserva también su rol de voluntario, que comparte subtipo.
+  return normalizados.includes('Coordinador') && !normalizados.includes('Voluntario')
+    ? [...normalizados, 'Voluntario']
+    : normalizados;
+};
+
 const construirRolData = (
   rol: RolSistema,
   body: Record<string, any>,
@@ -286,7 +295,8 @@ export const usuarioService = {
     const { nombre, paterno, materno, correo, telefono, contraseña, rol, foto_url } = body;
     const estado = (body as CrearUsuarioInput & { estado?: string | boolean }).estado;
 
-    const rolNormalizado = normalizarRolUI(rol);
+    const rolesNormalizados = normalizarRolesUI(body.roles, rol);
+    const rolNormalizado = rolesNormalizados[0];
     if (!rolNormalizado) {
       throw new AppError(`Rol inválido. Debe ser uno de: ${ROLES_VALIDOS.join(', ')}.`, 400);
     }
@@ -304,15 +314,17 @@ export const usuarioService = {
     const existente = await usuarioRepository.obtenerPorCorreo(correoNorm);
     if (existente) throw new AppError('El correo ya está registrado', 400);
 
-    const rolData = construirRolData(
-      rolNormalizado,
-      body as Record<string, any>,
-      undefined,
-      true
-    );
+    const rolesData = rolesNormalizados
+      .filter((rolItem) => !(rolItem === 'Voluntario' && rolesNormalizados.includes('Coordinador')))
+      .map((rolItem) => ({
+      rol: rolItem,
+      data: construirRolData(rolItem, body as Record<string, any>, undefined, true),
+      }));
+    const rolData = rolesData[0].data;
 
-    if (rolNormalizado === 'Beneficiario' && rolData.documento) {
-      const ciExistente = await usuarioRepository.obtenerPorDocumento(rolData.documento);
+    const datosBeneficiario = rolesData.find((item) => item.rol === 'Beneficiario')?.data;
+    if (datosBeneficiario?.documento) {
+      const ciExistente = await usuarioRepository.obtenerPorDocumento(datosBeneficiario.documento);
       if (ciExistente) throw new AppError('El documento (CI / NIT) ya está registrado', 400);
     }
 
@@ -330,7 +342,8 @@ export const usuarioService = {
         estado_cuenta: estado ?? 'Activo',
         rol: rolNormalizado,
       },
-      rolData
+      rolData,
+      rolesData
     );
 
     return { mensaje: 'Usuario creado con éxito', id_usuario: nuevo.id_usuario };
@@ -345,8 +358,9 @@ export const usuarioService = {
 
     const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado, foto_url } = body;
 
-    const rolNormalizado = normalizarRolUI(rol);
-    if (!rolNormalizado) {
+    const rolesNormalizados = normalizarRolesUI(body.roles, rol);
+    const rolNormalizado = rolesNormalizados[0] || 'Donante';
+    if (!rolesNormalizados.length && !Array.isArray(body.roles)) {
       throw new AppError(`Rol inválido. Debe ser uno de: ${ROLES_VALIDOS.join(', ')}.`, 400);
     }
 
@@ -370,19 +384,24 @@ export const usuarioService = {
     const usuarioActual = await usuarioRepository.obtenerPorId(id);
     if (!usuarioActual) throw new AppError('Usuario no encontrado', 404);
 
-    const rolData = construirRolData(
-      rolNormalizado,
-      body,
-      usuarioActual as unknown as Record<string, any>,
-      true
-    );
+    const rolesData = rolesNormalizados
+      .filter((rolItem) => !(rolItem === 'Voluntario' && rolesNormalizados.includes('Coordinador')))
+      .map((rolItem) => ({
+      rol: rolItem,
+      data: construirRolData(rolItem, body, usuarioActual as unknown as Record<string, any>, true),
+      }));
+    const rolData = rolesData[0]?.data || {};
 
-    if (rolNormalizado === 'Beneficiario' && rolData.documento) {
-      const ciExistente = await usuarioRepository.obtenerPorDocumento(rolData.documento);
+    const datosBeneficiario = rolesData.find((item) => item.rol === 'Beneficiario')?.data;
+    if (datosBeneficiario?.documento) {
+      const ciExistente = await usuarioRepository.obtenerPorDocumento(datosBeneficiario.documento);
       if (ciExistente && String(ciExistente.id_usuario) !== String(id)) {
         throw new AppError('El documento (CI / NIT) ya está registrado por otro usuario', 400);
       }
     }
+
+    const rolesActuales = usuarioActual.roles || [];
+    const rolesToRemove = rolesActuales.filter((rolActual) => !rolesNormalizados.includes(rolActual as RolSistema)) as RolSistema[];
 
     await usuarioRepository.actualizarUsuario(
       id,
@@ -396,9 +415,11 @@ export const usuarioService = {
         foto_url: foto_url !== undefined ? String(foto_url).trim() || null : undefined,
         // Si el payload no trae estado, conservar el actual en vez de reactivar.
         estado_cuenta: estado || usuarioActual.estado || 'Activo',
-        rol: rolNormalizado,
+        rol: rolesNormalizados.length ? rolNormalizado : 'Usuario',
       },
-      rolData
+      rolData,
+      rolesData,
+      rolesToRemove
     );
 
     return { mensaje: 'Usuario actualizado con éxito' };

@@ -35,6 +35,7 @@ import {
   getEstado,
   esActivo,
   getRolDisplay,
+  getRolesDisplay,
 } from '../../types/usuario.types';
 
 const PREVIEW_LIMIT = 3;
@@ -838,12 +839,16 @@ export const UsuarioList = ({
                         </td>
 
                         <td className="min-w-0 px-3 py-4">
-                          <span
-                            className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(user.rol)}`}
-                            title={(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(', ')}
-                          >
-                            {(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(' � ')}
-                          </span>
+                          <div className="flex max-w-full flex-wrap items-center gap-1" aria-label={`Roles: ${getRolesDisplay(user.roles, user.rol).join(', ')}`}>
+                            {getRolesDisplay(user.roles, user.rol).map((rol) => (
+                              <span
+                                key={rol}
+                                className={`inline-flex max-w-full items-center whitespace-nowrap rounded-full border px-2 py-1 text-[9px] font-bold uppercase leading-none tracking-[0.04em] ${getRolBadgeClass(rol)}`}
+                              >
+                                {rol}
+                              </span>
+                            ))}
+                          </div>
                         </td>
 
                         <td className="px-3 py-4">
@@ -930,12 +935,16 @@ export const UsuarioList = ({
                         <p className="mb-1 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">
                           Rol
                         </p>
-                        <span
-                          className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(user.rol)}`}
-                          title={(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(', ')}
-                        >
-                          {(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(' � ')}
-                        </span>
+                        <div className="flex max-w-full flex-wrap items-center gap-1" aria-label={`Roles: ${getRolesDisplay(user.roles, user.rol).join(', ')}`}>
+                            {getRolesDisplay(user.roles, user.rol).map((rol) => (
+                              <span
+                                key={rol}
+                                className={`inline-flex max-w-full items-center whitespace-nowrap rounded-full border px-2 py-1 text-[9px] font-bold uppercase leading-none tracking-[0.04em] ${getRolBadgeClass(rol)}`}
+                              >
+                                {rol}
+                              </span>
+                            ))}
+                          </div>
                       </div>
                       <div>
                         <p className="mb-1 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">
