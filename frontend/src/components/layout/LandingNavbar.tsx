@@ -65,22 +65,16 @@ export const LandingNavbar = () => {
     'group relative rounded-full px-3 py-2 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-text-muted dark:text-cream/65 transition-colors duration-200 hover:text-text dark:hover:text-cream';
 
   const ctaGold =
-    'press inline-flex items-center justify-center gap-2 rounded-xl bg-primary dark:bg-gold px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.12em] text-on-primary dark:text-night shadow-glow hover:bg-primary-hover dark:hover:bg-gold-bright';
+    'press items-center justify-center gap-2 rounded-xl bg-primary dark:bg-gold px-5 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.12em] text-on-primary dark:text-night shadow-glow hover:bg-primary-hover dark:hover:bg-gold-bright';
 
   const ctaGhost =
-    'press inline-flex items-center justify-center rounded-xl border border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-5 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-text-muted dark:text-cream/80 hover:border-primary dark:hover:border-white/30 hover:bg-surface-sunken dark:hover:bg-white/[0.07] hover:text-text dark:hover:text-cream';
+    'press items-center justify-center rounded-xl border border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-5 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-text-muted dark:text-cream/80 hover:border-primary dark:hover:border-white/30 hover:bg-surface-sunken dark:hover:bg-white/[0.07] hover:text-text dark:hover:text-cream';
 
   const badgeDesarrollo =
     'inline-flex items-center gap-2 rounded-xl border border-dashed border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-subtle dark:text-cream/40 select-none';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-surface-elevated/90 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl dark:border-night-line dark:bg-night/90">
-      {/* Filo dorado */}
-      <div
-        aria-hidden="true"
-        className="h-px w-full bg-linear-to-r from-transparent via-primary/60 dark:via-gold/70 to-transparent"
-      />
-
+    <header className="absolute inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between gap-3 pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] sm:h-[76px] md:gap-4 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))]">
         {/* LOGO */}
         <Link
@@ -93,11 +87,9 @@ export const LandingNavbar = () => {
           <IconLogo className="h-9 w-9 shrink-0 transition-transform duration-300 ease-out-soft motion-safe:group-hover:rotate-[-4deg] sm:h-10 sm:w-10" />
           <span className="hidden min-w-0 flex-col leading-none sm:flex">
             <span className="font-display text-[13.5px] font-bold uppercase tracking-[0.12em] text-text dark:text-cream">
-              Donaciones <span className="text-primary dark:text-gold">& Voluntariados</span>
+              Donaciones
             </span>
-            <span className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.3em] text-text-subtle dark:text-cream/45">
-              Plataforma de gestión
-            </span>
+            <span className="font-display text-[13.5px] font-bold uppercase tracking-[0.12em] text-primary dark:text-gold">& Voluntariados</span>
           </span>
         </Link>
 
@@ -254,7 +246,7 @@ export const LandingNavbar = () => {
       {menuMovil && (
         <div
           id="menu-movil"
-          className="anim-fade max-h-[calc(100dvh-76px)] overflow-y-auto overscroll-contain border-t border-border bg-surface-elevated px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-4 dark:border-night-line dark:bg-night-2/98 md:hidden"
+          className="anim-fade max-h-[calc(100dvh-4.25rem-env(safe-area-inset-top,0px))] overflow-y-auto overscroll-contain border-t border-border bg-surface-elevated px-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] pt-4 dark:border-night-line dark:bg-night-2/98 sm:max-h-[calc(100dvh-4.75rem-env(safe-area-inset-top,0px))] md:hidden"
         >
           <nav className="flex flex-col">
             {ENLACES.map((enlace) =>
@@ -288,7 +280,7 @@ export const LandingNavbar = () => {
                 <Link
                   to={isAdmin ? '/usuarios' : '/dashboard'}
                   onClick={() => setMenuMovil(false)}
-                  className={`${ctaGold} w-full`}
+                  className={`${ctaGold} flex w-full`}
                 >
                   {isAdmin ? 'Ir al panel admin' : 'Ir a mi panel'}
                 </Link>
@@ -302,10 +294,10 @@ export const LandingNavbar = () => {
                   Registro próximamente
                 </span>
                 <div className="grid grid-cols-2 gap-2.5">
-                  <Link to="/login" onClick={() => setMenuMovil(false)} className={`${ctaGhost} w-full`}>
+                  <Link to="/login" onClick={() => setMenuMovil(false)} className={`${ctaGhost} flex w-full`}>
                     Ingresar
                   </Link>
-                  <Link to="/registro" onClick={() => setMenuMovil(false)} className={`${ctaGhost} w-full`}>
+                  <Link to="/registro" onClick={() => setMenuMovil(false)} className={`${ctaGhost} flex w-full`}>
                     Registro
                   </Link>
                 </div>

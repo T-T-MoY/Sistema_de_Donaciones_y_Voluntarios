@@ -7,9 +7,18 @@ import {
     cambiarEstadoUsuario, 
     actualizarUsuario, 
     eliminarUsuario, 
-    obtenerUsuarioCompletoPorId 
+    obtenerUsuarioCompletoPorId,
+    obtenerUsuariosConUbicacion,
+    actualizarMiUbicacion,
+    obtenerSolicitudesVoluntarios,
+    revisarSolicitudVoluntario,
+    obtenerSolicitudesBeneficiarios,
+    revisarSolicitudBeneficiario,
+    activarPerfilDonante,
+    postularVoluntario,
+    postularBeneficiario
 } from '../controllers/userController';
-import { verificarToken, esAdmin } from '../middlewares/authMiddleware';
+import { verificarToken, esAdmin, esCoordinadorOAdmin } from '../middlewares/authMiddleware';
 import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -46,6 +55,23 @@ const upload = multer({
 // Rutas de perfil (cualquier usuario autenticado)
 router.get('/perfil', verificarToken, obtenerPerfil);
 router.put('/perfil', verificarToken, upload.single('foto'), actualizarPerfil);
+
+// Rutas de ubicación geográfica (donantes / mapa)
+router.get('/ubicaciones', verificarToken, obtenerUsuariosConUbicacion);
+router.post('/mi-ubicacion', verificarToken, actualizarMiUbicacion);
+
+// Rutas de postulaciones (cualquier usuario autenticado puede solicitar)
+router.post('/postular/donante', verificarToken, activarPerfilDonante);
+router.post('/postular/voluntario', verificarToken, postularVoluntario);
+router.post('/postular/beneficiario', verificarToken, postularBeneficiario);
+
+// Rutas de solicitudes de voluntarios (Coordinador de Voluntariado o Administrador)
+router.get('/solicitudes/voluntarios', verificarToken, esCoordinadorOAdmin, obtenerSolicitudesVoluntarios);
+router.patch('/solicitudes/voluntarios/:id', verificarToken, esCoordinadorOAdmin, revisarSolicitudVoluntario);
+
+// Rutas de solicitudes de beneficiarios (Administrador)
+router.get('/solicitudes/beneficiarios', verificarToken, esAdmin, obtenerSolicitudesBeneficiarios);
+router.patch('/solicitudes/beneficiarios/:id', verificarToken, esAdmin, revisarSolicitudBeneficiario);
 
 // Rutas CRUD de usuarios (solo administradores)
 router.get('/', verificarToken, esAdmin, listarUsuarios);

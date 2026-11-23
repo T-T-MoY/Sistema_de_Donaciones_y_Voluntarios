@@ -1,7 +1,9 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
+import { API_URL } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import FieldError from '../components/ui/FieldError';
+import MiUbicacion from '../components/mapa/MiUbicacion';
 import {
     validarCampo,
     esContraseñaSegura,
@@ -57,11 +59,14 @@ interface PerfilResponse {
     materno?: string;
     correo?: string;
     telefono?: string;
+    foto_url?: string | null;
     ci_nit?: string | number;
     fecha_nacimiento?: string;
     calle?: string;
     zona?: string;
     ciudad?: string;
+    ubi_latitud?: string | number | null;
+    ubi_longitud?: string | number | null;
     rol?: string;
     fecha_contratacion?: string;
     cargo?: string;
@@ -76,6 +81,13 @@ interface PerfilUpdateResponse {
     perfil?: Record<string, unknown>;
 }
 
+type Pestana = 'personal' | 'ubicacion' | 'seguridad';
+
+interface Coordenadas {
+    lat: number;
+    lng: number;
+}
+
 // =====================================================
 // ESTILOS COMPARTIDOS
 // =====================================================
@@ -86,6 +98,17 @@ const tituloSeccion =
     'flex items-center gap-2.5 font-display text-base font-bold tracking-[-0.02em] text-text';
 
 const subtituloSeccion = 'mt-1.5 mb-5 text-sm text-text-muted';
+
+const CAMPOS_PERSONALES = ['nombre', 'paterno', 'materno', 'correo', 'celular'];
+
+// =====================================================
+// UTILIDADES
+// =====================================================
+const aNumero = (valor: unknown): number | null => {
+    if (valor === null || valor === undefined || valor === '') return null;
+    const n = Number(valor);
+    return Number.isFinite(n) ? n : null;
+};
 
 // =====================================================
 // SKELETON DE CARGA
@@ -141,6 +164,11 @@ const Perfil = () => {
     const [touched, setTouched] = useState<Touched>({});
     const [cargando, setCargando] = useState<boolean>(false);
     const [cargandoInicial, setCargandoInicial] = useState<boolean>(true);
+    const [pestana, setPestana] = useState<Pestana>('personal');
+    const [coords, setCoords] = useState<Coordenadas | null>(null);
+    const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
+    const [previewFoto, setPreviewFoto] = useState<string | null>(null);
+    const inputFotoRef = useRef<HTMLInputElement>(null);
 
     // Datos específicos del rol
     const [datosRol, setDatosRol] = useState<DatosRol>({
@@ -152,8 +180,13 @@ const Perfil = () => {
         nivel_acceso: '',
         fecha_asignacion_cargo: ''
     });
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
-            
+    const apiUrl = API_URL;
+
+    useEffect(() => {
+        return () => {
+            if (previewFoto?.startsWith('blob:')) URL.revokeObjectURL(previewFoto);
+        };
+    }, [previewFoto]);
 
     // =====================================================
     // FLAGS DE ROL
@@ -162,6 +195,7 @@ const Perfil = () => {
     const esCliente = rolNorm === 'cliente';
     const esEmpleado = rolNorm === 'empleado';
     const esAdmin = rolNorm === 'admin' || rolNorm === 'administrador';
+    const esDonante = rolNorm === 'donante' || rolNorm === 'cliente';
 
     // =====================================================
     // CARGAR PERFIL
@@ -194,6 +228,16 @@ const Perfil = () => {
                     ciudad: datos.ciudad || ''
                 }));
 
+                // Los DECIMAL suelen llegar como texto desde el backend
+                const lat = aNumero(datos.ubi_latitud);
+                const lng = aNumero(datos.ubi_longitud);
+                setCoords(lat !== null && lng !== null ? { lat, lng } : null);
+
+                if (datos.foto_url) {
+                    const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+                    setPreviewFoto(datos.foto_url.startsWith('http') ? datos.foto_url : `${baseUrl}${datos.foto_url}`);
+                }
+
                 setDatosRol({
                     rol: datos.rol || '',
                     fecha_contratacion: datos.fecha_contratacion
@@ -221,6 +265,22 @@ const Perfil = () => {
     // =====================================================
     // HANDLERS
     // =====================================================
+
+    const handleFotoSeleccionada = (e: ChangeEvent<HTMLInputElement>): void => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            setMensaje({ texto: 'Por favor seleccioná un archivo de imagen válido.', tipo: 'error' });
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            setMensaje({ texto: 'La imagen no debe superar los 5MB.', tipo: 'error' });
+            return;
+        }
+        setArchivoFoto(file);
+        setPreviewFoto(URL.createObjectURL(file));
+        setMensaje({ texto: 'Foto seleccionada. Guardá los cambios para actualizar tu perfil.', tipo: 'exito' });
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
@@ -250,6 +310,11 @@ const Perfil = () => {
             const err = validarCampo(name === 'celular' ? 'telefono' : name, value, formData);
             setErrores((prev) => ({ ...prev, [name]: err }));
         }
+    };
+
+    const irASeguridad = (): void => {
+        setPestana('seguridad');
+        document.getElementById('perfil-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     // =====================================================
@@ -289,15 +354,18 @@ const Perfil = () => {
         // Validaciones de contraseña (todos los roles)
         if (formData.passwordNueva || formData.passwordConfirmar) {
             if (!formData.passwordActual) {
+                setPestana('seguridad');
                 setMensaje({ texto: 'Debés ingresar tu contraseña actual para cambiarla.', tipo: 'error' });
                 return;
             }
             const validPwd = esContraseñaSegura(formData.passwordNueva);
             if (!validPwd.valido) {
+                setPestana('seguridad');
                 setMensaje({ texto: validPwd.error ?? 'Contraseña inválida.', tipo: 'error' });
                 return;
             }
             if (formData.passwordNueva !== formData.passwordConfirmar) {
+                setPestana('seguridad');
                 setMensaje({ texto: 'Las contraseñas nuevas no coinciden.', tipo: 'error' });
                 return;
             }
@@ -308,6 +376,11 @@ const Perfil = () => {
             const tocados: Touched = {};
             Object.keys(erroresEncontrados).forEach((k) => { tocados[k] = true; });
             setTouched(tocados);
+
+            // Llevar al usuario a la pestaña donde está el primer error
+            const hayErrorPersonal = Object.keys(erroresEncontrados).some((k) => CAMPOS_PERSONALES.includes(k));
+            setPestana(hayErrorPersonal ? 'personal' : 'ubicacion');
+
             setMensaje({ texto: 'Revisá los campos marcados en rojo.', tipo: 'error' });
             return;
         }
@@ -332,14 +405,14 @@ const Perfil = () => {
 
             if (formData.passwordActual) dataToSend.append('passwordActual', formData.passwordActual);
             if (formData.passwordNueva) dataToSend.append('passwordNueva', formData.passwordNueva);
+            if (archivoFoto) dataToSend.append('foto', archivoFoto);
 
             const respuesta = await axios.put<PerfilUpdateResponse>(
-                `${import.meta.env.VITE_API_URL}/usuarios/perfil`,
+                `${apiUrl}/usuarios/perfil`,
                 dataToSend,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data'
+                        Authorization: `Bearer ${token}`
                     }
                 }
             );
@@ -348,6 +421,14 @@ const Perfil = () => {
 
             if (respuesta.data.token) {
                 login(respuesta.data.token);
+            }
+
+            const fotoGuardada = respuesta.data.perfil?.foto_url;
+            if (typeof fotoGuardada === 'string' && fotoGuardada) {
+                const baseUrl = apiUrl.replace(/\/api\/?$/, '');
+                setPreviewFoto(/^https?:\/\//i.test(fotoGuardada) ? fotoGuardada : `${baseUrl}${fotoGuardada}`);
+                setArchivoFoto(null);
+                if (inputFotoRef.current) inputFotoRef.current.value = '';
             }
 
             setFormData(prev => ({
@@ -376,6 +457,26 @@ const Perfil = () => {
     fechaMaxima.setFullYear(fechaMaxima.getFullYear() - 15);
     const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
 
+    // =====================================================
+    // ENLACE A GOOGLE MAPS
+    // Usa las coordenadas si existen; si no, busca por la dirección escrita.
+    // =====================================================
+    const direccionTexto = [formData.calle, formData.zona, formData.ciudad].filter(Boolean).join(', ');
+    const enlaceMaps = coords
+        ? `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`
+        : direccionTexto
+            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccionTexto)}`
+            : null;
+
+    // =====================================================
+    // PESTAÑAS
+    // =====================================================
+    const pestanas: { id: Pestana; etiqueta: string }[] = [
+        { id: 'personal', etiqueta: 'Datos personales' },
+        ...(esDonante ? [{ id: 'ubicacion' as Pestana, etiqueta: 'Dirección y ubicación' }] : []),
+        { id: 'seguridad', etiqueta: 'Seguridad' }
+    ];
+
     if (cargandoInicial) {
         return <PerfilSkeleton />;
     }
@@ -394,9 +495,34 @@ const Perfil = () => {
                 />
 
                 <div className="relative z-10 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-3xl font-extrabold text-night shadow-deep sm:h-24 sm:w-24 sm:text-4xl">
-                        {iniciales}
-                    </span>
+                    <div className="relative group">
+                        <div className="flex h-20 w-20 shrink-0 overflow-hidden items-center justify-center rounded-3xl border border-cream/15 bg-gold font-display text-3xl font-extrabold text-night shadow-deep sm:h-24 sm:w-24 sm:text-4xl">
+                            {previewFoto ? (
+                                <img src={previewFoto} alt="Perfil" className="h-full w-full object-cover" />
+                            ) : (
+                                iniciales
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => inputFotoRef.current?.click()}
+                            title="Subir o cambiar foto de perfil"
+                            aria-label="Subir foto de perfil"
+                            className="press absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-gold text-night shadow-lift transition hover:scale-110 hover:bg-gold-bright"
+                        >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                        <input
+                            ref={inputFotoRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFotoSeleccionada}
+                            className="hidden"
+                        />
+                    </div>
 
                     <div className="min-w-0 flex-1">
                         <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md">
@@ -425,15 +551,16 @@ const Perfil = () => {
                         </div>
                     </div>
 
-                    <a
-                        href="#seguridad"
+                    <button
+                        type="button"
+                        onClick={irASeguridad}
                         className="press inline-flex shrink-0 items-center gap-2 rounded-xl border border-cream/20 bg-cream/[0.06] px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-cream/85 hover:border-gold/50 hover:text-gold-bright"
                     >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
                         Seguridad
-                    </a>
+                    </button>
                 </div>
             </section>
 
@@ -502,6 +629,26 @@ const Perfil = () => {
                         </div>
                     )}
 
+                    {esDonante && (
+                        <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:80ms]">
+                            <span className="block text-[9.5px] font-bold uppercase tracking-[0.2em] text-accent-text">
+                                Perfil de Donante
+                            </span>
+                            <div className="mt-4 space-y-3.5">
+                                <div className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="shrink-0 text-text-muted">Tipo</span>
+                                    <span className="text-right font-semibold text-text">Donante Activo</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="shrink-0 text-text-muted">Geolocalización</span>
+                                    <span className="text-right font-semibold text-emerald-600 dark:text-emerald-400">
+                                        Puntos y Recojo
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Resumen de contacto */}
                     <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:140ms]">
                         <span className="block text-[9.5px] font-bold uppercase tracking-[0.2em] text-text-subtle">
@@ -523,18 +670,31 @@ const Perfil = () => {
                                 </svg>
                                 <span className="text-text-muted">{formData.celular || '—'}</span>
                             </li>
-                            {(formData.calle || formData.zona || formData.ciudad) && (
+                            {direccionTexto && (
                                 <li className="flex items-start gap-2.5 text-sm">
                                     <svg className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <span className="text-text-muted">
-                                        {[formData.calle, formData.zona, formData.ciudad].filter(Boolean).join(', ')}
-                                    </span>
+                                    <span className="text-text-muted">{direccionTexto}</span>
                                 </li>
                             )}
                         </ul>
+
+                        {/* Botón: abrir en Google Maps */}
+                        {enlaceMaps && (
+                            <a
+                                href={enlaceMaps}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="press mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] text-text-muted hover:border-primary/50 hover:text-primary"
+                            >
+                                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Abrir en Google Maps
+                            </a>
+                        )}
                     </div>
 
                     {/* Nota */}
@@ -547,13 +707,41 @@ const Perfil = () => {
                 </aside>
 
                 {/* =====================================================
-                    FORMULARIO
+                    FORMULARIO CON PESTAÑAS
                     ===================================================== */}
-                <div className="anim-rise lg:col-span-2 [animation-delay:60ms]">
+                <div id="perfil-form" className="anim-rise scroll-mt-24 lg:col-span-2 [animation-delay:60ms]">
                     <form onSubmit={(e) => void handleSubmit(e)} className="overflow-hidden rounded-2xl border border-border bg-surface-elevated shadow-soft" noValidate>
 
-                        {/* SECCIÓN 1: DATOS BÁSICOS */}
-                        <div className="border-b border-border p-6 md:p-8">
+                        {/* Barra de pestañas */}
+                        <div role="tablist" aria-label="Secciones del perfil" className="flex gap-1.5 overflow-x-auto border-b border-border p-3 md:px-6">
+                            {pestanas.map((p) => (
+                                <button
+                                    key={p.id}
+                                    type="button"
+                                    role="tab"
+                                    id={`tab-${p.id}`}
+                                    aria-selected={pestana === p.id}
+                                    aria-controls={`panel-${p.id}`}
+                                    onClick={() => setPestana(p.id)}
+                                    className={`press whitespace-nowrap rounded-xl px-4 py-2.5 text-[11.5px] font-bold uppercase tracking-[0.12em] transition-colors duration-200 ${
+                                        pestana === p.id
+                                            ? 'bg-primary-soft text-text'
+                                            : 'text-text-muted hover:bg-surface hover:text-text'
+                                    }`}
+                                >
+                                    {p.etiqueta}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* PANEL 1: DATOS PERSONALES */}
+                        <div
+                            role="tabpanel"
+                            id="panel-personal"
+                            aria-labelledby="tab-personal"
+                            hidden={pestana !== 'personal'}
+                            className="p-6 md:p-8"
+                        >
                             <h2 className={tituloSeccion}>
                                 <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
                                 Datos personales
@@ -595,7 +783,7 @@ const Perfil = () => {
                                     />
                                     <FieldError error={errores.materno} touched={touched.materno} />
                                 </div>
-                                <div className="md:col-span-2">
+                                <div>
                                     <label htmlFor="perfil-correo" className={etiquetaCampo}>Correo electrónico</label>
                                     <input
                                         id="perfil-correo"
@@ -606,7 +794,7 @@ const Perfil = () => {
                                     />
                                     <FieldError error={errores.correo} touched={touched.correo} />
                                 </div>
-                                <div className="md:col-span-2">
+                                <div>
                                     <label htmlFor="perfil-celular" className={etiquetaCampo}>Celular</label>
                                     <input
                                         id="perfil-celular"
@@ -621,86 +809,105 @@ const Perfil = () => {
                             </div>
                         </div>
 
-                        {/* SECCIÓN 2: DATOS ADICIONALES (SOLO CLIENTE) */}
-                        {esCliente && (
-                            <div className="border-b border-border p-6 md:p-8">
-                                <h2 className={tituloSeccion}>
-                                    <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
-                                    Datos adicionales
-                                </h2>
-                                <p className={subtituloSeccion}>Completá tu información de identificación y dirección.</p>
+                        {/* PANEL 2: DIRECCIÓN Y UBICACIÓN (CLIENTE / DONANTE) */}
+                        {esDonante && (
+                            <div
+                                role="tabpanel"
+                                id="panel-ubicacion"
+                                aria-labelledby="tab-ubicacion"
+                                hidden={pestana !== 'ubicacion'}
+                            >
+                                {esCliente && (
+                                    <div className="border-b border-border p-6 md:p-8">
+                                        <h2 className={tituloSeccion}>
+                                            <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
+                                            Datos adicionales
+                                        </h2>
+                                        <p className={subtituloSeccion}>Completá tu información de identificación y dirección.</p>
 
-                                <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
-                                    <div>
-                                        <label htmlFor="perfil-ci" className={etiquetaCampo}>CI / NIT</label>
-                                        <input
-                                            id="perfil-ci"
-                                            type="text" name="ci_nit"
-                                            inputMode="numeric"
-                                            value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
-                                            maxLength={15}
-                                            className={claseInput(errores.ci_nit, touched.ci_nit)}
-                                        />
-                                        <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
+                                        <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="perfil-ci" className={etiquetaCampo}>CI / NIT</label>
+                                                <input
+                                                    id="perfil-ci"
+                                                    type="text" name="ci_nit"
+                                                    inputMode="numeric"
+                                                    value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
+                                                    maxLength={15}
+                                                    className={claseInput(errores.ci_nit, touched.ci_nit)}
+                                                />
+                                                <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="perfil-fecha" className={etiquetaCampo}>Fecha de nacimiento</label>
+                                                <input
+                                                    id="perfil-fecha"
+                                                    type="date" name="fecha_nacimiento"
+                                                    value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
+                                                    max={fechaMaximaStr}
+                                                    className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
+                                                />
+                                                {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
+                                                    <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
+                                                ) : (
+                                                    <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
+                                                        {edadCalculada !== null ? (
+                                                            <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
+                                                        ) : '\u00A0'}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label htmlFor="perfil-calle" className={etiquetaCampo}>Calle / Avenida</label>
+                                                <input
+                                                    id="perfil-calle"
+                                                    type="text" name="calle"
+                                                    value={formData.calle} onChange={handleChange}
+                                                    maxLength={150}
+                                                    className={claseInput(errores.calle, touched.calle)}
+                                                />
+                                                <FieldError error={errores.calle} touched={touched.calle} />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="perfil-zona" className={etiquetaCampo}>Zona / Barrio</label>
+                                                <input
+                                                    id="perfil-zona"
+                                                    type="text" name="zona"
+                                                    value={formData.zona} onChange={handleChange}
+                                                    maxLength={100}
+                                                    className={claseInput(errores.zona, touched.zona)}
+                                                />
+                                                <FieldError error={errores.zona} touched={touched.zona} />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="perfil-ciudad" className={etiquetaCampo}>Ciudad</label>
+                                                <input
+                                                    id="perfil-ciudad"
+                                                    type="text" name="ciudad"
+                                                    value={formData.ciudad} onChange={handleChange}
+                                                    maxLength={100}
+                                                    className={claseInput(errores.ciudad, touched.ciudad)}
+                                                />
+                                                <FieldError error={errores.ciudad} touched={touched.ciudad} />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label htmlFor="perfil-fecha" className={etiquetaCampo}>Fecha de nacimiento</label>
-                                        <input
-                                            id="perfil-fecha"
-                                            type="date" name="fecha_nacimiento"
-                                            value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
-                                            max={fechaMaximaStr}
-                                            className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
-                                        />
-                                        {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
-                                            <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
-                                        ) : (
-                                            <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
-                                                {edadCalculada !== null ? (
-                                                    <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
-                                                ) : '\u00A0'}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label htmlFor="perfil-calle" className={etiquetaCampo}>Calle / Avenida</label>
-                                        <input
-                                            id="perfil-calle"
-                                            type="text" name="calle"
-                                            value={formData.calle} onChange={handleChange}
-                                            maxLength={150}
-                                            className={claseInput(errores.calle, touched.calle)}
-                                        />
-                                        <FieldError error={errores.calle} touched={touched.calle} />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="perfil-zona" className={etiquetaCampo}>Zona / Barrio</label>
-                                        <input
-                                            id="perfil-zona"
-                                            type="text" name="zona"
-                                            value={formData.zona} onChange={handleChange}
-                                            maxLength={100}
-                                            className={claseInput(errores.zona, touched.zona)}
-                                        />
-                                        <FieldError error={errores.zona} touched={touched.zona} />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="perfil-ciudad" className={etiquetaCampo}>Ciudad</label>
-                                        <input
-                                            id="perfil-ciudad"
-                                            type="text" name="ciudad"
-                                            value={formData.ciudad} onChange={handleChange}
-                                            maxLength={100}
-                                            className={claseInput(errores.ciudad, touched.ciudad)}
-                                        />
-                                        <FieldError error={errores.ciudad} touched={touched.ciudad} />
-                                    </div>
+                                )}
+
+                                <div className="p-6 md:p-8">
+                                    <MiUbicacion coordenadas={coords} onActualizada={setCoords} />
                                 </div>
                             </div>
                         )}
 
-                        {/* SECCIÓN 3: CONTRASEÑA */}
-                        <div id="seguridad" className="p-6 md:p-8">
+                        {/* PANEL 3: CONTRASEÑA */}
+                        <div
+                            role="tabpanel"
+                            id="panel-seguridad"
+                            aria-labelledby="tab-seguridad"
+                            hidden={pestana !== 'seguridad'}
+                            className="p-6 md:p-8"
+                        >
                             <h2 className={tituloSeccion}>
                                 <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
                                 Cambiar contraseña
@@ -747,11 +954,14 @@ const Perfil = () => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        {/* PIE: MENSAJE + ACCIONES (siempre visible, sin importar la pestaña) */}
+                        <div className="border-t border-border bg-surface p-6 md:px-8">
                             {mensaje.texto && (
                                 <div
                                     role="alert"
-                                    className={`anim-fade mt-4 flex items-start gap-2.5 rounded-xl border p-4 text-sm font-medium ${
+                                    className={`anim-fade mb-5 flex items-start gap-2.5 rounded-xl border p-4 text-sm font-medium ${
                                         mensaje.tipo === 'error'
                                             ? 'border-error/30 bg-error-soft text-error'
                                             : 'border-success/30 bg-success-soft text-success'
@@ -768,7 +978,7 @@ const Perfil = () => {
                                 </div>
                             )}
 
-                            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                                 <button
                                     type="submit"
                                     disabled={cargando}
@@ -785,7 +995,7 @@ const Perfil = () => {
                                 <button
                                     type="button"
                                     onClick={() => window.location.reload()}
-                                    className="press w-full rounded-xl border border-border bg-surface px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text sm:w-auto"
+                                    className="press w-full rounded-xl border border-border bg-surface-elevated px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text sm:w-auto"
                                 >
                                     Cancelar
                                 </button>

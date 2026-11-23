@@ -8,7 +8,9 @@
  * - "preview" → Vitrina: muestra 3 usuarios sin acciones (para dashboard).
  *
  * INCLUYE:
- * - Buscador, filtros por rol y estado (case-insensitive).
+ * - Buscador por nombre → apellidos → correo, con varios términos en orden
+ *   (ej. "luis mario"), sin distinguir acentos ni mayúsculas.
+ * - Filtros por rol y estado (case-insensitive).
  * - Botón "Limpiar filtros" siempre visible (atenuado cuando está inactivo).
  * - Contador de filtros activos con badge.
  * - Paginación numerada con elipsis.
@@ -65,6 +67,87 @@ const badgeEstado = (activo: boolean): string =>
     : 'border-error/30 bg-error-soft text-error';
 
 const puntoEstado = (activo: boolean): string => (activo ? 'bg-success' : 'bg-error');
+
+const getAvatarUrl = (fotoUrl?: unknown): string | null => {
+  if (!fotoUrl || typeof fotoUrl !== 'string') return null;
+  if (fotoUrl.startsWith('http://') || fotoUrl.startsWith('https://')) return fotoUrl;
+  const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000/api').replace(/\/api\/?$/, '');
+  return `${baseUrl}${fotoUrl.startsWith('/') ? '' : '/'}${fotoUrl}`;
+};
+
+// =====================================================
+// BÚSQUEDA
+// =====================================================
+
+/**
+ * Normaliza texto para comparar: minúsculas, sin acentos y sin espacios sobrantes.
+ */
+const normalizarTexto = (valor?: string | null): string =>
+  (valor || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+/**
+ * Campos de búsqueda en el orden pedido: nombre → apellidos → correo.
+ */
+const getCamposBusqueda = (u: Usuario): [string, string, string] => {
+  const nombre = normalizarTexto(u.nombre);
+  const apellidos = normalizarTexto(
+    u.apellidos || [u.paterno, u.materno].filter(Boolean).join(' '),
+  );
+  const correo = normalizarTexto(u.correo);
+  return [nombre, apellidos, correo];
+};
+
+const esInicioDePalabra = (texto: string, posicion: number): boolean =>
+  posicion === 0 || /[\s._@\-+]/.test(texto.charAt(posicion - 1));
+
+/**
+ * Puntúa la coincidencia de los términos respetando el orden
+ * nombre → apellidos → correo. Cada término puede quedarse en el campo actual
+ * o avanzar al siguiente, pero nunca retroceder.
+ *
+ * - "lu"        → coincide con nombre, apellidos o correo.
+ * - "luis mario" → "luis" en el nombre y "mario" en el nombre o apellidos.
+ * - "luis gmail" → "luis" en el nombre y "gmail" en el correo.
+ *
+ * Devuelve `null` cuando algún término no coincide.
+ */
+const puntuarBusqueda = (
+  campos: [string, string, string],
+  terminos: string[],
+): number | null => {
+  let campoActual = 0;
+  let puntaje = 0;
+
+  for (const termino of terminos) {
+    let campoEncontrado = -1;
+    let posicion = -1;
+
+    for (let i = campoActual; i < campos.length; i++) {
+      const encontrada = campos[i].indexOf(termino);
+      if (encontrada !== -1) {
+        campoEncontrado = i;
+        posicion = encontrada;
+        break;
+      }
+    }
+
+    if (campoEncontrado === -1) return null;
+
+    campoActual = campoEncontrado;
+    // El nombre pesa más que los apellidos, y los apellidos más que el correo.
+    puntaje += (campos.length - campoEncontrado) * 100;
+    // Coincidir al inicio de una palabra ("Lu" en "Lucía") vale más.
+    if (esInicioDePalabra(campos[campoEncontrado], posicion)) puntaje += 40;
+    // Cuanto antes aparezca, mejor.
+    puntaje -= Math.min(posicion, 30);
+  }
+
+  return puntaje;
+};
 
 export const UsuarioList = ({
   modo = 'app',
@@ -298,21 +381,10 @@ export const UsuarioList = ({
   // FILTRADO COMBINADO
   // =====================================================
   const filtrados = useMemo(() => {
-    const term = busqueda.trim().toLowerCase();
+    const terminos = normalizarTexto(busqueda).split(/\s+/).filter(Boolean);
 
-    return usuarios.filter((u) => {
-      // 1. Buscador
-      if (term) {
-        const coincide =
-          (u.nombre || '').toLowerCase().includes(term) ||
-          (u.apellidos || '').toLowerCase().includes(term) ||
-          (u.paterno || '').toLowerCase().includes(term) ||
-          (u.materno || '').toLowerCase().includes(term) ||
-          (u.correo || '').toLowerCase().includes(term);
-        if (!coincide) return false;
-      }
-
-      // 2. Filtro rol
+    const base = usuarios.filter((u) => {
+      // 1. Filtro rol
       if (filtroRol) {
         const rolUsuario = (u.rol || '').toLowerCase();
         const rolFiltro = filtroRol.toLowerCase();
@@ -323,13 +395,28 @@ export const UsuarioList = ({
         if (!coincide) return false;
       }
 
-      // 3. Filtro estado (case-insensitive)
+      // 2. Filtro estado (case-insensitive)
       if (filtroEstado) {
         if (getEstado(u).toLowerCase() !== filtroEstado.toLowerCase()) return false;
       }
 
       return true;
     });
+
+    // Sin término de búsqueda: solo filtros, sin reordenar.
+    if (terminos.length === 0) return base;
+
+    // Con búsqueda: nombre primero, luego apellidos y por último correo.
+    const puntuados: { usuario: Usuario; puntaje: number }[] = [];
+
+    for (const u of base) {
+      const puntaje = puntuarBusqueda(getCamposBusqueda(u), terminos);
+      if (puntaje !== null) puntuados.push({ usuario: u, puntaje });
+    }
+
+    return puntuados
+      .sort((a, b) => b.puntaje - a.puntaje)
+      .map((r) => r.usuario);
   }, [usuarios, busqueda, filtroRol, filtroEstado]);
 
   // =====================================================
@@ -723,9 +810,17 @@ export const UsuarioList = ({
 
                         <td className="min-w-0 px-3 py-4">
                           <div className="flex min-w-0 items-center gap-2.5">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-xs font-bold text-primary ring-1 ring-primary/15">
-                              {iniciales}
-                            </div>
+                            {getAvatarUrl(user.foto_url) ? (
+                              <img
+                                src={getAvatarUrl(user.foto_url)!}
+                                alt={nombreCompleto}
+                                className="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-border shadow-soft"
+                              />
+                            ) : (
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-xs font-bold text-primary ring-1 ring-primary/15">
+                                {iniciales}
+                              </div>
+                            )}
                             <span
                               className="truncate text-sm font-semibold text-text"
                               title={nombreCompleto}
@@ -802,9 +897,17 @@ export const UsuarioList = ({
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-[11px] font-bold tabular-nums text-text-subtle">
                         {numeroFila}
                       </span>
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15">
-                        {iniciales}
-                      </div>
+                      {getAvatarUrl(user.foto_url) ? (
+                        <img
+                          src={getAvatarUrl(user.foto_url)!}
+                          alt={nombreCompleto}
+                          className="h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-border shadow-soft"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-sm font-bold text-primary ring-1 ring-primary/15">
+                          {iniciales}
+                        </div>
+                      )}
                       <div className="min-w-0 flex-1">
                         <h3
                           className="truncate text-sm font-semibold text-text"

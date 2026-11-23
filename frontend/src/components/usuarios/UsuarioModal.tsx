@@ -61,7 +61,7 @@ const claseSelect =
 const rolBackendAFormulario = (rol?: string | null): Rol => {
     const r = (rol || '').toLowerCase().trim();
     if (r === 'administrador' || r === 'admin') return 'Admin';
-    if (r === 'voluntario' || r === 'empleado') return 'Empleado';
+    if (r === 'voluntario' || r === 'empleado' || r === 'coordinador') return 'Empleado';
     if (r === 'beneficiario') return 'Beneficiario';
     return 'Cliente';
 };
@@ -91,7 +91,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         necesidad: '',
         descripcion: '',
         estado_beneficiario: 'Pendiente',
-        nivel_acceso: 'GENERAL'
+        nivel_acceso: 'GENERAL',
+        es_coordinador: false,
     };
 
     const [formData, setFormData] = useState<FormData>(estadoInicial);
@@ -108,7 +109,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const esCliente = rolNorm === 'cliente';
     const esEmpleado = rolNorm === 'empleado';
     const esBeneficiario = rolNorm === 'beneficiario';
-    const esAdmin = rolNorm === 'admin' || rolNorm === 'administrador';
 
     // =====================================================
     // BLOQUEAR SCROLL DEL BODY MIENTRAS EL MODAL ESTÁ ABIERTO
@@ -183,7 +183,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     necesidad: d.necesidad || '',
                     descripcion: d.descripcion || '',
                     estado_beneficiario: d.estado_beneficiario || 'Pendiente',
-                    nivel_acceso: d.nivel_acceso === 'SUPERADMIN' ? 'SUPERADMIN' : 'GENERAL'
+                    nivel_acceso: d.nivel_acceso === 'SUPERADMIN' ? 'SUPERADMIN' : 'GENERAL',
+                    es_coordinador: Boolean(d.es_coordinador || (d.rol && String(d.rol).toLowerCase() === 'coordinador'))
                 });
                 setErrores({});
                 setTouched({});
@@ -275,6 +276,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             if (esEmpleado) {
                 payload.habilidades = formData.habilidades;
                 payload.disponibilidad = formData.disponibilidad?.trim() || '';
+                payload.es_coordinador = Boolean(formData.es_coordinador);
             }
 
             if (esBeneficiario) {
@@ -286,9 +288,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 payload.estado_beneficiario = formData.estado_beneficiario;
             }
 
-            if (esAdmin) {
-                payload.nivel_acceso = formData.nivel_acceso;
-            }
 
             if (formData.contraseña && formData.contraseña.trim()) {
                 payload.contraseña = formData.contraseña;
@@ -590,6 +589,25 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                         <option value="Fines de semana">Fines de semana</option>
                                     </select>
                                 </div>
+                                <div className="md:col-span-2 pt-1">
+                                    <label className="flex items-center gap-3 cursor-pointer rounded-xl border border-border bg-surface px-3.5 py-3 transition hover:border-accent/40">
+                                        <input
+                                            type="checkbox"
+                                            name="es_coordinador"
+                                            checked={Boolean(formData.es_coordinador)}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, es_coordinador: e.target.checked }))}
+                                            className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
+                                        />
+                                        <div>
+                                            <p className="text-[12.5px] font-bold text-text">
+                                                ¿Es Coordinador de Voluntariado?
+                                            </p>
+                                            <p className="text-[11px] text-text-muted">
+                                                Le permite revisar, aprobar o rechazar las solicitudes de nuevos voluntarios.
+                                            </p>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </>
                     )}
@@ -683,30 +701,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                     <option value="Verificado">Verificado</option>
                                     <option value="Rechazado">Rechazado</option>
                                 </select>
-                            </div>
-                        </>
-                    )}
-
-                    {/* === CAMPOS ADMIN === */}
-                    {esAdmin && (
-                        <>
-                            <h3 className={`${tituloSeccion} pt-3`}>
-                                <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
-                                Datos del administrador
-                            </h3>
-                            <div>
-                                <label htmlFor="modal-nivel" className={etiquetaCampo}>Nivel de acceso *</label>
-                                <select
-                                    id="modal-nivel"
-                                    name="nivel_acceso"
-                                    value={formData.nivel_acceso}
-                                    onChange={handleChange} onBlur={handleBlur}
-                                    className={claseInput(errores.nivel_acceso, touched.nivel_acceso)}
-                                >
-                                    <option value="GENERAL">General</option>
-                                    <option value="SUPERADMIN">Superadmin</option>
-                                </select>
-                                <FieldError error={errores.nivel_acceso} touched={touched.nivel_acceso} />
                             </div>
                         </>
                     )}

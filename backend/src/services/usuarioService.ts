@@ -15,8 +15,8 @@ import {
   validarDatosBeneficiario,
   validarDatosDonante,
   validarDatosVoluntario,
-  validarDatosAdministrador,
   normalizarHabilidades,
+  validarCoordenadas,
   ROLES_VALIDOS,
   RolSistema,
 } from '../utils/validaciones';
@@ -24,6 +24,7 @@ import type {
   UsuarioResponse,
   RolData,
   CrearUsuarioInput,
+  UbicacionResponse,
 } from '../models/usuarioModel';
 
 // ---------- Helpers ----------
@@ -43,6 +44,7 @@ const valorDefinido = (v: unknown): boolean =>
 const normalizarRolUI = (rol?: string | null): RolSistema | null => {
   const valor = (rol || '').toLowerCase().trim();
   if (valor === 'administrador' || valor === 'admin') return 'Administrador';
+  if (valor === 'coordinador') return 'Coordinador';
   if (valor === 'beneficiario') return 'Beneficiario';
   if (valor === 'donante' || valor === 'cliente') return 'Donante';
   if (valor === 'voluntario' || valor === 'empleado') return 'Voluntario';
@@ -52,7 +54,10 @@ const normalizarRolUI = (rol?: string | null): RolSistema | null => {
 const construirRolData = (
   rol: RolSistema,
   body: Record<string, any>,
-  actual?: Record<string, any>
+  actual?: Record<string, any>,
+  // Solo las rutas de administración pueden cambiar el estado de una
+  // solicitud. En el perfil propio se preserva el valor actual.
+  permitirCamposAdmin = false
 ): RolData => {
   const direccion =
     (valorDefinido(body.direccion) ? String(body.direccion).trim() : null) ||
@@ -62,11 +67,6 @@ const construirRolData = (
   const data: RolData = {};
 
   if (rol === 'Administrador') {
-    data.nivel_acceso = valorDefinido(body.nivel_acceso)
-      ? String(body.nivel_acceso).trim().toUpperCase()
-      : (actual?.nivel_acceso ?? 'GENERAL');
-    const v = validarDatosAdministrador(data.nivel_acceso);
-    if (!v.valido) throw new AppError(v.error!, 400);
     return data;
   }
 
@@ -86,9 +86,10 @@ const construirRolData = (
     data.descripcion = valorDefinido(body.descripcion)
       ? String(body.descripcion).trim()
       : (actual?.descripcion ?? null);
-    data.estado_beneficiario = valorDefinido(body.estado_beneficiario)
-      ? String(body.estado_beneficiario).trim()
-      : (actual?.estado_beneficiario ?? 'Pendiente');
+    data.estado_beneficiario =
+      permitirCamposAdmin && valorDefinido(body.estado_beneficiario)
+        ? String(body.estado_beneficiario).trim()
+        : (actual?.estado_beneficiario ?? 'Pendiente');
 
     const v = validarDatosBeneficiario({
       tipo_beneficiario: data.tipo_beneficiario || undefined,
@@ -119,13 +120,24 @@ const construirRolData = (
     return data;
   }
 
-  // Voluntario
+  // Voluntario / Coordinador
   data.habilidades = body.habilidades !== undefined
     ? normalizarHabilidades(body.habilidades)
     : (actual?.habilidades || []);
   data.disponibilidad = valorDefinido(body.disponibilidad)
     ? String(body.disponibilidad).trim()
     : (actual?.disponibilidad ?? null);
+  data.es_coordinador =
+    rol === 'Coordinador' ||
+    (permitirCamposAdmin && body.es_coordinador !== undefined
+      ? Boolean(body.es_coordinador)
+      : (actual?.es_coordinador ?? false));
+  // Preservar el estado de la solicitud: sin esto, cada edición del perfil
+  // o del admin devolvía al voluntario aprobado a "Pendiente".
+  data.estado_voluntario =
+    permitirCamposAdmin && valorDefinido(body.estado_voluntario)
+      ? String(body.estado_voluntario).trim()
+      : (actual?.estado_voluntario ?? null);
   const v = validarDatosVoluntario({
     habilidades: data.habilidades || [],
     disponibilidad: data.disponibilidad || undefined,
@@ -143,6 +155,8 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       apellido: usuario.apellido,
       correo: usuario.correo,
       rol: usuario.rol,
+      es_coordinador: Boolean(usuario.es_coordinador),
+      foto_url: usuario.foto_url,
     },
     process.env.JWT_SECRET as string,
     { expiresIn: '8h' }
@@ -189,7 +203,8 @@ export const usuarioService = {
   // ---------- Actualizar perfil ----------
   async actualizarPerfil(
     id_usuario: number,
-    body: Record<string, any>
+    body: Record<string, any>,
+    file?: Express.Multer.File
   ): Promise<{ mensaje: string; token: string; perfil: UsuarioResponse }> {
     if (!id_usuario) throw new AppError('No autorizado', 401);
 
@@ -227,6 +242,13 @@ export const usuarioService = {
       usuarioActual as unknown as Record<string, any>
     );
 
+    let foto_url: string | undefined;
+    if (file) {
+      foto_url = `/uploads/perfiles/${file.filename}`;
+    } else if (body.foto_url !== undefined) {
+      foto_url = String(body.foto_url).trim();
+    }
+
     const perfil = await usuarioRepository.actualizarPerfil(
       id_usuario,
       {
@@ -236,6 +258,7 @@ export const usuarioService = {
         correo: String(correo).toLowerCase().trim(),
         telefono: String(telefono).trim(),
         contraseña: hashNueva,
+        foto_url,
         rol: usuarioActual.rol,
       },
       rolData
@@ -254,7 +277,7 @@ export const usuarioService = {
   async crearUsuario(body: CrearUsuarioInput): Promise<{ mensaje: string; id_usuario: number }> {
     // `estado` se lee con cast seguro: si CrearUsuarioInput no lo declara,
     // la intersección lo aporta y el acceso sigue tipado.
-    const { nombre, paterno, materno, correo, telefono, contraseña, rol } = body;
+    const { nombre, paterno, materno, correo, telefono, contraseña, rol, foto_url } = body;
     const estado = (body as CrearUsuarioInput & { estado?: string | boolean }).estado;
 
     const rolNormalizado = normalizarRolUI(rol);
@@ -272,7 +295,12 @@ export const usuarioService = {
     const existente = await usuarioRepository.obtenerPorCorreo(correoNorm);
     if (existente) throw new AppError('El correo ya está registrado', 400);
 
-    const rolData = construirRolData(rolNormalizado, body as Record<string, any>);
+    const rolData = construirRolData(
+      rolNormalizado,
+      body as Record<string, any>,
+      undefined,
+      true
+    );
 
     if (rolNormalizado === 'Beneficiario' && rolData.documento) {
       const ciExistente = await usuarioRepository.obtenerPorDocumento(rolData.documento);
@@ -289,6 +317,7 @@ export const usuarioService = {
         correo: correoNorm,
         telefono: String(telefono).trim(),
         contraseña: hash,
+        foto_url: foto_url || null,
         estado_cuenta: estado ?? 'Activo',
         rol: rolNormalizado,
       },
@@ -305,7 +334,7 @@ export const usuarioService = {
   ): Promise<{ mensaje: string }> {
     if (!id || Number.isNaN(Number(id))) throw new AppError('ID de usuario inválido', 400);
 
-    const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado } = body;
+    const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado, foto_url } = body;
 
     const rolNormalizado = normalizarRolUI(rol);
     if (!rolNormalizado) {
@@ -332,7 +361,8 @@ export const usuarioService = {
     const rolData = construirRolData(
       rolNormalizado,
       body,
-      usuarioActual as unknown as Record<string, any>
+      usuarioActual as unknown as Record<string, any>,
+      true
     );
 
     if (rolNormalizado === 'Beneficiario' && rolData.documento) {
@@ -351,7 +381,9 @@ export const usuarioService = {
         correo: String(correo).toLowerCase().trim(),
         telefono: String(telefono).trim(),
         contraseña: hashNueva,
-        estado_cuenta: estado || 'Activo',
+        foto_url: foto_url !== undefined ? String(foto_url).trim() || null : undefined,
+        // Si el payload no trae estado, conservar el actual en vez de reactivar.
+        estado_cuenta: estado || usuarioActual.estado || 'Activo',
         rol: rolNormalizado,
       },
       rolData
@@ -374,5 +406,127 @@ export const usuarioService = {
     const usuario = await usuarioRepository.obtenerPorId(id);
     if (!usuario) throw new AppError('Usuario no encontrado', 404);
     return usuario;
+  },
+
+  // ---------- Ubicaciones geográficas de donantes ----------
+  async obtenerUsuariosConUbicacion(): Promise<UbicacionResponse[]> {
+    return await usuarioRepository.obtenerUsuariosConUbicacion();
+  },
+
+  async actualizarMiUbicacion(
+    id_usuario: number,
+    body: Record<string, any>
+  ): Promise<{ mensaje: string; ubicacion: { lat: number; lng: number } }> {
+    if (!id_usuario || Number.isNaN(Number(id_usuario))) {
+      throw new AppError('ID de usuario inválido', 400);
+    }
+
+    const lat = body.latitud ?? body.lat ?? body.ubi_latitud;
+    const lng = body.longitud ?? body.lng ?? body.ubi_longitud;
+
+    if (lat === undefined || lng === undefined || lat === null || lng === null) {
+      throw new AppError('Coordenadas (latitud y longitud) requeridas', 400);
+    }
+
+    const numLat = Number(lat);
+    const numLng = Number(lng);
+
+    const validacion = validarCoordenadas(numLat, numLng);
+    if (!validacion.valido) {
+      throw new AppError(validacion.error || 'Coordenadas geográficas inválidas', 400);
+    }
+
+    await usuarioRepository.actualizarUbicacionDonante(id_usuario, numLat, numLng);
+
+    return {
+      mensaje: 'Ubicación actualizada con éxito',
+      ubicacion: { lat: numLat, lng: numLng },
+    };
+  },
+
+  // ---------- Solicitudes de Voluntarios ----------
+  async obtenerSolicitudesVoluntarios(filtroEstado?: string) {
+    return await usuarioRepository.obtenerSolicitudesVoluntarios(filtroEstado);
+  },
+
+  async revisarSolicitudVoluntario(
+    id_voluntario: number | string,
+    nuevoEstado: string,
+    revisorId: number,
+    motivoRechazo?: string
+  ) {
+    const estadoNorm = (nuevoEstado || '').toLowerCase().trim();
+    if (!['aprobado', 'rechazado'].includes(estadoNorm)) {
+      throw new AppError('El estado debe ser "Aprobado" o "Rechazado".', 400);
+    }
+    const estadoFinal = estadoNorm === 'aprobado' ? 'Aprobado' : 'Rechazado';
+    if (Number(id_voluntario) === revisorId) {
+      throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
+    }
+    return await usuarioRepository.revisarSolicitudVoluntario(
+      id_voluntario,
+      estadoFinal,
+      revisorId,
+      motivoRechazo
+    );
+  },
+
+  // ---------- Solicitudes de Beneficiarios ----------
+  async obtenerSolicitudesBeneficiarios(filtroEstado?: string) {
+    return await usuarioRepository.obtenerSolicitudesBeneficiarios(filtroEstado);
+  },
+
+  async revisarSolicitudBeneficiario(
+    id_beneficiario: number | string,
+    nuevoEstado: string,
+    revisorId: number,
+    motivoRechazo?: string
+  ) {
+    const estadoNorm = (nuevoEstado || '').toLowerCase().trim();
+    if (!['verificado', 'rechazado'].includes(estadoNorm)) {
+      throw new AppError('El estado debe ser "Verificado" o "Rechazado".', 400);
+    }
+    const estadoFinal = estadoNorm === 'verificado' ? 'Verificado' : 'Rechazado';
+    if (Number(id_beneficiario) === revisorId) {
+      throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
+    }
+    return await usuarioRepository.revisarSolicitudBeneficiario(
+      id_beneficiario,
+      estadoFinal,
+      revisorId,
+      motivoRechazo
+    );
+  },
+
+  // ---------- Postulaciones desde Dashboard ----------
+  async activarPerfilDonante(id_usuario: number) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    return await usuarioRepository.activarPerfilDonante(id_usuario);
+  },
+
+  async postularVoluntario(id_usuario: number, body: Record<string, any>) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const habilidades = body.habilidades ? normalizarHabilidades(body.habilidades) : ['General'];
+    const disponibilidad = String(body.disponibilidad || 'A convenir').trim();
+    const solicitud = await usuarioRepository.postularVoluntario(id_usuario, habilidades, disponibilidad);
+    if (!solicitud) {
+      throw new AppError('Ya tienes un registro de voluntario; no puedes volver a solicitar ser voluntario.', 409);
+    }
+    return solicitud;
+  },
+
+  async postularBeneficiario(id_usuario: number, body: Record<string, any>) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const { tipo_beneficiario, documento, direccion, necesidad, descripcion } = body;
+    if (!documento || !direccion || !necesidad) {
+      throw new AppError('Documento (CI/NIT), dirección y necesidad son requeridos.', 400);
+    }
+    return await usuarioRepository.postularBeneficiario(id_usuario, {
+      tipo_beneficiario: tipo_beneficiario || 'Persona',
+      documento: String(documento).trim(),
+      direccion: String(direccion).trim(),
+      necesidad: String(necesidad).trim(),
+      descripcion: descripcion ? String(descripcion).trim() : null,
+    });
   },
 };

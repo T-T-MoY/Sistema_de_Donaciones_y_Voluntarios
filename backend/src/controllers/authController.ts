@@ -8,8 +8,8 @@ import { authService } from '../services/authService';
 
 export const registrar = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await authService.registrar(req.body);
-    res.status(201).json({ mensaje: 'Cuenta de donante creada con éxito' });
+    const resultado = await authService.registrar(req.body);
+    res.status(201).json(resultado);
   } catch (err) {
     next(err);
   }

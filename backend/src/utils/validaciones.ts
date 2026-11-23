@@ -287,10 +287,11 @@ export const validarDatosCliente = (datos: DatosClienteValidacion): ResultadoVal
 // VALIDACIONES DEL DOMINIO: DONACIONES Y VOLUNTARIADO
 // =====================================================
 
-export type RolSistema = 'Administrador' | 'Beneficiario' | 'Donante' | 'Voluntario';
+export type RolSistema = 'Administrador' | 'Coordinador' | 'Beneficiario' | 'Donante' | 'Voluntario';
 
 export const ROLES_VALIDOS: RolSistema[] = [
     'Administrador',
+    'Coordinador',
     'Beneficiario',
     'Donante',
     'Voluntario'

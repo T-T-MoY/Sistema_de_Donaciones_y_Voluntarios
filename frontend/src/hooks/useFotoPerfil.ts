@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../api/client';
 
 interface PerfilResponse {
   foto_url?: string | null;
@@ -28,14 +29,14 @@ export const useFotoPerfil = (): string | null => {
       }
       try {
         const res = await axios.get<PerfilResponse>(
-          `${import.meta.env.VITE_API_URL}/usuarios/perfil`,
+          `${API_URL}/usuarios/perfil`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (cancelado) return;
 
         if (res.data.foto_url) {
-          const baseUrl = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
-          setFotoUrl(`${baseUrl}${res.data.foto_url}`);
+          const baseUrl = API_URL.replace(/\/api\/?$/, '');
+          setFotoUrl(/^https?:\/\//i.test(res.data.foto_url) ? res.data.foto_url : `${baseUrl}${res.data.foto_url}`);
         } else {
           setFotoUrl(null);
         }
