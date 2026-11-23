@@ -44,6 +44,7 @@ const valorDefinido = (v: unknown): boolean =>
 const normalizarRolUI = (rol?: string | null): RolSistema | null => {
   const valor = (rol || '').toLowerCase().trim();
   if (valor === 'administrador' || valor === 'admin') return 'Administrador';
+  if (valor === 'coordinador') return 'Coordinador';
   if (valor === 'beneficiario') return 'Beneficiario';
   if (valor === 'donante' || valor === 'cliente') return 'Donante';
   if (valor === 'voluntario' || valor === 'empleado') return 'Voluntario';
@@ -53,7 +54,10 @@ const normalizarRolUI = (rol?: string | null): RolSistema | null => {
 const construirRolData = (
   rol: RolSistema,
   body: Record<string, any>,
-  actual?: Record<string, any>
+  actual?: Record<string, any>,
+  // Solo las rutas de administración pueden cambiar el estado de una
+  // solicitud. En el perfil propio se preserva el valor actual.
+  permitirCamposAdmin = false
 ): RolData => {
   const direccion =
     (valorDefinido(body.direccion) ? String(body.direccion).trim() : null) ||
@@ -82,9 +86,10 @@ const construirRolData = (
     data.descripcion = valorDefinido(body.descripcion)
       ? String(body.descripcion).trim()
       : (actual?.descripcion ?? null);
-    data.estado_beneficiario = valorDefinido(body.estado_beneficiario)
-      ? String(body.estado_beneficiario).trim()
-      : (actual?.estado_beneficiario ?? 'Pendiente');
+    data.estado_beneficiario =
+      permitirCamposAdmin && valorDefinido(body.estado_beneficiario)
+        ? String(body.estado_beneficiario).trim()
+        : (actual?.estado_beneficiario ?? 'Pendiente');
 
     const v = validarDatosBeneficiario({
       tipo_beneficiario: data.tipo_beneficiario || undefined,
@@ -115,16 +120,24 @@ const construirRolData = (
     return data;
   }
 
-  // Voluntario
+  // Voluntario / Coordinador
   data.habilidades = body.habilidades !== undefined
     ? normalizarHabilidades(body.habilidades)
     : (actual?.habilidades || []);
   data.disponibilidad = valorDefinido(body.disponibilidad)
     ? String(body.disponibilidad).trim()
     : (actual?.disponibilidad ?? null);
-  data.es_coordinador = body.es_coordinador !== undefined
-    ? Boolean(body.es_coordinador)
-    : (actual?.es_coordinador ?? false);
+  data.es_coordinador =
+    rol === 'Coordinador' ||
+    (permitirCamposAdmin && body.es_coordinador !== undefined
+      ? Boolean(body.es_coordinador)
+      : (actual?.es_coordinador ?? false));
+  // Preservar el estado de la solicitud: sin esto, cada edición del perfil
+  // o del admin devolvía al voluntario aprobado a "Pendiente".
+  data.estado_voluntario =
+    permitirCamposAdmin && valorDefinido(body.estado_voluntario)
+      ? String(body.estado_voluntario).trim()
+      : (actual?.estado_voluntario ?? null);
   const v = validarDatosVoluntario({
     habilidades: data.habilidades || [],
     disponibilidad: data.disponibilidad || undefined,
@@ -282,7 +295,12 @@ export const usuarioService = {
     const existente = await usuarioRepository.obtenerPorCorreo(correoNorm);
     if (existente) throw new AppError('El correo ya está registrado', 400);
 
-    const rolData = construirRolData(rolNormalizado, body as Record<string, any>);
+    const rolData = construirRolData(
+      rolNormalizado,
+      body as Record<string, any>,
+      undefined,
+      true
+    );
 
     if (rolNormalizado === 'Beneficiario' && rolData.documento) {
       const ciExistente = await usuarioRepository.obtenerPorDocumento(rolData.documento);
@@ -343,7 +361,8 @@ export const usuarioService = {
     const rolData = construirRolData(
       rolNormalizado,
       body,
-      usuarioActual as unknown as Record<string, any>
+      usuarioActual as unknown as Record<string, any>,
+      true
     );
 
     if (rolNormalizado === 'Beneficiario' && rolData.documento) {
@@ -363,7 +382,8 @@ export const usuarioService = {
         telefono: String(telefono).trim(),
         contraseña: hashNueva,
         foto_url: foto_url !== undefined ? String(foto_url).trim() || null : undefined,
-        estado_cuenta: estado || 'Activo',
+        // Si el payload no trae estado, conservar el actual en vez de reactivar.
+        estado_cuenta: estado || usuarioActual.estado || 'Activo',
         rol: rolNormalizado,
       },
       rolData
@@ -479,11 +499,20 @@ export const usuarioService = {
   },
 
   // ---------- Postulaciones desde Dashboard ----------
+  async activarPerfilDonante(id_usuario: number) {
+    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    return await usuarioRepository.activarPerfilDonante(id_usuario);
+  },
+
   async postularVoluntario(id_usuario: number, body: Record<string, any>) {
     if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
     const habilidades = body.habilidades ? normalizarHabilidades(body.habilidades) : ['General'];
     const disponibilidad = String(body.disponibilidad || 'A convenir').trim();
-    return await usuarioRepository.postularVoluntario(id_usuario, habilidades, disponibilidad);
+    const solicitud = await usuarioRepository.postularVoluntario(id_usuario, habilidades, disponibilidad);
+    if (!solicitud) {
+      throw new AppError('Ya tienes un registro de voluntario; no puedes volver a solicitar ser voluntario.', 409);
+    }
+    return solicitud;
   },
 
   async postularBeneficiario(id_usuario: number, body: Record<string, any>) {

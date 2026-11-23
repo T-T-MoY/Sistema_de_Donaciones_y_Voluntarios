@@ -14,6 +14,14 @@ import type {
   SolicitudBeneficiario
 } from '../types/usuario.types';
 
+/** Respuesta de `PUT /usuarios/estado/:id` (subconjunto del usuario). */
+interface EstadoUsuarioResponse {
+  id_usuario: number;
+  nombre: string;
+  correo: string;
+  estado: string;
+}
+
 export const usuarioApi = {
   /**
    * Lista todos los usuarios (solo admin).
@@ -32,21 +40,23 @@ export const usuarioApi = {
   },
 
   /**
-   * Crea un nuevo usuario.
+   * Crea un nuevo usuario. El backend solo devuelve el id creado.
    */
-  create: async (payload: Record<string, unknown>): Promise<Usuario> => {
-    const res = await api.post<Usuario>('/usuarios', payload);
+  create: async (
+    payload: Record<string, unknown>
+  ): Promise<{ mensaje: string; id_usuario: number }> => {
+    const res = await api.post<{ mensaje: string; id_usuario: number }>('/usuarios', payload);
     return res.data;
   },
 
   /**
-   * Actualiza un usuario existente.
+   * Actualiza un usuario existente. El backend solo confirma la operación.
    */
   update: async (
     id: number | string,
     payload: Record<string, unknown>
-  ): Promise<Usuario> => {
-    const res = await api.put<Usuario>(`/usuarios/${id}`, payload);
+  ): Promise<{ mensaje: string }> => {
+    const res = await api.put<{ mensaje: string }>(`/usuarios/${id}`, payload);
     return res.data;
   },
 
@@ -56,8 +66,11 @@ export const usuarioApi = {
   cambiarEstado: async (
     id: number | string,
     estado: string
-  ): Promise<Usuario> => {
-    const res = await api.put<Usuario>(`/usuarios/estado/${id}`, { estado });
+  ): Promise<{ mensaje: string; usuario: EstadoUsuarioResponse }> => {
+    const res = await api.put<{ mensaje: string; usuario: EstadoUsuarioResponse }>(
+      `/usuarios/estado/${id}`,
+      { estado }
+    );
     return res.data;
   },
 
@@ -158,6 +171,11 @@ export const usuarioApi = {
   /**
    * Postula al usuario autenticado como voluntario.
    */
+  activarPerfilDonante: async (): Promise<{ id_usuario: number; mensaje: string }> => {
+    const res = await api.post<{ id_usuario: number; mensaje: string }>('/usuarios/postular/donante');
+    return res.data;
+  },
+
   postularVoluntario: async (payload: {
     habilidades: string[] | string;
     disponibilidad: string;

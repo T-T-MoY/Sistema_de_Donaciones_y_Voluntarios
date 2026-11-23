@@ -61,7 +61,7 @@ const claseSelect =
 const rolBackendAFormulario = (rol?: string | null): Rol => {
     const r = (rol || '').toLowerCase().trim();
     if (r === 'administrador' || r === 'admin') return 'Admin';
-    if (r === 'voluntario' || r === 'empleado') return 'Empleado';
+    if (r === 'voluntario' || r === 'empleado' || r === 'coordinador') return 'Empleado';
     if (r === 'beneficiario') return 'Beneficiario';
     return 'Cliente';
 };

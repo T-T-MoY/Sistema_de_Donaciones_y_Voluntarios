@@ -700,6 +700,7 @@ const Dashboard = () => {
 
     const rolNormalizado = (usuario?.rol || '').toLowerCase();
     const esCoordinador = Boolean(usuario?.es_coordinador) || rolNormalizado === 'coordinador';
+    const yaEsVoluntario = esCoordinador || rolNormalizado === 'voluntario' || rolNormalizado === 'empleado';
     const esAdmin = rolNormalizado === 'administrador' || rolNormalizado === 'admin';
     const puedeAprobar = esCoordinador || esAdmin;
 
@@ -781,6 +782,18 @@ const Dashboard = () => {
             void error('', err.response?.data?.error || 'Error al procesar solicitud');
         } finally {
             setProcesandoId(null);
+        }
+    };
+
+    const handleActivarDonante = async () => {
+        setEnviandoPostulacion(true);
+        try {
+            await usuarioApi.activarPerfilDonante();
+            void exito('', 'Tu perfil de donante quedó habilitado.');
+        } catch (err: any) {
+            void error('', err.response?.data?.error || 'No se pudo habilitar el perfil de donante');
+        } finally {
+            setEnviandoPostulacion(false);
         }
     };
 
@@ -967,13 +980,19 @@ const Dashboard = () => {
                     <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
                         <div>
                             <h2 className="font-display text-xl font-bold text-text">¿Querés participar de otra manera?</h2>
-                            <p className="mt-1 text-sm text-text-muted">Enviá una solicitud y el equipo correspondiente la revisará.</p>
+                            <p className="mt-1 text-sm text-text-muted">
+                                {yaEsVoluntario
+                                    ? 'Como voluntario, podés solicitar ser beneficiario o habilitar tu perfil de donante.'
+                                    : 'Enviá una solicitud y el equipo correspondiente la revisará.'}
+                            </p>
                         </div>
                         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                            <button type="button" onClick={() => setModalVoluntarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">
+                            {yaEsVoluntario ? <button type="button" onClick={() => void handleActivarDonante()} disabled={enviandoPostulacion} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
+                                Habilitar perfil de donante
+                            </button> : <button type="button" onClick={() => setModalVoluntarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">
                                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a4 4 0 018 0v2zm7-13a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                                 Solicitar ser voluntario
-                            </button>
+                            </button>}
                             <button type="button" onClick={() => setModalBeneficiarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface px-5 py-3 text-sm font-bold text-text hover:border-accent hover:bg-accent-soft">
                                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 Solicitar ser beneficiario

@@ -203,7 +203,10 @@ export const authService = {
       throw new AppError('Credenciales inválidas', 401);
     }
     if (usuario.estado !== 'Activo' || usuario.activo === false) {
-      if (usuario.rol === 'Voluntario') {
+      if (usuario.estado_voluntario === 'Rechazado') {
+        throw new AppError('Tu solicitud de voluntariado fue rechazada. Contactá al coordinador.', 403);
+      }
+      if (usuario.estado_voluntario === 'Pendiente') {
         throw new AppError('Tu solicitud de voluntariado está pendiente de aprobación por el coordinador.', 403);
       }
       throw new AppError('Tu cuenta se encuentra inactiva o en revisión. Contactá al soporte.', 403);

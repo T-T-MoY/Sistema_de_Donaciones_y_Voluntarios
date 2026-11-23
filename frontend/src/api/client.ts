@@ -29,7 +29,10 @@ api.interceptors.response.use(
         return response;
     },
     (error: AxiosError) => {
-        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        // 401 = sesión inválida/expirada → cerrar sesión.
+        // 403 = autenticado pero sin permisos → NO cerrar sesión; el error
+        // se propaga para que la pantalla muestre el mensaje adecuado.
+        if (error.response?.status === 401) {
             console.warn("La sesión ha expirado o es inválida (Interceptado por client.ts)");
 
             localStorage.removeItem('token');
@@ -37,6 +40,8 @@ api.interceptors.response.use(
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }
+        } else if (error.response?.status === 403) {
+            console.warn("Acceso denegado (403): permisos insuficientes (Interceptado por client.ts)");
         }
 
         return Promise.reject(error);

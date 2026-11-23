@@ -18,14 +18,6 @@ import type {
 
 // ---------- Helpers de mapeo / normalización (privados del repo) ----------
 
-const TABLAS_SUBTIPO = {
-  Administrador: 'administrador',
-  Coordinador: 'voluntario',
-  Beneficiario: 'beneficiario',
-  Donante: 'donante',
-  Voluntario: 'voluntario',
-} as const;
-
 export const normalizarRol = (rol?: string | null): RolUsuario => {
   const valor = (rol || '').toLowerCase().trim();
   if (valor === 'administrador' || valor === 'admin') return 'Administrador';
@@ -483,12 +475,9 @@ export const usuarioRepository = {
 
       const rol = normalizarRol(usuarioData.rol);
 
-      // Un usuario tiene un único rol → limpia subtipos que no correspondan
-      for (const [nombreRol, tabla] of Object.entries(TABLAS_SUBTIPO)) {
-        if (nombreRol !== rol) {
-          await client.query(`DELETE FROM ${tabla} WHERE id_usuario = $1`, [id_usuario]);
-        }
-      }
+      // El esquema permite especialización solapada (donante + voluntario +
+      // beneficiario). No se eliminan los otros subtipos: hacerlo borraba,
+      // por ejemplo, los datos de donante al editar a un voluntario.
       if (rol !== 'Usuario') {
         await actualizarSubtipo(client, id_usuario, rol, rolData);
       }
@@ -658,15 +647,12 @@ export const usuarioRepository = {
         [nuevoEstado, revisorId, motivoRechazo?.trim() || null, id_voluntario]
       );
 
-      // Si se aprueba, se activa la cuenta de usuario para que pueda acceder
+      // Si se aprueba, se activa la cuenta de usuario para que pueda acceder.
+      // Un rechazo NO desactiva la cuenta: el usuario puede tener otros roles
+      // (por ejemplo, donante) y solo se marca el subtipo `voluntario`.
       if (nuevoEstado === 'Aprobado') {
         await client.query(
           `UPDATE usuario SET estado = 'Activo' WHERE id_usuario = $1 AND estado <> 'Eliminado'`,
-          [id_voluntario]
-        );
-      } else if (nuevoEstado === 'Rechazado') {
-        await client.query(
-          `UPDATE usuario SET estado = 'Inactivo' WHERE id_usuario = $1 AND estado <> 'Eliminado'`,
           [id_voluntario]
         );
       }
@@ -754,23 +740,31 @@ export const usuarioRepository = {
 
   // ---------- Postulaciones desde Dashboard ----------
 
+  async activarPerfilDonante(id_usuario: number | string): Promise<{ id_usuario: number; mensaje: string }> {
+    await pool.query(
+      `INSERT INTO donante (id_usuario) VALUES ($1)
+       ON CONFLICT (id_usuario) DO NOTHING`,
+      [id_usuario]
+    );
+    return { id_usuario: Number(id_usuario), mensaje: 'Perfil de donante activado con éxito' };
+  },
+
   async postularVoluntario(
     id_usuario: number | string,
     habilidades: string[],
     disponibilidad: string
-  ): Promise<{ id_usuario: number; mensaje: string }> {
-    await pool.query(
+  ): Promise<{ id_usuario: number; mensaje: string } | null> {
+    const { rows } = await pool.query<{ id_usuario: number }>(
       `INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, es_coordinador, estado)
-       VALUES ($1, $2, $3, FALSE, 'Pendiente')
-       ON CONFLICT (id_usuario) DO UPDATE SET
-         habilidades    = EXCLUDED.habilidades,
-         disponibilidad = EXCLUDED.disponibilidad,
-         estado         = 'Pendiente',
-         motivo_rechazo = NULL,
-         revisado_por   = NULL,
-         fecha_revision = NULL`,
+       SELECT $1, $2, $3, FALSE, 'Pendiente'
+       WHERE NOT EXISTS (SELECT 1 FROM voluntario WHERE id_usuario = $1)
+       ON CONFLICT (id_usuario) DO NOTHING
+       RETURNING id_usuario`,
       [id_usuario, habilidades, disponibilidad]
     );
+
+    if (!rows[0]) return null;
+
     return { id_usuario: Number(id_usuario), mensaje: 'Postulación a voluntariado enviada con éxito' };
   },
 

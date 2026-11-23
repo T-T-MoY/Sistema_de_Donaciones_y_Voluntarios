@@ -164,6 +164,7 @@ export interface CrearUsuarioInput {
   habilidades?: string[] | string | null;
   disponibilidad?: string | null;
   es_coordinador?: boolean;
+  estado_voluntario?: string | null;
 }
 
 /** Solicitud de voluntariado para coordinadores */

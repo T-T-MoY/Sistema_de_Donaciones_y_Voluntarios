@@ -59,7 +59,10 @@ export const useUsuarios = (autoFetch: boolean = true) => {
       setCargando(true);
       setError(null);
       try {
-        const nuevo = await usuarioApi.create(payload);
+        const { id_usuario } = await usuarioApi.create(payload);
+        // El endpoint de creación solo devuelve el id: se recarga el usuario
+        // completo antes de insertarlo en el estado.
+        const nuevo = await usuarioApi.getById(id_usuario);
         setUsuarios((prev) => [...prev, nuevo]);
         return nuevo;
       } catch (err: any) {
@@ -85,9 +88,13 @@ export const useUsuarios = (autoFetch: boolean = true) => {
       setCargando(true);
       setError(null);
       try {
-        const actualizado = await usuarioApi.update(id, payload);
+        await usuarioApi.update(id, payload);
+        // `update` solo confirma la operación: se recarga el usuario completo.
+        const actualizado = await usuarioApi.getById(id);
         setUsuarios((prev) =>
-          prev.map((u) => ((u.id ?? u.id_usuario) === id ? actualizado : u))
+          prev.map((u) =>
+            String(u.id ?? u.id_usuario) === String(id) ? actualizado : u
+          )
         );
         return actualizado;
       } catch (err: any) {
@@ -110,9 +117,14 @@ export const useUsuarios = (autoFetch: boolean = true) => {
       setCargando(true);
       setError(null);
       try {
-        const actualizado = await usuarioApi.cambiarEstado(id, nuevoEstado);
+        await usuarioApi.cambiarEstado(id, nuevoEstado);
+        // La respuesta trae solo un subconjunto del usuario: recargar para no
+        // reemplazar la fila de la lista con un objeto parcial.
+        const actualizado = await usuarioApi.getById(id);
         setUsuarios((prev) =>
-          prev.map((u) => ((u.id ?? u.id_usuario) === id ? actualizado : u))
+          prev.map((u) =>
+            String(u.id ?? u.id_usuario) === String(id) ? actualizado : u
+          )
         );
         return actualizado;
       } catch (err: any) {

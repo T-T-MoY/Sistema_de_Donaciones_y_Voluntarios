@@ -914,6 +914,7 @@ Checklist de calidad:
 | `PUT` | `/api/usuarios/perfil` | Sí | Cualquiera | Actualiza perfil (multipart) |
 | `GET` | `/api/usuarios/ubicaciones` | Sí | Cualquiera | Lista donantes con coordenadas guardadas |
 | `POST` | `/api/usuarios/mi-ubicacion` | Sí | Cualquiera | Guarda las coordenadas propias |
+| `POST` | `/api/usuarios/postular/donante` | Sí | Cualquiera | Habilita el subtipo Donante (sin revisión) |
 | `POST` | `/api/usuarios/postular/voluntario` | Sí | Cualquiera | Envía/actualiza la solicitud de voluntariado |
 | `POST` | `/api/usuarios/postular/beneficiario` | Sí | Cualquiera | Envía/actualiza la solicitud de beneficiario |
 | `GET` | `/api/usuarios/solicitudes/voluntarios` | Sí | Coordinador o Admin | Lista solicitudes; acepta `?estado=` |
@@ -965,6 +966,8 @@ El formulario de registro solicita los datos específicos de cada rol. En la API
 #### Postulaciones y revisiones
 
 Las postulaciones hechas desde el Dashboard requieren JWT. `POST /api/usuarios/postular/voluntario` acepta `habilidades` y `disponibilidad` (opcionales; usa `General` y `A convenir` por defecto). `POST /api/usuarios/postular/beneficiario` requiere `documento`, `direccion` y `necesidad`; `tipo_beneficiario` usa `Persona` por defecto y `descripcion` es opcional. Estas rutas agregan/actualizan el subtipo y dejan su estado en `Pendiente`.
+
+`POST /api/usuarios/postular/donante` crea el subtipo Donante si aún no existe; es idempotente y no requiere aprobación porque el esquema no define un estado de solicitud para donantes. Las cuentas con rol Voluntario o Coordinador pueden habilitarlo desde el Dashboard.
 
 Las bandejas aceptan filtro opcional `?estado=Pendiente`. Para revisar se envía `PATCH /api/usuarios/solicitudes/voluntarios/:id` con `{ "estado": "Aprobado" }` o `{ "estado": "Rechazado", "motivo_rechazo": "..." }`; coordinadores aprobados y administradores tienen acceso. Beneficiarios usan `PATCH /api/usuarios/solicitudes/beneficiarios/:id` con estado `Verificado` o `Rechazado`, solo para administradores. El revisor no puede revisar su propia solicitud.
 
