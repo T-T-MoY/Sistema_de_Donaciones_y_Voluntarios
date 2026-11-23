@@ -7,13 +7,13 @@ export function InventarioDonacionesSection() {
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 bg-success/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-surface-elevated/10 text-success border border-white/20 uppercase tracking-wider mb-5">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-surface-elevated/10 text-on-primary border border-white/20 uppercase tracking-wider mb-5">
               📦 Almacén Central de la Asociación
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-on-primary">
               Donaciones Directas al Inventario
             </h2>
-            <p className="mt-4 text-base sm:text-lg text-text-subtle leading-relaxed">
+            <p className="mt-4 text-base sm:text-lg text-on-primary/85 leading-relaxed">
               ¿Tienes ropa, calzado, frazadas o alimentos no perecederos en buen estado? Puedes entregarlos directamente a nuestro inventario general para que sean clasificados y resguardados hasta ser canalizados ante futuras emergencias o solicitudes urgentes.
             </p>
 
@@ -23,7 +23,7 @@ export function InventarioDonacionesSection() {
                   <span className="text-2xl">🏢</span>
                   <h4 className="font-bold text-white">Modalidad Exclusivamente Presencial</h4>
                 </div>
-                <p className="text-xs text-text-subtle leading-relaxed">
+                <p className="text-xs text-on-primary/80 leading-relaxed">
                   Para garantizar la calidad e higiene de los bienes, estas donaciones se reciben <strong>únicamente de manera física en nuestra sucursal central</strong>.
                 </p>
               </div>
@@ -33,7 +33,7 @@ export function InventarioDonacionesSection() {
                   <span className="text-2xl">✍️</span>
                   <h4 className="font-bold text-white">Registro y Trazabilidad Oficial</h4>
                 </div>
-                <p className="text-xs text-text-subtle leading-relaxed">
+                <p className="text-xs text-on-primary/80 leading-relaxed">
                   Un <strong>administrador autorizado</strong> inspecciona los artículos, genera el comprobante digital y lo asocia formalmente a tu cuenta de donante en el sistema.
                 </p>
               </div>
@@ -41,9 +41,9 @@ export function InventarioDonacionesSection() {
 
             <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-text-subtle uppercase tracking-wider">Centro de Acopio e Inventario General</p>
+                <p className="text-xs font-semibold text-on-primary/80 uppercase tracking-wider">Centro de Acopio e Inventario General</p>
                 <p className="text-sm font-bold text-white mt-1">Av. Busch esq. Villalobos #1200, Miraflores, La Paz</p>
-                <p className="text-xs text-success mt-0.5">Horario de atención: Lunes a Viernes de 08:30 a 17:30</p>
+                <p className="text-xs text-on-primary/80 mt-0.5">Horario de atención: Lunes a Viernes de 08:30 a 17:30</p>
               </div>
 
               <a
