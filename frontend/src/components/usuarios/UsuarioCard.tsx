@@ -12,7 +12,6 @@ import {
   getIniciales,
   getEstado,
   esActivo,
-  getRolDisplay,
   getRolesDisplay,
 } from '../../types/usuario.types';
 

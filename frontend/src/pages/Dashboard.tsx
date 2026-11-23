@@ -273,36 +273,6 @@ const MODULOS_ADMIN: Modulo[] = [
     },
 ];
 
-const MODULOS_EMPLEADO: Modulo[] = [
-    {
-        to: '/verificar-pagos',
-        titulo: 'Verificar Pagos',
-        descripcion: 'Aprobá o rechazá comprobantes de donaciones pendientes de los donantes de manera rápida.',
-        cta: 'Ir a Verificación de Pagos',
-        icono: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-        iconoBg: 'bg-info-soft text-info',
-        enDesarrollo: true,
-    },
-    {
-        to: '/gestion-voluntariados',
-        titulo: 'Gestión de Voluntariados',
-        descripcion: 'Supervisá la agenda de voluntariados, atendé a los voluntarios y gestioná cambios.',
-        cta: 'Ir a Gestión de Voluntariados',
-        icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-warning-soft text-warning',
-        enDesarrollo: true,
-    },
-    {
-        to: '/gestion-campanas',
-        titulo: 'Gestión de Campañas',
-        descripcion: 'Consultá las campañas activas y asistí a los beneficiarios.',
-        cta: 'Ir a Gestión de Campañas',
-        icono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-        iconoBg: 'bg-error-soft text-error',
-        enDesarrollo: true,
-    },
-];
-
 const MODULOS_CLIENTE: Modulo[] = [
     {
         to: '/campanas',
@@ -508,15 +478,6 @@ const PANEL_ADMIN: PanelRol = {
     modulos: MODULOS_ADMIN,
     descripcion: 'Supervisá usuarios, beneficiarios y actividad de la plataforma en tiempo real.',
     cta: { etiqueta: 'Ver usuarios', to: '/usuarios', icono: ICONOS.usuarios },
-    seccionTitulo: 'Módulos de gestión',
-    seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
-};
-
-const PANEL_EMPLEADO: PanelRol = {
-    kpis: KPIS_ADMIN,
-    modulos: MODULOS_EMPLEADO,
-    descripcion: 'Coordiná pagos, campañas y voluntariados de la plataforma.',
-    cta: { etiqueta: 'Verificar pagos', icono: ICONOS.check },
     seccionTitulo: 'Módulos de gestión',
     seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
 };
