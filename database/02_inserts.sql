@@ -73,3 +73,40 @@ INSERT INTO beneficiario (id_usuario, tipo_beneficiario, documento, direccion, n
 -- 3. SINCRONIZAR SECUENCIA DE IDs EN POSTGRESQL
 -- =========================================================
 SELECT setval('usuario_id_usuario_seq', (SELECT MAX(id_usuario) FROM usuario));
+-- =========================================================
+-- 4. CATÁLOGOS INICIALES DE GESTIÓN DE DONACIONES
+-- Se agregan al mismo archivo de inserts; no se modifican los registros
+-- ni los roles de Gestión de Usuarios definidos anteriormente.
+-- =========================================================
+INSERT INTO unidad_medida (codigo, nombre, permite_decimales) VALUES
+    ('UNI', 'Unidad', FALSE),
+    ('KG', 'Kilogramo', TRUE),
+    ('LT', 'Litro', TRUE),
+    ('CAJA', 'Caja', FALSE),
+    ('PAQ', 'Paquete', FALSE),
+    ('BOLSA', 'Bolsa', FALSE)
+ON CONFLICT (codigo) DO NOTHING;
+
+INSERT INTO donacion_categoria (nombre, tipo) VALUES
+    ('Granos y cereales', 'ALIMENTO'),
+    ('Enlatados y conservas', 'ALIMENTO'),
+    ('Lácteos y derivados', 'ALIMENTO'),
+    ('Frutas y verduras', 'ALIMENTO'),
+    ('Bebidas', 'ALIMENTO'),
+    ('Otros alimentos', 'ALIMENTO'),
+    ('Ropa y calzado', 'MATERIAL'),
+    ('Útiles escolares', 'MATERIAL'),
+    ('Higiene personal', 'MATERIAL'),
+    ('Muebles y enseres', 'MATERIAL'),
+    ('Insumos médicos', 'MATERIAL'),
+    ('Otros materiales', 'MATERIAL')
+ON CONFLICT (tipo, nombre) DO NOTHING;
+
+
+-- =========================================================
+-- ENTREGAS A BENEFICIARIOS
+-- No se insertan entregas de prueba: son movimientos reales de inventario
+-- y deben generarse únicamente desde la interfaz al confirmar la entrega.
+-- Las secuencias SERIAL de entrega_donacion e inventario_destino se
+-- inicializan automáticamente al registrar el primer movimiento.
+-- =========================================================

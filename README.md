@@ -2,7 +2,7 @@
 
 # 🤝 Sistema de Donaciones y Voluntariados
 
-**Plataforma para conectar donantes, voluntarios y beneficiarios.** Actualmente implementa autenticación, gestión de usuarios y solicitudes de participación; campañas, donaciones y trazabilidad integral siguen en desarrollo. Interfaz accesible en modo claro y oscuro.
+**Plataforma para conectar donantes, voluntarios y beneficiarios.** Incluye autenticación, gestión de usuarios y el módulo de Gestión de Donaciones con recepción, inventario central, fotografías y reportes. Campañas y Solicitudes de Ayuda quedan como integraciones futuras. Interfaz accesible en modo claro y oscuro.
 
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4-000000?style=for-the-badge&logo=express&logoColor=white)
@@ -15,7 +15,7 @@
 
 **Documento de onboarding técnico para equipos de desarrollo**
 
-`Módulo de usuarios: implementado` · `Autenticación y recuperación: implementadas` · `Campañas, donaciones y voluntariados: pendientes`
+`Módulo de usuarios: preservado` · `Gestión de Donaciones: integrada` · `Inventario: integrado` · `Campañas/Solicitudes de Ayuda: integración futura`
 
 </div>
 
@@ -85,6 +85,18 @@ Una plataforma web para gestionar el ciclo completo de la ayuda solidaria:
 4. **Errores centralizados:** `AppError` para negocio, `errorMiddleware` para traducir a HTTP.
 5. **Tokens semánticos de diseño:** los componentes no usan hex; usan `bg-surface`, `text-text-muted`, etc.
 6. **Accesibilidad y móvil primero:** contraste AA, foco visible, áreas táctiles, `safe-area`, reduced motion.
+
+---
+
+## Módulo integrado: Gestión de Donaciones
+
+La ruta privada `/donaciones` reutiliza el JWT y los roles canónicos existentes (Administrador, Donante, Voluntario y Beneficiario). El módulo incorpora registro, recepción, comprobantes, fotografías privadas, auditoría, reportes e inventario central. Los bienes aceptados en una recepción física ingresan automáticamente a `inventario` mediante un trigger PostgreSQL.
+
+Las tablas `inventario_destino` y sus columnas `campana_id` / `solicitud_ayuda_id` dejan preparado el vínculo de salida usando `id_inventario` + `id_donacion` + exactamente uno de los destinos. No se crean tablas ni endpoints de Campañas o Solicitudes de Ayuda, ni se inventan sus claves foráneas. Los puntos exactos que se completarán y las reglas de salida están documentados en `docs/INTEGRACION_CAMPANAS_SOLICITUDES.md`; el contrato API está en `backend/src/services/donacionIntegraciones.ts`.
+
+**Base de datos:** se conservan únicamente `database/01_schema.sql` y `database/02_inserts.sql`. El SQL original de Usuarios se mantiene sin cambios; las tablas de Donaciones se agregan al final de `01_schema.sql`. En una base nueva, Docker ejecuta ambos archivos en orden. Si ya existe un volumen PostgreSQL, no vuelvas a ejecutar completos esos archivos: `01_schema.sql` contiene al inicio los `CREATE TABLE` originales de Usuarios. Haz backup y ejecuta únicamente el bloque de Donaciones que comienza en `-- MÓDULO 2: GESTIÓN DE DONACIONES`; para catálogos, ejecuta únicamente el bloque final `4. CATÁLOGOS INICIALES` de `02_inserts.sql`. Así no se duplican tablas ni usuarios.
+
+**Fotografías:** JPG, PNG o WEBP, máximo 5 archivos de 5 MB por envío; se guardan en `backend/storage/donaciones`, fuera de la carpeta pública. En Docker el volumen `./backend/storage:/app/storage` conserva los archivos.
 
 ---
 

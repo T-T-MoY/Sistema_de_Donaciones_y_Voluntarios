@@ -42,6 +42,11 @@ export const errorMiddleware = (
     return;
   }
 
+  if (err.message === 'Formato de imagen no permitido.') {
+    res.status(400).json({ error: 'Formato de imagen no permitido. Usa JPG, PNG o WEBP.' });
+    return;
+  }
+
   console.error('💥 Error no controlado:', err);
   res.status(500).json({
     error:

@@ -21,6 +21,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import UsuariosPage from './pages/UsuariosPage';
+import DonacionesPage from './pages/DonacionesPage';
 import Perfil from './pages/Perfil';
 import Dashboard from './pages/Dashboard';
 import SolicitarRecuperacion from './pages/SolicitarRecuperacion';
@@ -46,6 +47,7 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/donaciones" element={<DonacionesPage />} />
 
             {/* Solo administradores */}
             <Route element={<RutasAdmin />}>
