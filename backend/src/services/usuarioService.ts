@@ -55,8 +55,8 @@ const construirRolData = (
   rol: RolSistema,
   body: Record<string, any>,
   actual?: Record<string, any>,
-  // Solo las rutas de administración pueden cambiar el estado de una
-  // solicitud. En el perfil propio se preserva el valor actual.
+  // Solo la selección administrativa del rol Coordinador puede asignar este
+  // subtipo directamente; las solicitudes mantienen su estado actual.
   permitirCamposAdmin = false
 ): RolData => {
   const direccion =
@@ -86,10 +86,9 @@ const construirRolData = (
     data.descripcion = valorDefinido(body.descripcion)
       ? String(body.descripcion).trim()
       : (actual?.descripcion ?? null);
-    data.estado_beneficiario =
-      permitirCamposAdmin && valorDefinido(body.estado_beneficiario)
-        ? String(body.estado_beneficiario).trim()
-        : (actual?.estado_beneficiario ?? 'Pendiente');
+    // El estado solo lo modifica el flujo de revisión, nunca datos del perfil
+    // ni el payload del formulario administrativo.
+    data.estado_beneficiario = actual?.estado_beneficiario ?? 'Pendiente';
 
     const v = validarDatosBeneficiario({
       tipo_beneficiario: data.tipo_beneficiario || undefined,
@@ -121,23 +120,23 @@ const construirRolData = (
   }
 
   // Voluntario / Coordinador
+  data.direccion = direccion;
   data.habilidades = body.habilidades !== undefined
     ? normalizarHabilidades(body.habilidades)
     : (actual?.habilidades || []);
   data.disponibilidad = valorDefinido(body.disponibilidad)
     ? String(body.disponibilidad).trim()
     : (actual?.disponibilidad ?? null);
-  data.es_coordinador =
-    rol === 'Coordinador' ||
-    (permitirCamposAdmin && body.es_coordinador !== undefined
-      ? Boolean(body.es_coordinador)
-      : (actual?.es_coordinador ?? false));
-  // Preservar el estado de la solicitud: sin esto, cada edición del perfil
-  // o del admin devolvía al voluntario aprobado a "Pendiente".
-  data.estado_voluntario =
-    permitirCamposAdmin && valorDefinido(body.estado_voluntario)
-      ? String(body.estado_voluntario).trim()
-      : (actual?.estado_voluntario ?? null);
+  data.es_coordinador = rol === 'Coordinador'
+    ? true
+    : permitirCamposAdmin
+      ? false
+      : Boolean(actual?.es_coordinador);
+  // La aprobación se controla en la bandeja de revisión. Los formularios
+  // conservan el estado existente y nunca pueden promover la solicitud.
+  data.estado_voluntario = rol === 'Coordinador'
+    ? 'Aprobado'
+    : (actual?.estado_voluntario ?? 'Pendiente');
   const v = validarDatosVoluntario({
     habilidades: data.habilidades || [],
     disponibilidad: data.disponibilidad || undefined,
@@ -156,6 +155,9 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       correo: usuario.correo,
       rol: usuario.rol,
       es_coordinador: Boolean(usuario.es_coordinador),
+      es_donante: Boolean(usuario.es_donante),
+      estado_voluntario: usuario.estado_voluntario ?? null,
+      estado_beneficiario: usuario.estado_beneficiario ?? null,
       foto_url: usuario.foto_url,
     },
     process.env.JWT_SECRET as string,
@@ -213,7 +215,10 @@ export const usuarioService = {
 
     const { nombre, paterno, materno, correo, telefono, passwordActual, passwordNueva } = body;
 
-    const v = validarDatosUsuario({ nombre, paterno, materno, correo, telefono });
+    const v = validarDatosUsuario({
+      nombre, paterno, materno, correo, telefono,
+      calle: body.calle, zona: body.zona, ciudad: body.ciudad,
+    });
     if (!v.valido) throw new AppError(v.error!, 400);
 
     let hashNueva: string | undefined;
@@ -285,7 +290,10 @@ export const usuarioService = {
       throw new AppError(`Rol inválido. Debe ser uno de: ${ROLES_VALIDOS.join(', ')}.`, 400);
     }
 
-    const v = validarDatosUsuario({ nombre, paterno, materno, correo, telefono });
+    const v = validarDatosUsuario({
+      nombre, paterno, materno, correo, telefono,
+      calle: body.calle, zona: body.zona, ciudad: body.ciudad,
+    });
     if (!v.valido) throw new AppError(v.error!, 400);
 
     const vPwd = esContraseñaSegura(contraseña);
@@ -341,7 +349,10 @@ export const usuarioService = {
       throw new AppError(`Rol inválido. Debe ser uno de: ${ROLES_VALIDOS.join(', ')}.`, 400);
     }
 
-    const v = validarDatosUsuario({ nombre, paterno, materno, correo, telefono });
+    const v = validarDatosUsuario({
+      nombre, paterno, materno, correo, telefono,
+      calle: body.calle, zona: body.zona, ciudad: body.ciudad,
+    });
     if (!v.valido) throw new AppError(v.error!, 400);
 
     let hashNueva: string | undefined;
@@ -463,6 +474,8 @@ export const usuarioService = {
     if (Number(id_voluntario) === revisorId) {
       throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
     }
+    const usuario = await usuarioRepository.obtenerPorId(id_voluntario);
+    if (!usuario) throw new AppError('Solicitud de voluntariado no encontrada.', 404);
     return await usuarioRepository.revisarSolicitudVoluntario(
       id_voluntario,
       estadoFinal,
@@ -490,6 +503,8 @@ export const usuarioService = {
     if (Number(id_beneficiario) === revisorId) {
       throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
     }
+    const usuario = await usuarioRepository.obtenerPorId(id_beneficiario);
+    if (!usuario) throw new AppError('Solicitud de beneficiario no encontrada.', 404);
     return await usuarioRepository.revisarSolicitudBeneficiario(
       id_beneficiario,
       estadoFinal,
@@ -499,34 +514,42 @@ export const usuarioService = {
   },
 
   // ---------- Postulaciones desde Dashboard ----------
-  async activarPerfilDonante(id_usuario: number) {
-    if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
-    return await usuarioRepository.activarPerfilDonante(id_usuario);
-  },
-
   async postularVoluntario(id_usuario: number, body: Record<string, any>) {
     if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const usuario = await usuarioRepository.obtenerPorId(id_usuario);
+    if (!usuario) throw new AppError('Usuario no encontrado', 404);
+    if (usuario.estado_voluntario === 'Pendiente') throw new AppError('Tu solicitud de voluntariado ya está pendiente.', 400);
+    if (usuario.estado_voluntario === 'Aprobado' || usuario.es_coordinador) throw new AppError('Ya tienes el rol Voluntario aprobado.', 400);
     const habilidades = body.habilidades ? normalizarHabilidades(body.habilidades) : ['General'];
     const disponibilidad = String(body.disponibilidad || 'A convenir').trim();
+    const validacion = validarDatosVoluntario({ habilidades, disponibilidad });
+    if (!validacion.valido) throw new AppError(validacion.error!, 400);
     const solicitud = await usuarioRepository.postularVoluntario(id_usuario, habilidades, disponibilidad);
     if (!solicitud) {
-      throw new AppError('Ya tienes un registro de voluntario; no puedes volver a solicitar ser voluntario.', 409);
+      throw new AppError(usuario.estado_voluntario === 'Pendiente' ? 'Tu solicitud de voluntariado ya está pendiente.' : 'Ya tienes el rol Voluntario aprobado.', 400);
     }
     return solicitud;
   },
 
   async postularBeneficiario(id_usuario: number, body: Record<string, any>) {
     if (!id_usuario) throw new AppError('Usuario no autenticado', 401);
+    const usuario = await usuarioRepository.obtenerPorId(id_usuario);
+    if (!usuario) throw new AppError('Usuario no encontrado', 404);
+    if (usuario.estado_beneficiario === 'Verificado') {
+      throw new AppError('Ya tienes el rol Beneficiario verificado.', 400);
+    }
     const { tipo_beneficiario, documento, direccion, necesidad, descripcion } = body;
     if (!documento || !direccion || !necesidad) {
       throw new AppError('Documento (CI/NIT), dirección y necesidad son requeridos.', 400);
     }
-    return await usuarioRepository.postularBeneficiario(id_usuario, {
+    const solicitud = await usuarioRepository.postularBeneficiario(id_usuario, {
       tipo_beneficiario: tipo_beneficiario || 'Persona',
       documento: String(documento).trim(),
       direccion: String(direccion).trim(),
       necesidad: String(necesidad).trim(),
       descripcion: descripcion ? String(descripcion).trim() : null,
     });
+    if (!solicitud) throw new AppError(usuario.estado_beneficiario === 'Pendiente' ? 'Tu solicitud de beneficiario ya está pendiente.' : 'Ya tienes el rol Beneficiario verificado.', 400);
+    return solicitud;
   },
 };

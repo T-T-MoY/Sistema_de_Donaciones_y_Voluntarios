@@ -16,26 +16,13 @@ import {
   esContraseñaSegura,
   esCorreoValido,
   esCiNitValido,
-  normalizarHabilidades,
 } from '../utils/validaciones';
 import type {
   UsuarioResponse,
   RolData,
-  RolUsuario,
   RegistroInput,
   RegistroResponse,
 } from '../models/usuarioModel';
-
-const construirDireccion = (
-  calle?: string | null,
-  zona?: string | null,
-  ciudad?: string | null
-): string | null => {
-  const partes = [calle, zona, ciudad]
-    .map((p) => (p || '').trim())
-    .filter(Boolean);
-  return partes.length ? partes.join(', ') : null;
-};
 
 const firmarToken = (usuario: UsuarioResponse): string =>
   jwt.sign(
@@ -46,7 +33,11 @@ const firmarToken = (usuario: UsuarioResponse): string =>
       apellido: usuario.apellido,
       correo: usuario.correo,
       rol: usuario.rol,
+      roles: usuario.roles,
       es_coordinador: Boolean(usuario.es_coordinador),
+      es_donante: Boolean(usuario.es_donante),
+      estado_voluntario: usuario.estado_voluntario ?? null,
+      estado_beneficiario: usuario.estado_beneficiario ?? null,
       foto_url: usuario.foto_url,
     },
     process.env.JWT_SECRET as string,
@@ -76,72 +67,17 @@ export const authService = {
     const existente = await usuarioRepository.obtenerPorCorreo(correo);
     if (existente) throw new AppError('El correo ya está registrado', 400);
 
-    // Normalizar el rol solicitado (por defecto Donante)
-    const rolRaw = (dto.rol || 'Donante').toLowerCase().trim();
+    const rolRaw = String(dto.rol || '').toLowerCase().trim();
     if (rolRaw === 'admin' || rolRaw === 'administrador') {
       throw new AppError('No está permitido registrarse como Administrador desde el formulario público.', 403);
     }
 
-    let rol: RolUsuario = 'Donante';
-    if (rolRaw === 'beneficiario') {
-      rol = 'Beneficiario';
-    } else if (rolRaw === 'voluntario' || rolRaw === 'empleado') {
-      rol = 'Voluntario';
-    } else if (rolRaw === 'donante' || rolRaw === 'cliente' || !rolRaw) {
-      rol = 'Donante';
-    } else {
-      throw new AppError('Rol inválido. Los roles permitidos son: Donante, Beneficiario o Voluntario.', 400);
-    }
+    // El registro solo crea la cuenta; las solicitudes se completan desde el dashboard.
+    const rol = 'Usuario' as const;
 
-    const direccion =
-      (dto.direccion && String(dto.direccion).trim()) ||
-      construirDireccion(dto.calle, dto.zona, dto.ciudad) ||
-      null;
-
-    let estadoCuenta = 'Activo';
-    let mensaje = 'Cuenta de donante creada con éxito';
+    const estadoCuenta = 'Activo';
+    const mensaje = 'Cuenta creada. Luego podrás solicitar participar o registrar una donación.';
     const rolData: RolData = {};
-
-    if (rol === 'Donante') {
-      estadoCuenta = 'Activo';
-      mensaje = 'Cuenta de donante creada con éxito';
-      rolData.direccion = direccion;
-      rolData.ubi_latitud =
-        dto.ubi_latitud !== undefined && dto.ubi_latitud !== null && String(dto.ubi_latitud).trim() !== ''
-          ? Number(dto.ubi_latitud)
-          : null;
-      rolData.ubi_longitud =
-        dto.ubi_longitud !== undefined && dto.ubi_longitud !== null && String(dto.ubi_longitud).trim() !== ''
-          ? Number(dto.ubi_longitud)
-          : null;
-    } else if (rol === 'Beneficiario') {
-      estadoCuenta = 'Activo';
-      mensaje = 'Solicitud de beneficiario registrada con éxito. Tu cuenta está en revisión.';
-
-      const documento = (dto.documento || dto.ci_nit || '').toString().trim();
-      if (!documento) {
-        throw new AppError('El documento (CI / NIT) es obligatorio para el registro de beneficiario.', 400);
-      }
-      const ciExistente = await usuarioRepository.obtenerPorDocumento(documento);
-      if (ciExistente) {
-        throw new AppError('El documento (CI / NIT) ya está registrado por otro usuario.', 400);
-      }
-
-      rolData.tipo_beneficiario = dto.tipo_beneficiario?.trim() || 'Persona';
-      rolData.documento = documento;
-      rolData.direccion = direccion || 'Sin dirección especificada';
-      rolData.necesidad = dto.necesidad?.trim() || 'Solicitud de apoyo general';
-      rolData.descripcion = dto.descripcion?.trim() || null;
-      rolData.estado_beneficiario = 'Pendiente';
-    } else if (rol === 'Voluntario') {
-      // Para voluntario: solicitud pendiente hasta que el coordinador lo apruebe
-      estadoCuenta = 'Inactivo';
-      mensaje = 'Solicitud de voluntariado registrada con éxito. Tu cuenta está pendiente de aprobación por el coordinador.';
-
-      rolData.habilidades = dto.habilidades ? normalizarHabilidades(dto.habilidades) : ['General'];
-      rolData.disponibilidad =
-        (dto.disponibilidad && String(dto.disponibilidad).trim()) || 'A coordinar con el coordinador';
-    }
 
     const hash = await bcrypt.hash(dto.contraseña, 10);
 
@@ -179,7 +115,11 @@ export const authService = {
       telefono: string | null;
       estado: string;
       rol: string;
+      roles: string[];
       es_coordinador?: boolean;
+      es_donante?: boolean;
+      estado_voluntario?: string | null;
+      estado_beneficiario?: string | null;
       foto_url?: string | null;
     };
   }> {
@@ -232,7 +172,36 @@ export const authService = {
         telefono: usuario.telefono,
         estado: usuario.estado,
         rol: usuario.rol,
+        roles: usuario.roles,
         es_coordinador: Boolean(usuario.es_coordinador),
+        es_donante: Boolean(usuario.es_donante),
+        estado_voluntario: usuario.estado_voluntario ?? null,
+        estado_beneficiario: usuario.estado_beneficiario ?? null,
+        foto_url: usuario.foto_url || null,
+      },
+    };
+  },
+
+  async refrescarSesion(id_usuario: number) {
+    const usuario = await usuarioRepository.obtenerPorId(id_usuario);
+    if (!usuario) throw new AppError('La cuenta no está disponible.', 401);
+    if (usuario.estado !== 'Activo') throw new AppError('La cuenta está inactiva.', 403);
+    return {
+      token: firmarToken(usuario),
+      usuario: {
+        id: usuario.id_usuario,
+        id_usuario: usuario.id_usuario,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        correo: usuario.correo,
+        telefono: usuario.telefono,
+        estado: usuario.estado,
+        rol: usuario.rol,
+        roles: usuario.roles,
+        es_coordinador: Boolean(usuario.es_coordinador),
+        es_donante: Boolean(usuario.es_donante),
+        estado_voluntario: usuario.estado_voluntario ?? null,
+        estado_beneficiario: usuario.estado_beneficiario ?? null,
         foto_url: usuario.foto_url || null,
       },
     };

@@ -12,6 +12,7 @@ export type RolUsuario =
   | 'Donante'
   | 'Voluntario'
   | 'Usuario';
+export type RolParticipacion = 'Administrador' | 'Coordinador' | 'Beneficiario' | 'Donante' | 'Voluntario';
 
 /** Fila cruda tal como vuelve del SELECT con JOINs. */
 export interface UsuarioRow {
@@ -39,11 +40,13 @@ export interface UsuarioRow {
   habilidades: string[] | null;
   disponibilidad: string | null;
   es_coordinador: boolean | null;
+  es_donante: boolean;
   estado_voluntario: string | null;
   revisado_por_voluntario: number | null;
   motivo_rechazo_voluntario: string | null;
   fecha_registro_voluntario: Date | string | null;
   rol: RolUsuario;
+  roles: RolParticipacion[];
 }
 
 /** Fila del SELECT de donantes con ubicación geográfica. */
@@ -85,6 +88,7 @@ export interface UsuarioResponse {
   fecha_registro?: Date | string;
   fecha_creacion?: Date | string;
   rol: RolUsuario;
+  roles: RolParticipacion[];
   nivel_acceso?: string | null;
   tipo_beneficiario?: string | null;
   documento?: string | null;
@@ -100,6 +104,7 @@ export interface UsuarioResponse {
   habilidades?: string[];
   disponibilidad?: string | null;
   es_coordinador?: boolean;
+  es_donante?: boolean;
   estado_voluntario?: string | null;
   revisado_por_voluntario?: number | null;
   motivo_rechazo_voluntario?: string | null;

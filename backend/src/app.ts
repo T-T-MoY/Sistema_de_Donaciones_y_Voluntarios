@@ -26,6 +26,7 @@ import path from 'path';
 // Gestión de usuarios y autenticación
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import donacionRoutes from './routes/donacionRoutes';
 
 // ============================================================================
 // IMPORTACIÓN DE MIDDLEWARES GLOBALES
@@ -91,6 +92,9 @@ app.use('/api/auth', authRoutes);
 
 // Gestión de usuarios
 app.use('/api/usuarios', userRoutes);
+
+// Gestión de donaciones: módulo aislado, reutiliza la autenticación existente.
+app.use('/api/donaciones', donacionRoutes);
 
 // ============================================================================
 // RUTA PRINCIPAL

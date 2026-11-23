@@ -8,10 +8,9 @@
 // =====================================================
 // ROLES Y ESTADOS
 // =====================================================
-export type Rol = 'Cliente' | 'Empleado' | 'Admin' | 'Administrador' | 'Beneficiario' | 'Coordinador';
+export type Rol = 'Donante' | 'Voluntario' | 'Coordinador' | 'Beneficiario' | 'Administrador';
 export type Estado = 'Activo' | 'Inactivo';
 export type Turno = 'Mañana' | 'Tarde' | 'Noche';
-export type NivelAcceso = 'SUPERADMIN' | 'GENERAL';
 
 // =====================================================
 // MODELO DE USUARIO (lo que devuelve el backend)
@@ -28,6 +27,7 @@ export interface Usuario {
   telefono?: string;
   foto_url?: string | null;
   rol?: string;
+  roles?: string[];
   estado?: string;
   estado_cuenta?: string;
   ci_nit?: string | number | null;
@@ -38,8 +38,8 @@ export interface Usuario {
   fecha_contratacion?: string | null;
   cargo?: string | null;
   turno?: Turno | null;
-  nivel_acceso?: NivelAcceso | null;
   es_coordinador?: boolean;
+  es_donante?: boolean;
   estado_voluntario?: string | null;
   estado_beneficiario?: string | null;
   habilidades?: string[];
@@ -70,9 +70,6 @@ export interface UsuarioFormData {
   direccion: string;
   necesidad: string;
   descripcion: string;
-  estado_beneficiario: string;
-  nivel_acceso: NivelAcceso;
-  es_coordinador?: boolean;
   foto_url?: string | null;
 }
 
@@ -136,6 +133,11 @@ export const getRolDisplay = (rol?: string | null): string => {
   if (lower === 'admin' || lower === 'administrador') return 'Administrador';
   if (lower === 'beneficiario') return 'Beneficiario';
   return rol?.trim() || '';
+};
+
+export const getRolesDisplay = (roles?: string[] | null, rol?: string | null): string[] => {
+  const lista = roles?.length ? roles : rol ? [rol] : [];
+  return [...new Set(lista.map((r) => getRolDisplay(r)).filter(Boolean))];
 };
 
 export const esActivo = (u: Usuario): boolean => {

@@ -26,6 +26,7 @@ interface ConfirmModalProps {
   accionSecundaria?: { texto: string; onClick: () => void };
   /** Cuál botón muestra "Procesando…" mientras `cargando` es true. */
   accionEnCurso?: 'confirmar' | 'secundaria';
+  campoTexto?: { etiqueta: string; valor: string; onChange: (valor: string) => void; placeholder?: string; requerido?: boolean };
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -42,6 +43,7 @@ const ConfirmModal = ({
   cargando = false,
   accionSecundaria,
   accionEnCurso = 'confirmar',
+  campoTexto,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
@@ -146,6 +148,7 @@ const ConfirmModal = ({
               {advertencia}
             </div>
           )}
+          {campoTexto && <label className="mt-4 block text-sm font-semibold text-text">{campoTexto.etiqueta}<textarea autoFocus value={campoTexto.valor} onChange={e => campoTexto.onChange(e.target.value)} placeholder={campoTexto.placeholder} rows={3} maxLength={1000} className="mt-1.5 w-full resize-y rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-normal" /></label>}
         </div>
 
         <div className="flex flex-col-reverse gap-2 px-5 pb-6 pt-4 sm:flex-row sm:flex-wrap sm:justify-end sm:px-6">
@@ -176,7 +179,7 @@ const ConfirmModal = ({
             ref={botonConfirmarRef}
             type="button"
             onClick={onConfirm}
-            disabled={cargando}
+            disabled={cargando || Boolean(campoTexto?.requerido && !campoTexto.valor.trim())}
             className={`press rounded-xl px-4 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60 ${
               esPeligro
                 ? 'bg-error text-white hover:opacity-90'

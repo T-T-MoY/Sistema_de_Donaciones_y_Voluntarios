@@ -363,7 +363,7 @@ export const UsuarioList = ({
   const rolesDisponibles = useMemo(() => {
     const set = new Set<string>();
     usuarios.forEach((u) => {
-      if (u.rol) set.add(String(u.rol));
+      (u.roles?.length ? u.roles : u.rol ? [u.rol] : []).forEach((rol) => set.add(String(rol)));
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [usuarios]);
@@ -386,12 +386,13 @@ export const UsuarioList = ({
     const base = usuarios.filter((u) => {
       // 1. Filtro rol
       if (filtroRol) {
-        const rolUsuario = (u.rol || '').toLowerCase();
+        const rolesUsuario = (u.roles?.length ? u.roles : [u.rol || '']).map((rol) => rol.toLowerCase());
         const rolFiltro = filtroRol.toLowerCase();
-        const coincide =
+        const coincide = rolesUsuario.some((rolUsuario) =>
           rolUsuario === rolFiltro ||
           (rolFiltro === 'admin' && rolUsuario === 'administrador') ||
-          (rolFiltro === 'administrador' && rolUsuario === 'admin');
+          (rolFiltro === 'administrador' && rolUsuario === 'admin')
+        );
         if (!coincide) return false;
       }
 
@@ -513,7 +514,7 @@ export const UsuarioList = ({
       iconoPath: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
     },
     {
-      etiqueta: 'Suspendidos',
+      etiqueta: 'Inactivos',
       valor: usuariosSuspendidos,
       icono: 'bg-error-soft text-error',
       acento: 'text-error',
@@ -839,9 +840,9 @@ export const UsuarioList = ({
                         <td className="min-w-0 px-3 py-4">
                           <span
                             className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(user.rol)}`}
-                            title={getRolDisplay(user.rol)}
+                            title={(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(', ')}
                           >
-                            {getRolDisplay(user.rol)}
+                            {(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(' � ')}
                           </span>
                         </td>
 
@@ -931,9 +932,9 @@ export const UsuarioList = ({
                         </p>
                         <span
                           className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(user.rol)}`}
-                          title={getRolDisplay(user.rol)}
+                          title={(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(', ')}
                         >
-                          {getRolDisplay(user.rol)}
+                          {(user.roles?.length ? user.roles : [user.rol || '']).map(getRolDisplay).join(' � ')}
                         </span>
                       </div>
                       <div>

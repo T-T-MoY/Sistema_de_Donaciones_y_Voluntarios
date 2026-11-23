@@ -13,6 +13,7 @@ import {
   getEstado,
   esActivo,
   getRolDisplay,
+  getRolesDisplay,
 } from '../../types/usuario.types';
 
 interface UsuarioCardProps {
@@ -99,9 +100,9 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
           </p>
           <span
             className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(usuario.rol)}`}
-            title={getRolDisplay(usuario.rol)}
+            title={getRolesDisplay(usuario.roles, usuario.rol).join(', ')}
           >
-            {getRolDisplay(usuario.rol) || '—'}
+            {getRolesDisplay(usuario.roles, usuario.rol).join(' · ') || '—'}
           </span>
         </div>
         <div>

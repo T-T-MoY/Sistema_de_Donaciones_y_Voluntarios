@@ -63,8 +63,8 @@ const Navbar = ({ abierto, onCerrar, colapsado, onAlternarColapsado }: NavbarPro
             path: '/donaciones', 
             name: '3. Gestión de Donaciones', 
             icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', 
-            roles: ['Administrador', 'Coordinador', 'Voluntario', 'Beneficiario', 'Donante', 'Empleado', 'Cliente', 'Usuario'],
-            enDesarrollo: true
+            roles: ['Administrador', 'Voluntario', 'Beneficiario', 'Donante'],
+            enDesarrollo: false
         },
         { 
             path: '/voluntarios', 
@@ -89,16 +89,16 @@ const Navbar = ({ abierto, onCerrar, colapsado, onAlternarColapsado }: NavbarPro
         }
     ];
 
-    const rolNormal = (usuario?.rol || 'Usuario').toLowerCase();
-    const esCoordinador = Boolean(usuario?.es_coordinador) || rolNormal === 'coordinador';
+    const rolesNormalizados = (usuario?.roles || [usuario?.rol || 'Usuario']).map((rol) => rol.toLowerCase());
+    const esCoordinador = Boolean(usuario?.es_coordinador) || rolesNormalizados.includes('coordinador');
     const menuFiltrado = menuItems.filter(item => {
         return item.roles.some(r => {
             const rNorm = r.toLowerCase();
-            if (rNorm === rolNormal) return true;
+            if (rolesNormalizados.includes(rNorm)) return true;
             if (esCoordinador && rNorm === 'coordinador') return true;
-            if ((rolNormal === 'admin' || rolNormal === 'administrador') && rNorm === 'administrador') return true;
-            if ((rolNormal === 'donante' || rolNormal === 'cliente') && (rNorm === 'donante' || rNorm === 'cliente')) return true;
-            if ((rolNormal === 'voluntario' || rolNormal === 'empleado') && (rNorm === 'voluntario' || rNorm === 'empleado')) return true;
+            if (rolesNormalizados.some((rol) => ['admin', 'administrador'].includes(rol)) && rNorm === 'administrador') return true;
+            if (rolesNormalizados.some((rol) => ['donante', 'cliente'].includes(rol)) && ['donante', 'cliente'].includes(rNorm)) return true;
+            if (rolesNormalizados.some((rol) => ['voluntario', 'empleado'].includes(rol)) && ['voluntario', 'empleado'].includes(rNorm)) return true;
             return false;
         });
     });

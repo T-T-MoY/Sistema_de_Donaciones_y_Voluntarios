@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import api from '../api/client';
 
 // =====================================================
 // TIPOS
@@ -9,6 +10,7 @@ export interface Usuario {
     nombre: string;
     correo: string;
     rol: string;
+    roles: string[];
     exp: number;
     iat?: number;
     [key: string]: unknown;
@@ -19,6 +21,7 @@ export interface AuthContextType {
     token: string | null;
     isAuthenticated: boolean;
     login: (nuevoToken: string) => void;
+    refreshSession: () => Promise<void>;
     logout: () => void;
 }
 
@@ -58,6 +61,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     };
 
+    const refreshSession = async (): Promise<void> => {
+        if (!localStorage.getItem('token')) return;
+        const { data } = await api.post<{ token: string }>('/auth/refresh');
+        login(data.token);
+    };
+
     // Validar el token y su expiración al recargar
     useEffect(() => {
         if (token) {
@@ -73,6 +82,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             }
         }
     }, [token]);
+
+    // Releer el rol y el estado de las solicitudes cuando se abre la app o
+    // vuelve a primer plano, por si otro administrador aprobó el perfil.
+    useEffect(() => {
+        const actualizarSesion = (): void => {
+            if (document.visibilityState !== 'visible') return;
+            void refreshSession().catch((error) => {
+                if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+                    console.error('No se pudo actualizar la sesión', error);
+                }
+            });
+        };
+
+        actualizarSesion();
+        window.addEventListener('focus', actualizarSesion);
+        document.addEventListener('visibilitychange', actualizarSesion);
+        return () => {
+            window.removeEventListener('focus', actualizarSesion);
+            document.removeEventListener('visibilitychange', actualizarSesion);
+        };
+    }, []);
 
     // SISTEMA AFK (15 minutos de inactividad)
     useEffect(() => {
@@ -108,7 +138,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return (
         <AuthContext.Provider
-            value={{ usuario, token, isAuthenticated: !!token, login, logout }}
+            value={{ usuario, token, isAuthenticated: !!token, login, refreshSession, logout }}
         >
             {children}
         </AuthContext.Provider>

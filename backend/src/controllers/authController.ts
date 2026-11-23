@@ -24,6 +24,16 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+export const refrescarSesion = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id_usuario = Number(req.usuario?.id_usuario || req.usuario?.id);
+    const resultado = await authService.refrescarSesion(id_usuario);
+    res.status(200).json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const solicitarRecuperacion = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const resultado = await authService.solicitarRecuperacion(req.body?.correo);

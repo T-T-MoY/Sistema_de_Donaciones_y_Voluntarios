@@ -22,6 +22,11 @@ export interface LoginResponse {
     telefono: string | null;
     estado: string;
     rol: string;
+    roles: string[];
+    es_coordinador?: boolean;
+    es_donante?: boolean;
+    estado_voluntario?: string | null;
+    estado_beneficiario?: string | null;
   };
 }
 
@@ -37,12 +42,6 @@ export interface RegistroRequest {
   zona?: string;
   ciudad?: string;
   direccion?: string;
-  rol?: string;
-  tipo_beneficiario?: string;
-  necesidad?: string;
-  descripcion?: string;
-  habilidades?: string[] | string;
-  disponibilidad?: string;
   edad?: number | null;
 }
 
@@ -53,6 +52,7 @@ export interface TokenPayload {
   apellido: string;
   correo: string;
   rol: string;
+  roles: string[];
   iat?: number;
   exp?: number;
 }

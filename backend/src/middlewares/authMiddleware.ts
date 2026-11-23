@@ -29,8 +29,8 @@ const verificarToken = (req: Request, res: Response, next: NextFunction) => {
 
 const esAdmin = (req: Request, res: Response, next: NextFunction) => {
     const usuario = (req as any).usuario;
-    const rol = usuario?.rol?.toLowerCase();
-    if (!usuario || (rol !== 'admin' && rol !== 'administrador')) {
+    const roles = (usuario?.roles || [usuario?.rol]).map((r: string) => r?.toLowerCase());
+    if (!usuario || !roles.some((rol: string) => rol === 'admin' || rol === 'administrador')) {
         return res.status(403).json({
             error: 'Acceso denegado. Se requieren permisos de administrador.'
         });
@@ -38,33 +38,11 @@ const esAdmin = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
-const esAdminOEmpleado = (req: Request, res: Response, next: NextFunction) => {
-    const usuario = (req as any).usuario;
-    const rol = usuario?.rol?.toLowerCase();
-    if (!usuario || (rol !== 'admin' && rol !== 'administrador' && rol !== 'empleado')) {
-        return res.status(403).json({
-            error: 'Acceso denegado. Se requieren permisos de administrador o empleado.'
-        });
-    }
-    next();
-};
-
-const esCliente = (req: Request, res: Response, next: NextFunction) => {
-    const usuario = (req as any).usuario;
-    const rol = usuario?.rol?.toLowerCase();
-    if (!usuario || rol !== 'cliente') {
-        return res.status(403).json({
-            error: 'Acceso denegado. Se requieren permisos de cliente.'
-        });
-    }
-    next();
-};
-
 const esCoordinadorOAdmin = (req: Request, res: Response, next: NextFunction) => {
     const usuario = (req as any).usuario;
-    const rol = usuario?.rol?.toLowerCase();
+    const roles = (usuario?.roles || [usuario?.rol]).map((r: string) => r?.toLowerCase());
     const esCoord = Boolean(usuario?.es_coordinador);
-    if (!usuario || (rol !== 'admin' && rol !== 'administrador' && rol !== 'coordinador' && !esCoord)) {
+    if (!usuario || (!roles.some((rol: string) => ['admin', 'administrador', 'coordinador'].includes(rol)) && !esCoord)) {
         return res.status(403).json({
             error: 'Acceso denegado. Se requieren permisos de Coordinador de Voluntariado o Administrador.'
         });
@@ -72,4 +50,4 @@ const esCoordinadorOAdmin = (req: Request, res: Response, next: NextFunction) =>
     next();
 };
 
-export { verificarToken, esAdmin, esAdminOEmpleado, esCliente, esCoordinadorOAdmin };
+export { verificarToken, esAdmin, esCoordinadorOAdmin };

@@ -15,6 +15,9 @@ export interface DatosUsuarioValidacion {
     materno?: string | null;
     correo?: string | null;
     telefono?: string | number | null;
+    calle?: string | null;
+    zona?: string | null;
+    ciudad?: string | null;
 }
 
 export interface DatosClienteValidacion {
@@ -41,6 +44,10 @@ export const esSoloNumeros = (texto: any): boolean => {
     if (texto === null || texto === undefined) return false;
     return /^[0-9]+$/.test(String(texto).trim());
 };
+
+const esCalleValida = (texto: string): boolean => /^[\p{L}\p{M}\d\s#.,º°/'’()-]+$/u.test(texto.trim());
+const esUbicacionLetras = (texto: string): boolean => /^[\p{L}\p{M}\s'’\-]+$/u.test(texto.trim());
+const esHabilidadValida = (texto: string): boolean => /^[\p{L}\p{M}\p{N}\s,'’./&+()-]+$/u.test(texto.trim());
 
 /**
  * Valida un correo electrónico con formato estándar.
@@ -188,7 +195,7 @@ export const longitudValida = (texto: any, min: number, max: number): boolean =>
  * Devuelve { valido: true } o { valido: false, error: 'mensaje' }.
  */
 export const validarDatosUsuario = (datos: DatosUsuarioValidacion): ResultadoValidacion => {
-    const { nombre, paterno, materno, correo, telefono } = datos;
+    const { nombre, paterno, materno, correo, telefono, calle, zona, ciudad } = datos;
 
     // Nombre
     if (!nombre || !nombre.trim()) {
@@ -241,6 +248,16 @@ export const validarDatosUsuario = (datos: DatosUsuarioValidacion): ResultadoVal
         return { valido: false, error: 'El teléfono debe tener exactamente 8 dígitos numéricos.' };
     }
 
+    if (calle && (calle.trim().length > 150 || !esCalleValida(calle))) {
+        return { valido: false, error: 'La calle admite letras, números y signos de dirección comunes (máximo 150 caracteres).' };
+    }
+    if (zona && (zona.trim().length > 100 || !esUbicacionLetras(zona))) {
+        return { valido: false, error: 'La zona solo puede contener letras, espacios, apóstrofes y guiones (máximo 100 caracteres).' };
+    }
+    if (ciudad && (ciudad.trim().length > 100 || !esUbicacionLetras(ciudad))) {
+        return { valido: false, error: 'La ciudad solo puede contener letras, espacios, apóstrofes y guiones (máximo 100 caracteres).' };
+    }
+
     return { valido: true };
 };
 
@@ -266,18 +283,18 @@ export const validarDatosCliente = (datos: DatosClienteValidacion): ResultadoVal
     }
 
     // Calle (opcional pero si viene, validar)
-    if (calle && calle.trim().length > 150) {
-        return { valido: false, error: 'La calle no puede superar los 150 caracteres.' };
+    if (calle && (calle.trim().length > 150 || !esCalleValida(calle))) {
+        return { valido: false, error: 'La calle admite letras, números y signos de dirección comunes (máximo 150 caracteres).' };
     }
 
     // Zona (opcional)
-    if (zona && zona.trim().length > 100) {
-        return { valido: false, error: 'La zona no puede superar los 100 caracteres.' };
+    if (zona && (zona.trim().length > 100 || !esUbicacionLetras(zona))) {
+        return { valido: false, error: 'La zona solo puede contener letras, espacios, apóstrofes y guiones (máximo 100 caracteres).' };
     }
 
     // Ciudad (opcional)
-    if (ciudad && ciudad.trim().length > 100) {
-        return { valido: false, error: 'La ciudad no puede superar los 100 caracteres.' };
+    if (ciudad && (ciudad.trim().length > 100 || !esUbicacionLetras(ciudad))) {
+        return { valido: false, error: 'La ciudad solo puede contener letras, espacios, apóstrofes y guiones (máximo 100 caracteres).' };
     }
 
     return { valido: true, edad: resultadoFecha.edad };
@@ -424,6 +441,9 @@ export const validarDatosVoluntario = (datos: DatosVoluntarioValidacion): Result
     }
     if (lista.some((h) => h.length > 60)) {
         return { valido: false, error: 'Cada habilidad puede tener máximo 60 caracteres.' };
+    }
+    if (lista.some((h) => !esHabilidadValida(h))) {
+        return { valido: false, error: 'Las habilidades no deben incluir emojis ni símbolos no permitidos.' };
     }
 
     if (!disponibilidad || !disponibilidad.trim()) {

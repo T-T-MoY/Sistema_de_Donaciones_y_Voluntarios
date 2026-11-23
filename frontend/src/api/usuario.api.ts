@@ -93,11 +93,7 @@ export const usuarioApi = {
    * Actualiza el perfil del usuario autenticado.
    */
   updatePerfil: async (formData: FormData): Promise<any> => {
-    const res = await api.put('/usuarios/perfil', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const res = await api.put('/usuarios/perfil', formData);
     return res.data;
   },
 
@@ -165,14 +161,6 @@ export const usuarioApi = {
       `/usuarios/solicitudes/beneficiarios/${id}`,
       payload
     );
-    return res.data;
-  },
-
-  /**
-   * Postula al usuario autenticado como voluntario.
-   */
-  activarPerfilDonante: async (): Promise<{ id_usuario: number; mensaje: string }> => {
-    const res = await api.post<{ id_usuario: number; mensaje: string }>('/usuarios/postular/donante');
     return res.data;
   },
 

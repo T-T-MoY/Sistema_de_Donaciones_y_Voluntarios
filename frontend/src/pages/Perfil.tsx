@@ -7,7 +7,6 @@ import MiUbicacion from '../components/mapa/MiUbicacion';
 import {
     validarCampo,
     esContraseñaSegura,
-    calcularEdad,
     claseInput
 } from '../utils/validaciones';
 
@@ -23,8 +22,6 @@ interface FormData {
     passwordActual: string;
     passwordNueva: string;
     passwordConfirmar: string;
-    ci_nit: string;
-    fecha_nacimiento: string;
     calle: string;
     zona: string;
     ciudad: string;
@@ -32,12 +29,10 @@ interface FormData {
 
 interface DatosRol {
     rol: string;
-    fecha_contratacion: string;
-    cargo: string;
-    turno: string;
-    antiguedad: string | number;
-    nivel_acceso: string;
-    fecha_asignacion_cargo: string;
+    habilidades: string[];
+    disponibilidad: string;
+    estado_voluntario: string | null;
+    estado_beneficiario: string | null;
 }
 
 interface Mensaje {
@@ -60,20 +55,17 @@ interface PerfilResponse {
     correo?: string;
     telefono?: string;
     foto_url?: string | null;
-    ci_nit?: string | number;
-    fecha_nacimiento?: string;
+    direccion?: string | null;
     calle?: string;
     zona?: string;
     ciudad?: string;
     ubi_latitud?: string | number | null;
     ubi_longitud?: string | number | null;
     rol?: string;
-    fecha_contratacion?: string;
-    cargo?: string;
-    turno?: string;
-    antiguedad?: string | number;
-    nivel_acceso?: string;
-    fecha_asignacion_cargo?: string;
+    habilidades?: string[];
+    disponibilidad?: string | null;
+    estado_voluntario?: string | null;
+    estado_beneficiario?: string | null;
 }
 
 interface PerfilUpdateResponse {
@@ -86,6 +78,13 @@ type Pestana = 'personal' | 'ubicacion' | 'seguridad';
 interface Coordenadas {
     lat: number;
     lng: number;
+}
+
+interface PerfilSnapshot {
+    formData: FormData;
+    datosRol: DatosRol;
+    coords: Coordenadas | null;
+    previewFoto: string | null;
 }
 
 // =====================================================
@@ -152,8 +151,6 @@ const Perfil = () => {
         passwordActual: '',
         passwordNueva: '',
         passwordConfirmar: '',
-        ci_nit: '',
-        fecha_nacimiento: '',
         calle: '',
         zona: '',
         ciudad: ''
@@ -169,16 +166,15 @@ const Perfil = () => {
     const [archivoFoto, setArchivoFoto] = useState<File | null>(null);
     const [previewFoto, setPreviewFoto] = useState<string | null>(null);
     const inputFotoRef = useRef<HTMLInputElement>(null);
+    const perfilInicialRef = useRef<PerfilSnapshot | null>(null);
 
     // Datos específicos del rol
     const [datosRol, setDatosRol] = useState<DatosRol>({
         rol: '',
-        fecha_contratacion: '',
-        cargo: '',
-        turno: '',
-        antiguedad: '',
-        nivel_acceso: '',
-        fecha_asignacion_cargo: ''
+        habilidades: [],
+        disponibilidad: '',
+        estado_voluntario: null,
+        estado_beneficiario: null,
     });
     const apiUrl = API_URL;
 
@@ -191,11 +187,9 @@ const Perfil = () => {
     // =====================================================
     // FLAGS DE ROL
     // =====================================================
-    const rolNorm = (datosRol.rol || usuario?.rol || '').toLowerCase().trim();
-    const esCliente = rolNorm === 'cliente';
-    const esEmpleado = rolNorm === 'empleado';
-    const esAdmin = rolNorm === 'admin' || rolNorm === 'administrador';
-    const esDonante = rolNorm === 'donante' || rolNorm === 'cliente';
+    const rolesPerfil = (usuario?.roles || [datosRol.rol || usuario?.rol || '']).map((r) => r.toLowerCase());
+    const esVoluntario = rolesPerfil.includes('voluntario') || rolesPerfil.includes('coordinador');
+    const esDonante = Boolean(usuario?.es_donante) || rolesPerfil.includes('donante');
 
     // =====================================================
     // CARGAR PERFIL
@@ -209,57 +203,52 @@ const Perfil = () => {
                 );
                 const datos = res.data;
 
-                let fechaInput = '';
-                if (datos.fecha_nacimiento) {
-                    fechaInput = new Date(datos.fecha_nacimiento).toISOString().split('T')[0];
-                }
-
-                setFormData(prev => ({
-                    ...prev,
+                const formInicial: FormData = {
                     nombre: datos.nombre || '',
                     paterno: datos.paterno || '',
                     materno: datos.materno || '',
                     correo: datos.correo || '',
                     celular: datos.telefono || '',
-                    ci_nit: datos.ci_nit ? String(datos.ci_nit) : '',
-                    fecha_nacimiento: fechaInput,
-                    calle: datos.calle || '',
+                    passwordActual: '', passwordNueva: '', passwordConfirmar: '',
+                    calle: datos.calle || datos.direccion || '',
                     zona: datos.zona || '',
                     ciudad: datos.ciudad || ''
-                }));
+                };
+                setFormData(formInicial);
 
                 // Los DECIMAL suelen llegar como texto desde el backend
                 const lat = aNumero(datos.ubi_latitud);
                 const lng = aNumero(datos.ubi_longitud);
-                setCoords(lat !== null && lng !== null ? { lat, lng } : null);
+                const coordsIniciales = lat !== null && lng !== null ? { lat, lng } : null;
+                setCoords(coordsIniciales);
 
+                let fotoInicial: string | null = null;
                 if (datos.foto_url) {
                     const baseUrl = apiUrl.replace(/\/api\/?$/, '');
-                    setPreviewFoto(datos.foto_url.startsWith('http') ? datos.foto_url : `${baseUrl}${datos.foto_url}`);
+                    fotoInicial = datos.foto_url.startsWith('http') ? datos.foto_url : `${baseUrl}${datos.foto_url}`;
                 }
+                setPreviewFoto(fotoInicial);
 
-                setDatosRol({
+                const rolInicial: DatosRol = {
                     rol: datos.rol || '',
-                    fecha_contratacion: datos.fecha_contratacion
-                        ? new Date(datos.fecha_contratacion).toISOString().split('T')[0]
-                        : '',
-                    cargo: datos.cargo || '',
-                    turno: datos.turno || '',
-                    antiguedad: datos.antiguedad ?? '',
-                    nivel_acceso: datos.nivel_acceso || '',
-                    fecha_asignacion_cargo: datos.fecha_asignacion_cargo
-                        ? new Date(datos.fecha_asignacion_cargo).toISOString().split('T')[0]
-                        : ''
-                });
+                    habilidades: datos.habilidades || [],
+                    disponibilidad: datos.disponibilidad || '',
+                    estado_voluntario: datos.estado_voluntario ?? null,
+                    estado_beneficiario: datos.estado_beneficiario ?? null,
+                };
+                setDatosRol(rolInicial);
+                perfilInicialRef.current = { formData: formInicial, datosRol: rolInicial, coords: coordsIniciales, previewFoto: fotoInicial };
 
             } catch (error) {
                 console.error("Error al cargar perfil", error);
+                setMensaje({ texto: 'No se pudo cargar tu perfil. Revisá tu conexión e intentá nuevamente.', tipo: 'error' });
             } finally {
                 setCargandoInicial(false);
             }
         };
 
         if (token) void fetchPerfil();
+        else setCargandoInicial(false);
     }, [token]);
 
     // =====================================================
@@ -286,7 +275,7 @@ const Perfil = () => {
         const { name, value } = e.target;
 
         let valorFiltrado = value;
-        if (name === 'ci_nit' || name === 'celular') {
+        if (name === 'celular') {
             valorFiltrado = value.replace(/[^0-9]/g, '');
         }
 
@@ -294,7 +283,7 @@ const Perfil = () => {
         setFormData(nuevosDatos);
         setTouched((prev) => ({ ...prev, [name]: true }));
 
-        const camposValidables = ['nombre', 'paterno', 'materno', 'correo', 'celular', 'ci_nit', 'fecha_nacimiento', 'calle', 'zona', 'ciudad'];
+        const camposValidables = ['nombre', 'paterno', 'materno', 'correo', 'celular', 'calle', 'zona', 'ciudad'];
         if (camposValidables.includes(name)) {
             const err = validarCampo(name === 'celular' ? 'telefono' : name, valorFiltrado, nuevosDatos);
             setErrores((prev) => ({ ...prev, [name]: err }));
@@ -305,7 +294,7 @@ const Perfil = () => {
         const { name, value } = e.target;
         setTouched((prev) => ({ ...prev, [name]: true }));
 
-        const camposValidables = ['nombre', 'paterno', 'materno', 'correo', 'celular', 'ci_nit', 'fecha_nacimiento', 'calle', 'zona', 'ciudad'];
+        const camposValidables = ['nombre', 'paterno', 'materno', 'correo', 'celular', 'calle', 'zona', 'ciudad'];
         if (camposValidables.includes(name)) {
             const err = validarCampo(name === 'celular' ? 'telefono' : name, value, formData);
             setErrores((prev) => ({ ...prev, [name]: err }));
@@ -338,18 +327,6 @@ const Perfil = () => {
 
         const errCelular = validarCampo('telefono', formData.celular, formData);
         if (errCelular) erroresEncontrados.celular = errCelular;
-
-        // Validaciones SOLO de cliente
-        if (esCliente) {
-            if (formData.ci_nit) {
-                const errCi = validarCampo('ci_nit', formData.ci_nit, formData);
-                if (errCi) erroresEncontrados.ci_nit = errCi;
-            }
-            if (formData.fecha_nacimiento) {
-                const errFecha = validarCampo('fecha_nacimiento', formData.fecha_nacimiento, formData);
-                if (errFecha) erroresEncontrados.fecha_nacimiento = errFecha;
-            }
-        }
 
         // Validaciones de contraseña (todos los roles)
         if (formData.passwordNueva || formData.passwordConfirmar) {
@@ -394,10 +371,7 @@ const Perfil = () => {
             dataToSend.append('correo', formData.correo.toLowerCase().trim());
             dataToSend.append('telefono', formData.celular);
 
-            // Solo enviar datos de cliente si es Cliente
-            if (esCliente) {
-                dataToSend.append('ci_nit', formData.ci_nit);
-                dataToSend.append('fecha_nacimiento', formData.fecha_nacimiento);
+            if (esDonante) {
                 dataToSend.append('calle', formData.calle);
                 dataToSend.append('zona', formData.zona);
                 dataToSend.append('ciudad', formData.ciudad);
@@ -449,13 +423,27 @@ const Perfil = () => {
 
     const iniciales = formData.nombre ? formData.nombre.charAt(0).toUpperCase() : 'U';
 
-    const edadCalculada = formData.fecha_nacimiento
-        ? calcularEdad(formData.fecha_nacimiento)
-        : null;
+    const cancelarCambios = (): void => {
+        const inicial = perfilInicialRef.current;
+        if (!inicial) return;
+        setFormData({ ...inicial.formData });
+        setDatosRol({ ...inicial.datosRol });
+        setCoords(inicial.coords);
+        setPreviewFoto(inicial.previewFoto);
+        setArchivoFoto(null);
+        setErrores({});
+        setTouched({});
+        setMensaje({ texto: '', tipo: '' });
+        setPestana('personal');
+        if (inputFotoRef.current) inputFotoRef.current.value = '';
+    };
 
-    const fechaMaxima = new Date();
-    fechaMaxima.setFullYear(fechaMaxima.getFullYear() - 15);
-    const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+    const actualizarCoordenadasGuardadas = (nuevas: Coordenadas): void => {
+        setCoords(nuevas);
+        if (perfilInicialRef.current) {
+            perfilInicialRef.current = { ...perfilInicialRef.current, coords: nuevas };
+        }
+    };
 
     // =====================================================
     // ENLACE A GOOGLE MAPS
@@ -527,7 +515,7 @@ const Perfil = () => {
                     <div className="min-w-0 flex-1">
                         <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1 text-[9.5px] font-bold uppercase tracking-[0.18em] text-cream/85 backdrop-blur-md">
                             <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-                            {datosRol.rol || usuario?.rol || 'Usuario'}
+                            {usuario?.roles?.join(' · ') || datosRol.rol || usuario?.rol || 'Usuario'}
                         </span>
 
                         <h1 className="mt-3 truncate font-display text-2xl font-extrabold leading-tight tracking-[-0.03em] text-cream md:text-[2rem]">
@@ -540,11 +528,7 @@ const Perfil = () => {
 
                         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-cream/45">
                             {formData.ciudad && <span>{formData.ciudad}</span>}
-                            {formData.ciudad && edadCalculada !== null && (
-                                <span className="h-1 w-1 rounded-full bg-cream/25" />
-                            )}
-                            {edadCalculada !== null && <span>{edadCalculada} años</span>}
-                            {(formData.ciudad || edadCalculada !== null) && (
+                            {formData.ciudad && (
                                 <span className="h-1 w-1 rounded-full bg-cream/25" />
                             )}
                             <span>Miembro de la red solidaria</span>
@@ -571,60 +555,24 @@ const Perfil = () => {
                     ===================================================== */}
                 <aside className="space-y-5 lg:col-span-1">
 
-                    {/* Datos del rol */}
-                    {(esEmpleado || esAdmin) && (
+                    {esVoluntario && (
                         <div className="anim-rise rounded-2xl border border-border bg-surface-elevated p-5 shadow-soft [animation-delay:80ms]">
                             <span className="block text-[9.5px] font-bold uppercase tracking-[0.2em] text-accent-text">
-                                {esEmpleado && 'Datos laborales'}
-                                {esAdmin && 'Datos de administrador'}
+                                Perfil de voluntario
                             </span>
-
                             <div className="mt-4 space-y-3.5">
-                                {esEmpleado && (
-                                    <>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">Cargo</span>
-                                            <span className="text-right font-semibold text-text">{datosRol.cargo || '—'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">Turno</span>
-                                            <span className="text-right font-semibold text-text">{datosRol.turno || '—'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">Fecha contratación</span>
-                                            <span className="text-right font-semibold text-text">
-                                                {datosRol.fecha_contratacion
-                                                    ? new Date(datosRol.fecha_contratacion).toLocaleDateString('es-BO')
-                                                    : '—'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">Antigüedad</span>
-                                            <span className="text-right font-semibold text-text">
-                                                {datosRol.antiguedad !== '' && datosRol.antiguedad !== null
-                                                    ? `${datosRol.antiguedad} año(s)`
-                                                    : '—'}
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-
-                                {esAdmin && (
-                                    <>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">Nivel de acceso</span>
-                                            <span className="text-right font-semibold text-text">{datosRol.nivel_acceso || '—'}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between gap-3 text-sm">
-                                            <span className="shrink-0 text-text-muted">En el cargo desde</span>
-                                            <span className="text-right font-semibold text-text">
-                                                {datosRol.fecha_asignacion_cargo
-                                                    ? new Date(datosRol.fecha_asignacion_cargo).toLocaleDateString('es-BO')
-                                                    : '—'}
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
+                                <div className="text-sm">
+                                    <span className="block text-text-muted">Habilidades</span>
+                                    <span className="font-semibold text-text">{datosRol.habilidades.join(', ') || '—'}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="shrink-0 text-text-muted">Disponibilidad</span>
+                                    <span className="text-right font-semibold text-text">{datosRol.disponibilidad || '—'}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3 text-sm">
+                                    <span className="shrink-0 text-text-muted">Estado</span>
+                                    <span className="text-right font-semibold text-text">{datosRol.estado_voluntario || '—'}</span>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -817,46 +765,14 @@ const Perfil = () => {
                                 aria-labelledby="tab-ubicacion"
                                 hidden={pestana !== 'ubicacion'}
                             >
-                                {esCliente && (
-                                    <div className="border-b border-border p-6 md:p-8">
+                                <div className="border-b border-border p-6 md:p-8">
                                         <h2 className={tituloSeccion}>
                                             <span aria-hidden="true" className="h-4 w-1 rounded-full bg-accent" />
-                                            Datos adicionales
+                                            Dirección
                                         </h2>
-                                        <p className={subtituloSeccion}>Completá tu información de identificación y dirección.</p>
+                                        <p className={subtituloSeccion}>Actualizá tu dirección y ubicación en el mapa.</p>
 
                                         <div className="grid grid-cols-1 gap-x-5 gap-y-1 md:grid-cols-2">
-                                            <div>
-                                                <label htmlFor="perfil-ci" className={etiquetaCampo}>CI / NIT</label>
-                                                <input
-                                                    id="perfil-ci"
-                                                    type="text" name="ci_nit"
-                                                    inputMode="numeric"
-                                                    value={formData.ci_nit} onChange={handleChange} onBlur={handleBlur}
-                                                    maxLength={15}
-                                                    className={claseInput(errores.ci_nit, touched.ci_nit)}
-                                                />
-                                                <FieldError error={errores.ci_nit} touched={touched.ci_nit} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="perfil-fecha" className={etiquetaCampo}>Fecha de nacimiento</label>
-                                                <input
-                                                    id="perfil-fecha"
-                                                    type="date" name="fecha_nacimiento"
-                                                    value={formData.fecha_nacimiento} onChange={handleChange} onBlur={handleBlur}
-                                                    max={fechaMaximaStr}
-                                                    className={claseInput(errores.fecha_nacimiento, touched.fecha_nacimiento)}
-                                                />
-                                                {errores.fecha_nacimiento && touched.fecha_nacimiento ? (
-                                                    <FieldError error={errores.fecha_nacimiento} touched={touched.fecha_nacimiento} />
-                                                ) : (
-                                                    <p className="mt-1.5 min-h-[18px] text-xs text-text-muted">
-                                                        {edadCalculada !== null ? (
-                                                            <>Edad: <span className="font-semibold text-primary">{edadCalculada} años</span></>
-                                                        ) : '\u00A0'}
-                                                    </p>
-                                                )}
-                                            </div>
                                             <div className="md:col-span-2">
                                                 <label htmlFor="perfil-calle" className={etiquetaCampo}>Calle / Avenida</label>
                                                 <input
@@ -892,10 +808,9 @@ const Perfil = () => {
                                             </div>
                                         </div>
                                     </div>
-                                )}
 
                                 <div className="p-6 md:p-8">
-                                    <MiUbicacion coordenadas={coords} onActualizada={setCoords} />
+                                    <MiUbicacion coordenadas={coords} onActualizada={actualizarCoordenadasGuardadas} />
                                 </div>
                             </div>
                         )}
@@ -994,7 +909,7 @@ const Perfil = () => {
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => window.location.reload()}
+                                    onClick={cancelarCambios}
                                     className="press w-full rounded-xl border border-border bg-surface-elevated px-6 py-3 text-[12.5px] font-bold uppercase tracking-[0.1em] text-text-muted hover:border-border-strong hover:bg-surface-inset hover:text-text sm:w-auto"
                                 >
                                     Cancelar

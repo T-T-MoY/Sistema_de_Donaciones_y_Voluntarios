@@ -92,6 +92,7 @@ const mapearUsuario = (fila: UsuarioRow): UsuarioResponse => {
     fecha_registro: fila.fecha_registro,
     fecha_creacion: fila.fecha_registro,
     rol,
+    roles: fila.roles || (rol === 'Usuario' ? [] : [rol]),
     tipo_beneficiario: fila.tipo_beneficiario,
     documento: fila.documento,
     ci_nit: fila.documento,
@@ -106,6 +107,7 @@ const mapearUsuario = (fila: UsuarioRow): UsuarioResponse => {
     habilidades: fila.habilidades || [],
     disponibilidad: fila.disponibilidad,
     es_coordinador: Boolean(fila.es_coordinador),
+    es_donante: Boolean(fila.es_donante),
     estado_voluntario: fila.estado_voluntario ?? null,
     revisado_por_voluntario: fila.revisado_por_voluntario ?? null,
     motivo_rechazo_voluntario: fila.motivo_rechazo_voluntario ?? null,
@@ -124,6 +126,7 @@ const SELECT_USUARIO = `
         b.revisado_por AS revisado_por_beneficiario,
         b.motivo_rechazo AS motivo_rechazo_beneficiario,
         d.direccion AS direccion_donante,
+        (d.id_usuario IS NOT NULL) AS es_donante,
         d.ubi_latitud, d.ubi_longitud,
         v.habilidades, v.disponibilidad,
         v.es_coordinador,
@@ -131,11 +134,18 @@ const SELECT_USUARIO = `
         v.revisado_por AS revisado_por_voluntario,
         v.motivo_rechazo AS motivo_rechazo_voluntario,
         v.fecha_registro AS fecha_registro_voluntario,
+        ARRAY_REMOVE(ARRAY[
+            CASE WHEN a.id_usuario IS NOT NULL THEN 'Administrador' END,
+            CASE WHEN v.id_usuario IS NOT NULL AND v.estado = 'Aprobado' AND v.es_coordinador = TRUE THEN 'Coordinador' END,
+            CASE WHEN v.id_usuario IS NOT NULL AND v.estado = 'Aprobado' THEN 'Voluntario' END,
+            CASE WHEN b.id_usuario IS NOT NULL AND b.estado = 'Verificado' THEN 'Beneficiario' END,
+            CASE WHEN d.id_usuario IS NOT NULL THEN 'Donante' END
+        ]::text[], NULL) AS roles,
         CASE
             WHEN a.id_usuario IS NOT NULL THEN 'Administrador'
-            WHEN v.id_usuario IS NOT NULL AND v.es_coordinador = TRUE THEN 'Coordinador'
-            WHEN v.id_usuario IS NOT NULL THEN 'Voluntario'
-            WHEN b.id_usuario IS NOT NULL THEN 'Beneficiario'
+            WHEN v.id_usuario IS NOT NULL AND v.estado = 'Aprobado' AND v.es_coordinador = TRUE THEN 'Coordinador'
+            WHEN v.id_usuario IS NOT NULL AND v.estado = 'Aprobado' THEN 'Voluntario'
+            WHEN b.id_usuario IS NOT NULL AND b.estado = 'Verificado' THEN 'Beneficiario'
             WHEN d.id_usuario IS NOT NULL THEN 'Donante'
             ELSE 'Usuario'
         END AS rol
@@ -230,8 +240,7 @@ async function actualizarSubtipo(
          documento         = EXCLUDED.documento,
          direccion         = EXCLUDED.direccion,
          necesidad         = EXCLUDED.necesidad,
-         descripcion       = EXCLUDED.descripcion,
-         estado            = EXCLUDED.estado`,
+         descripcion       = EXCLUDED.descripcion`,
       [
         id_usuario,
         normalizarTipoBeneficiario(rolData.tipo_beneficiario),
@@ -273,7 +282,7 @@ async function actualizarSubtipo(
          habilidades    = EXCLUDED.habilidades,
          disponibilidad = EXCLUDED.disponibilidad,
          es_coordinador = EXCLUDED.es_coordinador,
-         estado         = EXCLUDED.estado`,
+         estado         = CASE WHEN EXCLUDED.es_coordinador THEN 'Aprobado' ELSE voluntario.estado END`,
       [id_usuario, rolData.habilidades || [], (rolData.disponibilidad || '').trim(), esCoord, estadoVol]
     );
   }
@@ -356,7 +365,7 @@ export const usuarioRepository = {
       );
 
       const id_usuario = rows[0].id_usuario;
-      await insertarSubtipo(client, id_usuario, rol, rolData);
+      if (rol === 'Administrador') await insertarSubtipo(client, id_usuario, rol, rolData);
 
       await client.query('COMMIT');
       return { id_usuario };
@@ -428,6 +437,13 @@ export const usuarioRepository = {
       if (rol !== 'Usuario') {
         await actualizarSubtipo(client, id_usuario, rol, rolData);
       }
+      if (rol === 'Voluntario' || rol === 'Coordinador') {
+        await client.query(
+          `INSERT INTO donante (id_usuario, direccion) VALUES ($1, $2)
+           ON CONFLICT (id_usuario) DO UPDATE SET direccion = EXCLUDED.direccion`,
+          [id_usuario, rolData.direccion?.trim() || null]
+        );
+      }
 
       await client.query('COMMIT');
       return await usuarioRepository.obtenerPorId(id_usuario);
@@ -475,12 +491,8 @@ export const usuarioRepository = {
 
       const rol = normalizarRol(usuarioData.rol);
 
-      // El esquema permite especialización solapada (donante + voluntario +
-      // beneficiario). No se eliminan los otros subtipos: hacerlo borraba,
-      // por ejemplo, los datos de donante al editar a un voluntario.
-      if (rol !== 'Usuario') {
-        await actualizarSubtipo(client, id_usuario, rol, rolData);
-      }
+      // Cambiar datos de un subtipo nunca elimina los demás roles del usuario.
+      if (rol !== 'Usuario') await actualizarSubtipo(client, id_usuario, rol, rolData);
 
       await client.query('COMMIT');
       return { id_usuario };
@@ -740,15 +752,6 @@ export const usuarioRepository = {
 
   // ---------- Postulaciones desde Dashboard ----------
 
-  async activarPerfilDonante(id_usuario: number | string): Promise<{ id_usuario: number; mensaje: string }> {
-    await pool.query(
-      `INSERT INTO donante (id_usuario) VALUES ($1)
-       ON CONFLICT (id_usuario) DO NOTHING`,
-      [id_usuario]
-    );
-    return { id_usuario: Number(id_usuario), mensaje: 'Perfil de donante activado con éxito' };
-  },
-
   async postularVoluntario(
     id_usuario: number | string,
     habilidades: string[],
@@ -756,9 +759,19 @@ export const usuarioRepository = {
   ): Promise<{ id_usuario: number; mensaje: string } | null> {
     const { rows } = await pool.query<{ id_usuario: number }>(
       `INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, es_coordinador, estado)
-       SELECT $1, $2, $3, FALSE, 'Pendiente'
-       WHERE NOT EXISTS (SELECT 1 FROM voluntario WHERE id_usuario = $1)
-       ON CONFLICT (id_usuario) DO NOTHING
+       VALUES ($1, $2, $3, FALSE, 'Pendiente')
+       ON CONFLICT (id_usuario) DO UPDATE SET
+         habilidades = EXCLUDED.habilidades,
+         disponibilidad = EXCLUDED.disponibilidad,
+         estado = CASE WHEN voluntario.estado = 'Aprobado' OR voluntario.es_coordinador
+                       THEN voluntario.estado ELSE 'Pendiente' END,
+         revisado_por = CASE WHEN voluntario.estado = 'Aprobado' OR voluntario.es_coordinador
+                             THEN voluntario.revisado_por ELSE NULL END,
+         fecha_revision = CASE WHEN voluntario.estado = 'Aprobado' OR voluntario.es_coordinador
+                               THEN voluntario.fecha_revision ELSE NULL END,
+         motivo_rechazo = CASE WHEN voluntario.estado = 'Aprobado' OR voluntario.es_coordinador
+                               THEN voluntario.motivo_rechazo ELSE NULL END
+       WHERE voluntario.estado = 'Rechazado' AND voluntario.es_coordinador = FALSE
        RETURNING id_usuario`,
       [id_usuario, habilidades, disponibilidad]
     );
@@ -777,8 +790,8 @@ export const usuarioRepository = {
       necesidad: string;
       descripcion?: string | null;
     }
-  ): Promise<{ id_usuario: number; mensaje: string }> {
-    await pool.query(
+  ): Promise<{ id_usuario: number; mensaje: string } | null> {
+    const { rows } = await pool.query<{ id_usuario: number }>(
       `INSERT INTO beneficiario (id_usuario, tipo_beneficiario, documento, direccion, necesidad, descripcion, estado)
        VALUES ($1, $2, $3, $4, $5, $6, 'Pendiente')
        ON CONFLICT (id_usuario) DO UPDATE SET
@@ -787,10 +800,16 @@ export const usuarioRepository = {
          direccion         = EXCLUDED.direccion,
          necesidad         = EXCLUDED.necesidad,
          descripcion       = EXCLUDED.descripcion,
-         estado            = 'Pendiente',
-         motivo_rechazo    = NULL,
-         revisado_por      = NULL,
-         fecha_revision    = NULL`,
+         estado            = CASE WHEN beneficiario.estado = 'Verificado'
+                                  THEN beneficiario.estado ELSE 'Pendiente' END,
+         motivo_rechazo    = CASE WHEN beneficiario.estado = 'Verificado'
+                                  THEN beneficiario.motivo_rechazo ELSE NULL END,
+         revisado_por      = CASE WHEN beneficiario.estado = 'Verificado'
+                                  THEN beneficiario.revisado_por ELSE NULL END,
+         fecha_revision    = CASE WHEN beneficiario.estado = 'Verificado'
+                                  THEN beneficiario.fecha_revision ELSE NULL END
+       WHERE beneficiario.estado = 'Rechazado'
+       RETURNING id_usuario`,
       [
         id_usuario,
         normalizarTipoBeneficiario(datos.tipo_beneficiario),
@@ -800,6 +819,7 @@ export const usuarioRepository = {
         datos.descripcion?.trim() || null,
       ]
     );
+    if (!rows[0]) return null;
     return { id_usuario: Number(id_usuario), mensaje: 'Solicitud de beneficiario enviada con éxito' };
   },
 };

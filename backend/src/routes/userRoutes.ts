@@ -14,7 +14,6 @@ import {
     revisarSolicitudVoluntario,
     obtenerSolicitudesBeneficiarios,
     revisarSolicitudBeneficiario,
-    activarPerfilDonante,
     postularVoluntario,
     postularBeneficiario
 } from '../controllers/userController';
@@ -61,7 +60,6 @@ router.get('/ubicaciones', verificarToken, obtenerUsuariosConUbicacion);
 router.post('/mi-ubicacion', verificarToken, actualizarMiUbicacion);
 
 // Rutas de postulaciones (cualquier usuario autenticado puede solicitar)
-router.post('/postular/donante', verificarToken, activarPerfilDonante);
 router.post('/postular/voluntario', verificarToken, postularVoluntario);
 router.post('/postular/beneficiario', verificarToken, postularBeneficiario);
 
