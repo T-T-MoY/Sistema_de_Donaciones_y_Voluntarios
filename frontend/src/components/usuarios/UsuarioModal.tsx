@@ -13,13 +13,13 @@ import { createPortal } from 'react-dom';
 import api from '../../api/client';
 import FieldError from '../ui/FieldError';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import {
     validarCampo,
     validarFormularioCompleto,
     claseInput
 } from '../../utils/validaciones';
 import type { Rol, UsuarioFormData } from '../../types/usuario.types';
-import { getRolDisplay } from '../../types/usuario.types';
 
 // =====================================================
 // TIPOS LOCALES (auxiliares del modal)
@@ -56,19 +56,20 @@ const claseSelect =
 // =====================================================
 // COMPONENTE
 // =====================================================
-// El backend devuelve Donante / Voluntario / Administrador / Beneficiario.
-// El select del modal usa Cliente / Empleado / Admin, así que se traduce al cargar.
+// El selector y la API usan los roles canónicos.
 const rolBackendAFormulario = (rol?: string | null): Rol => {
     const r = (rol || '').toLowerCase().trim();
-    if (r === 'administrador' || r === 'admin') return 'Admin';
-    if (r === 'voluntario' || r === 'empleado' || r === 'coordinador') return 'Empleado';
+    if (r === 'administrador' || r === 'admin') return 'Administrador';
+    if (r === 'coordinador') return 'Coordinador';
+    if (r === 'voluntario' || r === 'empleado') return 'Voluntario';
     if (r === 'beneficiario') return 'Beneficiario';
-    return 'Cliente';
+    return 'Donante';
 };
 
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
     const modoEdicion = Boolean(usuarioId);
     const { exito } = useToast();
+    const { usuario: usuarioSesion, refreshSession } = useAuth();
 
     const estadoInicial: FormData = {
         nombre: '',
@@ -77,7 +78,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         correo: '',
         telefono: '',
         contraseña: '',
-        rol: 'Cliente',
+        rol: 'Donante',
+        roles: ['Donante'],
         estado: 'Activo',
         ci_nit: '',
         fecha_nacimiento: '',
@@ -90,9 +92,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         direccion: '',
         necesidad: '',
         descripcion: '',
-        estado_beneficiario: 'Pendiente',
-        nivel_acceso: 'GENERAL',
-        es_coordinador: false,
     };
 
     const [formData, setFormData] = useState<FormData>(estadoInicial);
@@ -105,10 +104,10 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     // =====================================================
     // FLAGS DE ROL
     // =====================================================
-    const rolNorm = (formData.rol || '').toLowerCase().trim();
-    const esCliente = rolNorm === 'cliente';
-    const esEmpleado = rolNorm === 'empleado';
-    const esBeneficiario = rolNorm === 'beneficiario';
+    const rolesNorm = formData.roles.map((rol) => rol.toLowerCase().trim());
+    const esDonante = rolesNorm.includes('donante');
+    const esVoluntario = rolesNorm.includes('voluntario') || rolesNorm.includes('coordinador');
+    const esBeneficiario = rolesNorm.includes('beneficiario');
 
     // =====================================================
     // BLOQUEAR SCROLL DEL BODY MIENTRAS EL MODAL ESTÁ ABIERTO
@@ -166,12 +165,16 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     telefono: d.telefono || '',
                     contraseña: '',
                     rol: rolBackendAFormulario(d.rol),
+                    roles: (() => {
+                        const roles = (Array.isArray(d.roles) && d.roles.length ? d.roles : [d.rol]).map(rolBackendAFormulario);
+                        return roles.includes('Coordinador') ? roles.filter((rol: Rol) => rol !== 'Voluntario') : roles;
+                    })(),
                     estado: d.estado_cuenta || 'Activo',
                     ci_nit: d.ci_nit ? String(d.ci_nit) : '',
                     fecha_nacimiento: d.fecha_nacimiento
                         ? new Date(d.fecha_nacimiento).toISOString().split('T')[0]
                         : '',
-                    calle: d.calle || '',
+                    calle: d.calle || d.direccion || '',
                     zona: d.zona || '',
                     ciudad: d.ciudad || '',
                     habilidades: Array.isArray(d.habilidades)
@@ -182,9 +185,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     direccion: d.direccion || '',
                     necesidad: d.necesidad || '',
                     descripcion: d.descripcion || '',
-                    estado_beneficiario: d.estado_beneficiario || 'Pendiente',
-                    nivel_acceso: d.nivel_acceso === 'SUPERADMIN' ? 'SUPERADMIN' : 'GENERAL',
-                    es_coordinador: Boolean(d.es_coordinador || (d.rol && String(d.rol).toLowerCase() === 'coordinador'))
                 });
                 setErrores({});
                 setTouched({});
@@ -228,9 +228,21 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
 
     const handleRolChange = (e: ChangeEvent<HTMLSelectElement>): void => {
         const nuevoRol = e.target.value as Rol;
-        setFormData((prev) => ({ ...prev, rol: nuevoRol }));
-        setErrores({});
-        setTouched({});
+        if (!nuevoRol) return;
+        setFormData((prev) => ({
+            ...prev,
+            rol: prev.roles[0] || nuevoRol,
+            roles: prev.roles.includes(nuevoRol) ? prev.roles : [...prev.roles, nuevoRol],
+        }));
+        e.target.value = '';
+    };
+
+    const handleQuitarRol = (rolQuitar: Rol): void => {
+        setFormData((prev) => {
+            const roles = prev.roles.filter((rol) => rol !== rolQuitar);
+            if (rolQuitar === 'Coordinador') roles.push('Voluntario');
+            return { ...prev, roles, rol: roles[0] || prev.rol };
+        });
     };
 
     // =====================================================
@@ -240,10 +252,14 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         e.preventDefault();
         setError('');
 
-        const erroresEncontrados = validarFormularioCompleto(
-            formData,
-            formData.rol,
-            modoEdicion
+        if (!modoEdicion && formData.roles.length === 0) {
+            setError('Asigná al menos un rol para crear el usuario.');
+            return;
+        }
+
+        const erroresEncontrados = Object.assign(
+            {},
+            ...formData.roles.map((rol) => validarFormularioCompleto(formData, rol, modoEdicion))
         );
 
         if (Object.keys(erroresEncontrados).length > 0) {
@@ -264,19 +280,19 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 correo: formData.correo.toLowerCase().trim(),
                 telefono: String(formData.telefono).trim(),
                 rol: formData.rol,
+                roles: formData.roles,
                 estado: formData.estado
             };
 
-            if (esCliente) {
+            if (esDonante) {
                 payload.calle = formData.calle?.trim() || '';
                 payload.zona = formData.zona?.trim() || '';
                 payload.ciudad = formData.ciudad?.trim() || '';
             }
 
-            if (esEmpleado) {
+            if (esVoluntario) {
                 payload.habilidades = formData.habilidades;
                 payload.disponibilidad = formData.disponibilidad?.trim() || '';
-                payload.es_coordinador = Boolean(formData.es_coordinador);
             }
 
             if (esBeneficiario) {
@@ -285,7 +301,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 payload.direccion = formData.direccion?.trim() || '';
                 payload.necesidad = formData.necesidad?.trim() || '';
                 payload.descripcion = formData.descripcion?.trim() || '';
-                payload.estado_beneficiario = formData.estado_beneficiario;
             }
 
 
@@ -305,6 +320,10 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 void exito('', 'Usuario actualizado con éxito');
             } else {
                 void exito('', 'Usuario creado con éxito');
+            }
+
+            if (modoEdicion && Number(usuarioSesion?.id) === Number(usuarioId)) {
+                await refreshSession();
             }
 
             onSave();
@@ -449,19 +468,36 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div>
-                            <label htmlFor="modal-rol" className={etiquetaCampo}>Rol *</label>
+                        <div className="md:col-span-2">
+                            <label htmlFor="modal-rol" className={etiquetaCampo}>Roles asignados</label>
+                            <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Roles asignados">
+                                {formData.roles.map((rol) => (
+                                    <span key={rol} className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-bold text-text">
+                                        {rol === 'Coordinador' ? 'Coord.' : rol}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleQuitarRol(rol)}
+                                            aria-label={`Quitar rol ${rol}`}
+                                            title={`Quitar ${rol}`}
+                                            className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-error/15 hover:text-error focus:outline-none focus:ring-2 focus:ring-error/30"
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
                             <select
                                 id="modal-rol"
-                                name="rol"
-                                value={formData.rol}
+                                value=""
                                 onChange={handleRolChange}
                                 className={claseSelect}
                             >
-                                <option value="Cliente">{getRolDisplay('Cliente')}</option>
-                                <option value="Empleado">{getRolDisplay('Empleado')}</option>
-                                <option value="Beneficiario">Beneficiario</option>
-                                <option value="Admin">{getRolDisplay('Admin')}</option>
+                                <option value="">Añadir nuevo rol</option>
+                                <option value="Donante" disabled={formData.roles.includes('Donante')}>Donante</option>
+                                <option value="Voluntario" disabled={formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
+                                <option value="Coordinador" disabled={formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
+                                <option value="Beneficiario" disabled={formData.roles.includes('Beneficiario')}>Beneficiario</option>
+                                <option value="Administrador" disabled={formData.roles.includes('Administrador')}>Administrador</option>
                             </select>
                         </div>
                         <div>
@@ -507,7 +543,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     </div>
 
                     {/* === DATOS PERSONALES (SOLO CLIENTE) === */}
-                    {esCliente && (
+                    {esDonante && (
                         <>
                             <h3 className={`${tituloSeccion} pt-3`}>
                                 <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
@@ -554,7 +590,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     )}
 
                     {/* === CAMPOS EMPLEADO === */}
-                    {esEmpleado && (
+                    {esVoluntario && (
                         <>
                             <h3 className={`${tituloSeccion} pt-3`}>
                                 <span aria-hidden="true" className="h-3.5 w-1 rounded-full bg-accent" />
@@ -588,25 +624,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                         <option value="Noche">Noche</option>
                                         <option value="Fines de semana">Fines de semana</option>
                                     </select>
-                                </div>
-                                <div className="md:col-span-2 pt-1">
-                                    <label className="flex items-center gap-3 cursor-pointer rounded-xl border border-border bg-surface px-3.5 py-3 transition hover:border-accent/40">
-                                        <input
-                                            type="checkbox"
-                                            name="es_coordinador"
-                                            checked={Boolean(formData.es_coordinador)}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, es_coordinador: e.target.checked }))}
-                                            className="h-4 w-4 rounded border-border accent-primary cursor-pointer"
-                                        />
-                                        <div>
-                                            <p className="text-[12.5px] font-bold text-text">
-                                                ¿Es Coordinador de Voluntariado?
-                                            </p>
-                                            <p className="text-[11px] text-text-muted">
-                                                Le permite revisar, aprobar o rechazar las solicitudes de nuevos voluntarios.
-                                            </p>
-                                        </div>
-                                    </label>
                                 </div>
                             </div>
                         </>
@@ -688,20 +705,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 <FieldError error={errores.descripcion} touched={touched.descripcion} />
                             </div>
 
-                            <div>
-                                <label htmlFor="modal-estado-benef" className={etiquetaCampo}>Estado de verificación</label>
-                                <select
-                                    id="modal-estado-benef"
-                                    name="estado_beneficiario"
-                                    value={formData.estado_beneficiario}
-                                    onChange={handleChange}
-                                    className={claseSelect}
-                                >
-                                    <option value="Pendiente">Pendiente</option>
-                                    <option value="Verificado">Verificado</option>
-                                    <option value="Rechazado">Rechazado</option>
-                                </select>
-                            </div>
                         </>
                     )}
 

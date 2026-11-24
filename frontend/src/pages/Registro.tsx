@@ -39,15 +39,6 @@ interface FormData {
     disponibilidad: string;
 }
 
-type RolParticipacion = 'Donante' | 'Voluntario' | 'Beneficiario';
-
-interface OpcionRol {
-    valor: RolParticipacion;
-    titulo: string;
-    detalle: string;
-    requiereAprobacion: boolean;
-}
-
 interface Errores {
     [key: string]: string | undefined;
 }
@@ -68,12 +59,6 @@ const tituloSeccion =
 // =====================================================
 // ROLES DISPONIBLES (solo se puede elegir uno a la vez)
 // =====================================================
-const OPCIONES_ROL: OpcionRol[] = [
-    { valor: 'Donante', titulo: 'Donante', detalle: 'Acceso inmediato', requiereAprobacion: false },
-    { valor: 'Beneficiario', titulo: 'Beneficiario', detalle: 'Revisión de solicitud', requiereAprobacion: true },
-    { valor: 'Voluntario', titulo: 'Voluntario', detalle: 'Aprobación coordinador', requiereAprobacion: true },
-];
-
 // =====================================================
 // CAMPO REUTILIZABLE
 // Solo ocupa espacio para el error cuando realmente hay uno
@@ -141,7 +126,6 @@ const Registro = () => {
         disponibilidad: 'Fines de semana',
     });
 
-    const [rolElegido, setRolElegido] = useState<RolParticipacion>('Donante');
     const [aceptarTerminos, setAceptarTerminos] = useState<boolean>(false);
     const [mostrarContraseña, setMostrarContraseña] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
@@ -150,26 +134,11 @@ const Registro = () => {
     const [cargando, setCargando] = useState<boolean>(false);
 
     const navigate = useNavigate();
-    const { exito, advertencia } = useToast();
+    const { exito } = useToast();
 
     // =====================================================
     // HANDLERS
     // =====================================================
-
-    const seleccionarRol = (rol: RolParticipacion) => {
-        setRolElegido(rol);
-        // Limpiar errores de campos específicos al alternar rol
-        setErrores((prev) => {
-            const copia = { ...prev };
-            delete copia.necesidad;
-            delete copia.tipo_beneficiario;
-            delete copia.descripcion;
-            delete copia.habilidades;
-            delete copia.disponibilidad;
-            return copia;
-        });
-        if (error) setError('');
-    };
 
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -221,7 +190,7 @@ const Registro = () => {
 
         const erroresEncontrados = validarFormularioCompleto(
             { ...formData, direccion: direccionCompleta },
-            rolElegido,
+            'Usuario',
             false
         );
 
@@ -251,38 +220,14 @@ const Registro = () => {
                 zona: formData.zona.trim() || undefined,
                 ciudad: formData.ciudad.trim() || undefined,
                 direccion: direccionCompleta || undefined,
-                rol: rolElegido,
+
                 edad,
             };
-
-            if (rolElegido === 'Beneficiario') {
-                payload.tipo_beneficiario = formData.tipo_beneficiario;
-                payload.necesidad = formData.necesidad.trim();
-                payload.descripcion = formData.descripcion.trim() || undefined;
-            } else if (rolElegido === 'Voluntario') {
-                payload.habilidades = formData.habilidades.trim() || 'General';
-                payload.disponibilidad = formData.disponibilidad.trim() || 'Fines de semana';
-            }
 
             const res = await axios.post(`${apiUrl}/auth/registrar`, payload);
             const mensajeServidor = res.data?.mensaje;
 
-            if (rolElegido === 'Voluntario') {
-                advertencia(
-                    mensajeServidor || 'Tu solicitud de voluntariado quedó registrada y está pendiente de aprobación por el coordinador.',
-                    'Solicitud pendiente'
-                );
-            } else if (rolElegido === 'Beneficiario') {
-                exito(
-                    mensajeServidor || 'Solicitud de beneficiario registrada con éxito. Queda en revisión.',
-                    'En revisión'
-                );
-            } else {
-                exito(
-                    mensajeServidor || 'Cuenta de donante creada con éxito.',
-                    '¡Bienvenido Donante!'
-                );
-            }
+            exito(mensajeServidor || 'Cuenta creada. Luego podras elegir como participar.', 'Bienvenido!');
 
             void navigate('/login');
         } catch (err: any) {
@@ -415,85 +360,6 @@ const Registro = () => {
 
                             <form id="registro-form" onSubmit={(e) => void handleSubmit(e)} className="mt-2 min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto overscroll-contain pb-5 pr-2 [scrollbar-gutter:stable]" noValidate>
 
-                                {/* ROL: solo uno a la vez */}
-                                <div>
-                                    <h3 className={tituloSeccion}>
-                                        <span className="h-px w-5 bg-accent" />
-                                        Tipo de cuenta
-                                    </h3>
-                                    <p id="registro-rol-texto" className="mt-1.5 text-[13px] leading-relaxed text-text-muted">
-                                        Seleccioná cómo deseás participar en la plataforma:
-                                    </p>
-
-                                    <div
-                                        role="radiogroup"
-                                        aria-labelledby="registro-rol-texto"
-                                        className="mt-2.5 grid grid-cols-3 gap-2 sm:gap-3"
-                                    >
-                                        {OPCIONES_ROL.map((op) => {
-                                            const activo = rolElegido === op.valor;
-                                            return (
-                                                <button
-                                                    key={op.valor}
-                                                    type="button"
-                                                    role="radio"
-                                                    aria-checked={activo}
-                                                    onClick={() => seleccionarRol(op.valor)}
-                                                    className={`press flex flex-col items-center justify-center gap-0.5 rounded-xl border px-2 py-2.5 text-center transition-colors
-                                                        ${activo
-                                                            ? 'border-primary bg-primary text-on-primary shadow-soft'
-                                                            : 'border-border bg-surface text-text-muted hover:border-primary/50 hover:text-text'
-                                                        }`}
-                                                >
-                                                    <span className="text-[12px] font-bold uppercase tracking-[0.12em]">
-                                                        {op.titulo}
-                                                    </span>
-                                                    <span className={`hidden text-[10px] font-medium sm:block ${activo ? 'text-on-primary/80' : 'text-text-subtle'}`}>
-                                                        {op.detalle}
-                                                    </span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {/* BANNERS SEGÚN EL ROL ELEGIDO */}
-                                    {rolElegido === 'Donante' && (
-                                        <div
-                                            role="status"
-                                            className="anim-fade mt-2.5 flex items-center gap-2 rounded-xl border border-success/30 bg-success-soft px-3 py-2 text-[12px] font-medium text-text"
-                                        >
-                                            <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
-                                            <span>
-                                                Como <strong>Donante</strong> tu cuenta se activa inmediatamente para donar y ubicar puntos de recojo en el mapa.
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {rolElegido === 'Beneficiario' && (
-                                        <div
-                                            role="status"
-                                            className="anim-fade mt-2.5 flex items-center gap-2 rounded-xl border border-info/40 bg-info-soft px-3 py-2 text-[12px] font-medium text-text"
-                                        >
-                                            <span className="h-2 w-2 shrink-0 rounded-full bg-info" />
-                                            <span>
-                                                Como <strong>Beneficiario</strong> completá tus datos de solicitud para que el equipo evalúe la entrega de ayuda.
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {rolElegido === 'Voluntario' && (
-                                        <div
-                                            role="status"
-                                            className="anim-fade mt-2.5 flex items-center gap-2 rounded-xl border border-warning/40 bg-warning-soft px-3 py-2 text-[12px] font-medium text-text"
-                                        >
-                                            <span className="h-2 w-2 shrink-0 rounded-full bg-warning" />
-                                            <span>
-                                                Tu cuenta quedará en <strong>solicitud pendiente</strong> hasta que el coordinador voluntario apruebe tu postulación.
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
                                 {/* FILA 1: NOMBRES + PATERNO + MATERNO */}
                                 <div className="grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-3">
                                     <Campo
@@ -579,176 +445,6 @@ const Registro = () => {
                                         />
                                     </div>
                                 </div>
-
-                                {/* CAMPOS ESPECÍFICOS PARA BENEFICIARIO */}
-                                {rolElegido === 'Beneficiario' && (
-                                    <div className="anim-fade space-y-3 rounded-2xl border border-info/30 bg-info-soft/30 p-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-info text-[11px] text-white font-bold">
-                                                🤝
-                                            </span>
-                                            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.16em] text-text">
-                                                Datos de solicitud de beneficiario
-                                            </h4>
-                                        </div>
-
-                                        <div>
-                                            <label className={etiquetaCampo}>Tipo de beneficiario *</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                {(['Persona', 'Familia', 'Institucion'] as const).map((tipo) => {
-                                                    const sel = formData.tipo_beneficiario === tipo;
-                                                    return (
-                                                        <button
-                                                            key={tipo}
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setFormData((prev) => ({ ...prev, tipo_beneficiario: tipo }));
-                                                                setTouched((prev) => ({ ...prev, tipo_beneficiario: true }));
-                                                            }}
-                                                            className={`press rounded-xl border py-2 text-center text-xs font-bold transition-all ${
-                                                                sel
-                                                                    ? 'border-primary bg-primary text-on-primary shadow-soft'
-                                                                    : 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text'
-                                                            }`}
-                                                        >
-                                                            {tipo === 'Institucion' ? 'Institución' : tipo}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            {errores.tipo_beneficiario && touched.tipo_beneficiario && (
-                                                <FieldError error={errores.tipo_beneficiario} touched={touched.tipo_beneficiario} />
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className={etiquetaCampo} htmlFor="registro-necesidad">
-                                                Necesidad principal *
-                                            </label>
-                                            <input
-                                                id="registro-necesidad"
-                                                type="text"
-                                                name="necesidad"
-                                                value={formData.necesidad}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                placeholder="Ej: Canasta familiar, medicamentos, ropa de abrigo..."
-                                                maxLength={150}
-                                                className={claseInput(errores.necesidad, touched.necesidad)}
-                                            />
-                                            {errores.necesidad && touched.necesidad && (
-                                                <FieldError error={errores.necesidad} touched={touched.necesidad} />
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className={etiquetaCampo} htmlFor="registro-descripcion">
-                                                Detalle de la situación (opcional)
-                                            </label>
-                                            <textarea
-                                                id="registro-descripcion"
-                                                name="descripcion"
-                                                rows={2}
-                                                value={formData.descripcion}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                placeholder="Explicá brevemente tu requerimiento o situación para la evaluación..."
-                                                maxLength={2000}
-                                                className={claseInput(errores.descripcion, touched.descripcion)}
-                                            />
-                                            {errores.descripcion && touched.descripcion && (
-                                                <FieldError error={errores.descripcion} touched={touched.descripcion} />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* CAMPOS ESPECÍFICOS PARA VOLUNTARIO */}
-                                {rolElegido === 'Voluntario' && (
-                                    <div className="anim-fade space-y-3 rounded-2xl border border-warning/40 bg-warning-soft/30 p-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warning text-[11px] text-night font-bold">
-                                                🙋
-                                            </span>
-                                            <h4 className="font-display text-[11px] font-bold uppercase tracking-[0.16em] text-text">
-                                                Postulación de Voluntariado
-                                            </h4>
-                                        </div>
-
-                                        <p className="text-xs leading-relaxed text-text-muted">
-                                            Tu registro se creará como <strong className="text-text">solicitud pendiente</strong>. El coordinador de voluntarios revisará tu perfil para autorizar tu acceso.
-                                        </p>
-
-                                        <div>
-                                            <label className={etiquetaCampo} htmlFor="registro-disponibilidad">
-                                                Disponibilidad de tiempo *
-                                            </label>
-                                            <select
-                                                id="registro-disponibilidad"
-                                                name="disponibilidad"
-                                                value={formData.disponibilidad}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                className={claseInput(errores.disponibilidad, touched.disponibilidad)}
-                                            >
-                                                <option value="Fines de semana">Fines de semana</option>
-                                                <option value="Tardes (14:00 - 19:00)">Tardes (14:00 - 19:00)</option>
-                                                <option value="Mañanas (08:00 - 12:00)">Mañanas (08:00 - 12:00)</option>
-                                                <option value="Tiempo completo">Tiempo completo</option>
-                                                <option value="Flexible / A convenir">Flexible / A convenir</option>
-                                            </select>
-                                            {errores.disponibilidad && touched.disponibilidad && (
-                                                <FieldError error={errores.disponibilidad} touched={touched.disponibilidad} />
-                                            )}
-                                        </div>
-
-                                        <div>
-                                            <label className={etiquetaCampo} htmlFor="registro-habilidades">
-                                                Habilidades y áreas de apoyo * (separadas por comas)
-                                            </label>
-                                            <input
-                                                id="registro-habilidades"
-                                                type="text"
-                                                name="habilidades"
-                                                value={formData.habilidades}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                placeholder="Ej: Logística, Primeros Auxilios, Conducción"
-                                                maxLength={200}
-                                                className={claseInput(errores.habilidades, touched.habilidades)}
-                                            />
-                                            {errores.habilidades && touched.habilidades && (
-                                                <FieldError error={errores.habilidades} touched={touched.habilidades} />
-                                            )}
-
-                                            {/* Sugerencias cliqueables */}
-                                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                                                <span className="text-[10px] font-semibold text-text-muted">Agregar:</span>
-                                                {['Logística', 'Primeros Auxilios', 'Transporte', 'Atención Social', 'Cocina', 'Organización'].map((sug) => (
-                                                    <button
-                                                        key={sug}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const actual = formData.habilidades
-                                                                ? formData.habilidades.split(',').map((s) => s.trim()).filter(Boolean)
-                                                                : [];
-                                                            if (!actual.includes(sug)) {
-                                                                const nueva = [...actual, sug].join(', ');
-                                                                setFormData((prev) => ({ ...prev, habilidades: nueva }));
-                                                                setTouched((prev) => ({ ...prev, habilidades: true }));
-                                                                const err = validarCampo('habilidades', nueva, { ...formData, habilidades: nueva });
-                                                                setErrores((prev) => ({ ...prev, habilidades: err }));
-                                                            }
-                                                        }}
-                                                        className="press rounded-lg border border-border bg-surface px-2 py-0.5 text-[10.5px] font-medium text-text-muted transition-colors hover:border-accent hover:text-text"
-                                                    >
-                                                        + {sug}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
 
                                 {/* CUENTA */}
                                 <div className="pt-1">

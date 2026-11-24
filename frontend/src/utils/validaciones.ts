@@ -35,6 +35,10 @@ export const esSoloNumeros = (texto: any): boolean => {
     return /^[0-9]+$/.test(String(texto).trim());
 };
 
+const esCalleValida = (texto: string): boolean => /^[\p{L}\p{M}\d\s#.,º°/'’()-]+$/u.test(texto.trim());
+const esUbicacionLetras = (texto: string): boolean => /^[\p{L}\p{M}\s'’\-]+$/u.test(texto.trim());
+const esHabilidadValida = (texto: string): boolean => /^[\p{L}\p{M}\p{N}\s,'’./&+()-]+$/u.test(texto.trim());
+
 /**
  * Valida un correo electrónico con formato estándar.
  */
@@ -273,6 +277,7 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
             if (lista.length === 0) return 'Indicá al menos una habilidad (separadas por comas).';
             if (lista.length > 20) return 'Máximo 20 habilidades.';
             if (lista.some((h) => h.length > 60)) return 'Cada habilidad puede tener máximo 60 caracteres.';
+            if (lista.some((h) => !esHabilidadValida(h))) return 'Las habilidades no deben incluir emojis ni símbolos no permitidos.';
             return '';
         }
 
@@ -288,23 +293,20 @@ export const validarCampo = (name: string, value: any, formData: Record<string, 
             }
             return '';
 
-        // Admin
-        case 'nivel_acceso':
-            if (!value) return 'El nivel de acceso es obligatorio.';
-            if (!['SUPERADMIN', 'GENERAL'].includes(value)) return 'Nivel inválido.';
-            return '';
-
         // Dirección (opcionales)
         case 'calle':
             if (value && value.trim().length > 150) return 'Máximo 150 caracteres.';
+            if (value && !esCalleValida(value)) return 'La calle admite letras, números y signos de dirección comunes.';
             return '';
 
         case 'zona':
             if (value && value.trim().length > 100) return 'Máximo 100 caracteres.';
+            if (value && !esUbicacionLetras(value)) return 'La zona solo puede contener letras, espacios, apóstrofes y guiones.';
             return '';
 
         case 'ciudad':
             if (value && value.trim().length > 100) return 'Máximo 100 caracteres.';
+            if (value && !esUbicacionLetras(value)) return 'La ciudad solo puede contener letras, espacios, apóstrofes y guiones.';
             return '';
 
         default:
@@ -359,15 +361,11 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
     }
 
     // === CAMPOS ESPECÍFICOS DEL ROL ===
-    if (rol === 'Empleado' || rol === 'Voluntario') {
+    if (rol === 'Coordinador' || rol === 'Voluntario') {
         ['habilidades', 'disponibilidad'].forEach((campo) => {
             const err = validarCampo(campo, formData[campo], formData);
             if (err) errores[campo] = err;
         });
-        if (rol === 'Empleado' && formData.antiguedad !== undefined && formData.antiguedad !== '') {
-            const errAnti = validarCampo('antiguedad', formData.antiguedad, formData);
-            if (errAnti) errores.antiguedad = errAnti;
-        }
     }
 
     if (rol === 'Beneficiario') {
@@ -383,11 +381,6 @@ export const validarFormularioCompleto = (formData: Record<string, any>, rol: st
             const errDesc = validarCampo('descripcion', formData.descripcion, formData);
             if (errDesc) errores.descripcion = errDesc;
         }
-    }
-
-    if (rol === 'Admin' || rol === 'Administrador') {
-        const errNivel = validarCampo('nivel_acceso', formData.nivel_acceso, formData);
-        if (errNivel) errores.nivel_acceso = errNivel;
     }
 
     return errores;

@@ -44,7 +44,7 @@ router.post('/entregas', admin, c.registrarEntrega);
 
 // --- Registro --------------------------------------------------------------
 router.post('/presencial', registran, c.registrarPresencial);
-router.post('/', requerirRol('Donante'), c.registrarPropia);
+router.post('/', c.registrarPropia);
 
 // --- Consulta y gestión ----------------------------------------------------
 router.get('/', todos, c.listar);

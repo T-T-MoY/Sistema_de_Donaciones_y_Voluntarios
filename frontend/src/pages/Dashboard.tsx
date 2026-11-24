@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Link } from 'react-router-dom';
 import { usuarioApi } from '../api/usuario.api';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import type { SolicitudVoluntario, SolicitudBeneficiario } from '../types/usuario.types';
 
 // =====================================================
@@ -31,7 +32,7 @@ interface Modulo {
 }
 
 // =====================================================
-// DATOS
+// DATOS_
 // =====================================================
 const ICONOS = {
     usuarios: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
@@ -272,36 +273,6 @@ const MODULOS_ADMIN: Modulo[] = [
     },
 ];
 
-const MODULOS_EMPLEADO: Modulo[] = [
-    {
-        to: '/verificar-pagos',
-        titulo: 'Verificar Pagos',
-        descripcion: 'Aprobá o rechazá comprobantes de donaciones pendientes de los donantes de manera rápida.',
-        cta: 'Ir a Verificación de Pagos',
-        icono: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-        iconoBg: 'bg-info-soft text-info',
-        enDesarrollo: true,
-    },
-    {
-        to: '/gestion-voluntariados',
-        titulo: 'Gestión de Voluntariados',
-        descripcion: 'Supervisá la agenda de voluntariados, atendé a los voluntarios y gestioná cambios.',
-        cta: 'Ir a Gestión de Voluntariados',
-        icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-        iconoBg: 'bg-warning-soft text-warning',
-        enDesarrollo: true,
-    },
-    {
-        to: '/gestion-campanas',
-        titulo: 'Gestión de Campañas',
-        descripcion: 'Consultá las campañas activas y asistí a los beneficiarios.',
-        cta: 'Ir a Gestión de Campañas',
-        icono: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
-        iconoBg: 'bg-error-soft text-error',
-        enDesarrollo: true,
-    },
-];
-
 const MODULOS_CLIENTE: Modulo[] = [
     {
         to: '/campanas',
@@ -312,7 +283,6 @@ const MODULOS_CLIENTE: Modulo[] = [
         iconoBg: 'bg-success-soft text-success',
         badge: 'En vivo',
         badgeClass: 'bg-success-soft text-success',
-        enDesarrollo: true,
     },
     {
         to: '/donaciones',
@@ -323,7 +293,6 @@ const MODULOS_CLIENTE: Modulo[] = [
         iconoBg: 'bg-primary-soft text-primary',
         badge: 'Historial',
         badgeClass: 'bg-primary-soft text-primary',
-        enDesarrollo: true,
     },
     {
         to: '/voluntariados',
@@ -359,7 +328,6 @@ const MODULOS_DONANTE: Modulo[] = [
         iconoBg: 'bg-success-soft text-success',
         badge: 'En vivo',
         badgeClass: 'bg-success-soft text-success',
-        enDesarrollo: true,
     },
     {
         to: '/donaciones',
@@ -370,7 +338,6 @@ const MODULOS_DONANTE: Modulo[] = [
         iconoBg: 'bg-primary-soft text-primary',
         badge: 'Historial',
         badgeClass: 'bg-primary-soft text-primary',
-        enDesarrollo: true,
     },
     {
         to: '/mi-impacto',
@@ -428,7 +395,6 @@ const MODULOS_BENEFICIARIO: Modulo[] = [
         iconoBg: 'bg-warning-soft text-warning',
         badge: 'Abiertas',
         badgeClass: 'bg-warning-soft text-warning',
-        enDesarrollo: true,
     },
     {
         to: '/mi-perfil-solidario',
@@ -507,15 +473,6 @@ const PANEL_ADMIN: PanelRol = {
     modulos: MODULOS_ADMIN,
     descripcion: 'Supervisá usuarios, beneficiarios y actividad de la plataforma en tiempo real.',
     cta: { etiqueta: 'Ver usuarios', to: '/usuarios', icono: ICONOS.usuarios },
-    seccionTitulo: 'Módulos de gestión',
-    seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
-};
-
-const PANEL_EMPLEADO: PanelRol = {
-    kpis: KPIS_ADMIN,
-    modulos: MODULOS_EMPLEADO,
-    descripcion: 'Coordiná pagos, campañas y voluntariados de la plataforma.',
-    cta: { etiqueta: 'Verificar pagos', icono: ICONOS.check },
     seccionTitulo: 'Módulos de gestión',
     seccionSubtitulo: 'Seleccioná un módulo para empezar a operar.',
 };
@@ -681,7 +638,7 @@ const getAvatarUrl = (fotoUrl?: string | null): string | null => {
 // COMPONENTE PRINCIPAL
 // =====================================================
 const Dashboard = () => {
-    const { usuario } = useAuth();
+    const { usuario, refreshSession } = useAuth();
     const { exito, error } = useToast();
 
     const getSaludo = () => {
@@ -698,10 +655,12 @@ const Dashboard = () => {
         year: 'numeric'
     });
 
-    const rolNormalizado = (usuario?.rol || '').toLowerCase();
-    const esCoordinador = Boolean(usuario?.es_coordinador) || rolNormalizado === 'coordinador';
-    const yaEsVoluntario = esCoordinador || rolNormalizado === 'voluntario' || rolNormalizado === 'empleado';
-    const esAdmin = rolNormalizado === 'administrador' || rolNormalizado === 'admin';
+    const rolesUsuario = (usuario?.roles || [usuario?.rol || '']).map(r => r.toLowerCase());
+    const rolNormalizado = rolesUsuario[0] || '';
+    const tieneRol = (rol: string) => rolesUsuario.includes(rol.toLowerCase());
+    const esCoordinador = Boolean(usuario?.es_coordinador) || tieneRol('coordinador');
+    const yaEsVoluntario = esCoordinador || tieneRol('voluntario') || tieneRol('empleado');
+    const esAdmin = tieneRol('administrador') || tieneRol('admin');
     const puedeAprobar = esCoordinador || esAdmin;
 
     // Modales de postulación
@@ -723,6 +682,13 @@ const Dashboard = () => {
     const [solicitudesBen, setSolicitudesBen] = useState<SolicitudBeneficiario[]>([]);
     const [cargandoSol, setCargandoSol] = useState<boolean>(false);
     const [procesandoId, setProcesandoId] = useState<number | null>(null);
+    const [rechazo, setRechazo] = useState<{ tipo: 'voluntario' | 'beneficiario'; id: number } | null>(null);
+    const [motivoRechazo, setMotivoRechazo] = useState('');
+    const estadoVol = String(usuario?.estado_voluntario || '');
+    const estadoBen = String(usuario?.estado_beneficiario || '');
+    const yaEsBeneficiario = tieneRol('beneficiario') || estadoBen === 'Verificado';
+    const puedeSolicitarVoluntario = !yaEsVoluntario && !['Pendiente', 'Aprobado'].includes(estadoVol);
+    const puedeSolicitarBeneficiario = !yaEsBeneficiario && !['Pendiente', 'Verificado'].includes(estadoBen);
 
     const cargarSolicitudes = async () => {
         if (!puedeAprobar) return;
@@ -748,16 +714,14 @@ const Dashboard = () => {
     }, [puedeAprobar]);
 
     const handleRevisarVoluntario = async (id: number, nuevoEstado: 'Aprobado' | 'Rechazado') => {
-        let motivo: string | undefined;
         if (nuevoEstado === 'Rechazado') {
-            const respuesta = window.prompt('Ingrese el motivo de rechazo (opcional):');
-            if (respuesta === null) return;
-            motivo = respuesta.trim() || undefined;
+            setMotivoRechazo(''); setRechazo({ tipo: 'voluntario', id }); return;
         }
         setProcesandoId(id);
         try {
-            await usuarioApi.revisarSolicitudVoluntario(id, { estado: nuevoEstado, motivo_rechazo: motivo });
+            await usuarioApi.revisarSolicitudVoluntario(id, { estado: nuevoEstado });
             void exito('', `Solicitud de voluntario ${nuevoEstado.toLowerCase()} con éxito.`);
+            await refreshSession().catch(() => undefined);
             await cargarSolicitudes();
         } catch (err: any) {
             void error('', err.response?.data?.error || 'Error al procesar solicitud');
@@ -767,16 +731,14 @@ const Dashboard = () => {
     };
 
     const handleRevisarBeneficiario = async (id: number, nuevoEstado: 'Verificado' | 'Rechazado') => {
-        let motivo: string | undefined;
         if (nuevoEstado === 'Rechazado') {
-            const respuesta = window.prompt('Ingrese el motivo de rechazo (opcional):');
-            if (respuesta === null) return;
-            motivo = respuesta.trim() || undefined;
+            setMotivoRechazo(''); setRechazo({ tipo: 'beneficiario', id }); return;
         }
         setProcesandoId(id);
         try {
-            await usuarioApi.revisarSolicitudBeneficiario(id, { estado: nuevoEstado, motivo_rechazo: motivo });
+            await usuarioApi.revisarSolicitudBeneficiario(id, { estado: nuevoEstado });
             void exito('', `Solicitud de beneficiario ${nuevoEstado.toLowerCase()} con éxito.`);
+            await refreshSession().catch(() => undefined);
             await cargarSolicitudes();
         } catch (err: any) {
             void error('', err.response?.data?.error || 'Error al procesar solicitud');
@@ -785,16 +747,19 @@ const Dashboard = () => {
         }
     };
 
-    const handleActivarDonante = async () => {
-        setEnviandoPostulacion(true);
+    const confirmarRechazo = async () => {
+        if (!rechazo || !motivoRechazo.trim()) return;
+        setProcesandoId(rechazo.id);
         try {
-            await usuarioApi.activarPerfilDonante();
-            void exito('', 'Tu perfil de donante quedó habilitado.');
+            const datos = { estado: 'Rechazado' as const, motivo_rechazo: motivoRechazo.trim() };
+            if (rechazo.tipo === 'voluntario') await usuarioApi.revisarSolicitudVoluntario(rechazo.id, datos);
+            else await usuarioApi.revisarSolicitudBeneficiario(rechazo.id, datos);
+            void exito('', 'La solicitud fue rechazada.');
+            setRechazo(null); setMotivoRechazo('');
+            await cargarSolicitudes();
         } catch (err: any) {
-            void error('', err.response?.data?.error || 'No se pudo habilitar el perfil de donante');
-        } finally {
-            setEnviandoPostulacion(false);
-        }
+            void error('', err.response?.data?.error || 'Error al procesar solicitud');
+        } finally { setProcesandoId(null); }
     };
 
     const handlePostularVoluntario = async (e: React.FormEvent) => {
@@ -806,6 +771,7 @@ const Dashboard = () => {
                 habilidades: habilidades.length ? habilidades : ['General'],
                 disponibilidad: dispPostulacion
             });
+            await refreshSession();
             void exito('', '¡Tu postulación como voluntario ha sido enviada con éxito! Está en revisión.');
             setModalVoluntarioAbierto(false);
             setHabilidadesPostulacion('');
@@ -831,6 +797,7 @@ const Dashboard = () => {
                 necesidad: necesidadBenefPostulacion,
                 descripcion: descBenefPostulacion || undefined
             });
+            await refreshSession();
             void exito('', '¡Tu solicitud como beneficiario ha sido enviada! El administrador la verificará.');
             setModalBeneficiarioAbierto(false);
             setDocBenefPostulacion('');
@@ -846,8 +813,8 @@ const Dashboard = () => {
 
     const panel = rolNormalizado === 'administrador' || rolNormalizado === 'admin'
         ? PANEL_ADMIN
-        : rolNormalizado === 'empleado'
-            ? PANEL_EMPLEADO
+        : esCoordinador
+            ? PANEL_VOLUNTARIO
             : rolNormalizado === 'donante'
                 ? PANEL_DONANTE
                 : rolNormalizado === 'beneficiario'
@@ -855,6 +822,33 @@ const Dashboard = () => {
                     : rolNormalizado === 'voluntario'
                         ? PANEL_VOLUNTARIO
                         : PANEL_USUARIO;
+    const modulosDisponibles = panel.modulos.filter(modulo => !modulo.enDesarrollo);
+
+    // ── Multi-rol: detectar roles secundarios del JWT (campo 'roles' o derivar del estado del usuario)
+    // El token puede traer un array 'roles' además del campo 'rol' principal.
+    const rolesSecundarios: PanelRol[] = [];
+    const rolesJwt: string[] = Array.isArray((usuario as any)?.roles)
+        ? (usuario as any).roles.map((r: string) => r.toLowerCase())
+        : [];
+
+    // Si el usuario tiene estado_voluntario Aprobado pero su rol principal NO es voluntario
+    const esVoluntarioSecundario = (usuario as any)?.estado_voluntario === 'Aprobado' &&
+        rolNormalizado !== 'voluntario' && rolNormalizado !== 'administrador';
+    // Si el usuario tiene estado_beneficiario Verificado pero su rol principal NO es beneficiario
+    const esBeneficiarioSecundario = (usuario as any)?.estado_beneficiario === 'Verificado' &&
+        rolNormalizado !== 'beneficiario' && rolNormalizado !== 'administrador';
+
+    if (esVoluntarioSecundario || rolesJwt.includes('voluntario')) {
+        rolesSecundarios.push(PANEL_VOLUNTARIO);
+    }
+    if (esBeneficiarioSecundario || rolesJwt.includes('beneficiario')) {
+        rolesSecundarios.push(PANEL_BENEFICIARIO);
+    }
+    if ((rolNormalizado === 'voluntario' || rolesJwt.includes('donante')) &&
+        rolNormalizado !== 'donante' && rolNormalizado !== 'administrador') {
+        // Donante como secundario solo si el JWT lo indica
+        if (rolesJwt.includes('donante')) rolesSecundarios.push(PANEL_DONANTE);
+    }
 
     return (
         <div className="pb-10">
@@ -901,7 +895,7 @@ const Dashboard = () => {
                                 <p className="max-w-xl text-sm leading-relaxed text-cream/70 md:text-base">
                                     Panel de{' '}
                                     <span className="font-semibold text-gold-bright">
-                                        {usuario?.rol || 'Usuario'}
+                                        {usuario?.roles?.join(' · ') || usuario?.rol || 'Usuario'}
                                     </span>
                                     . {panel.descripcion}
                                 </p>
@@ -954,7 +948,7 @@ const Dashboard = () => {
                     </section>
 
                     {/* 3. MÓDULOS DE GESTIÓN */}
-                    <section>
+                    {modulosDisponibles.length > 0 && <section>
                         <div className="anim-rise mb-6 flex flex-wrap items-end justify-between gap-3 [animation-delay:120ms]">
                             <div>
                                 <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-text">
@@ -965,19 +959,53 @@ const Dashboard = () => {
                                 </p>
                             </div>
                             <span className="rounded-full border border-border bg-surface-elevated px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-text-muted shadow-soft">
-                                {panel.modulos.length} {panel.modulos.length === 1 ? 'módulo' : 'módulos'}
+                                {modulosDisponibles.length} {modulosDisponibles.length === 1 ? 'módulo' : 'módulos'}
                             </span>
                         </div>
 
                         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-                            {panel.modulos.map((modulo, i) => (
+                            {modulosDisponibles.map((modulo, i) => (
                                 <ModuloCard key={modulo.to + modulo.titulo} modulo={modulo} index={i} />
                             ))}
                         </div>
-                    </section>
+                    </section>}
+
+                    {/* ── ROLES SECUNDARIOS (multi-rol) ── */}
+                    {rolesSecundarios.map((panelSecundario, idx) => {
+                        const etiquetaRol =
+                            panelSecundario === PANEL_VOLUNTARIO ? 'También eres Voluntario' :
+                            panelSecundario === PANEL_DONANTE   ? 'También eres Donante'    :
+                                                                  'También eres Beneficiario';
+                        return (
+                            <section key={idx} className="space-y-6 border-t border-border pt-8">
+                                <div className="flex items-center gap-3">
+                                    <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
+                                        {etiquetaRol}
+                                    </span>
+                                </div>
+                                <div className="anim-rise mb-6 flex flex-wrap items-end justify-between gap-3">
+                                    <div>
+                                        <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-text">
+                                            {panelSecundario.seccionTitulo}
+                                        </h2>
+                                        <p className="mt-1 text-sm text-text-muted">{panelSecundario.seccionSubtitulo}</p>
+                                    </div>
+                                    <span className="rounded-full border border-border bg-surface-elevated px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-text-muted shadow-soft">
+                                        {panelSecundario.modulos.length} {panelSecundario.modulos.length === 1 ? 'módulo' : 'módulos'}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 md:gap-5 xl:grid-cols-4">
+                                    {panelSecundario.kpis.map((kpi, i) => <KpiCard key={kpi.etiqueta + idx} kpi={kpi} index={i} />)}
+                                </div>
+                                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+                                    {panelSecundario.modulos.map((modulo, i) => <ModuloCard key={modulo.to + modulo.titulo + idx} modulo={modulo} index={i} />)}
+                                </div>
+                            </section>
+                        );
+                    })}
 
                     {/* Postulaciones accesibles para cualquier cuenta autenticada */}
-                    <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
+                    {!esAdmin && <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
                         <div>
                             <h2 className="font-display text-xl font-bold text-text">¿Querés participar de otra manera?</h2>
                             <p className="mt-1 text-sm text-text-muted">
@@ -987,18 +1015,17 @@ const Dashboard = () => {
                             </p>
                         </div>
                         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                            {yaEsVoluntario ? <button type="button" onClick={() => void handleActivarDonante()} disabled={enviandoPostulacion} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
-                                Habilitar perfil de donante
-                            </button> : <button type="button" onClick={() => setModalVoluntarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">
+                            {!usuario?.es_donante && <Link to="/donaciones" className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">Registrar una donación</Link>}{puedeSolicitarVoluntario && <button type="button" onClick={() => setModalVoluntarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-on-primary hover:bg-primary-hover">
                                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M9 20H4v-2a4 4 0 018 0v2zm7-13a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                                 Solicitar ser voluntario
-                            </button>}
-                            <button type="button" onClick={() => setModalBeneficiarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface px-5 py-3 text-sm font-bold text-text hover:border-accent hover:bg-accent-soft">
+                            </button>}{puedeSolicitarBeneficiario && <button type="button" onClick={() => setModalBeneficiarioAbierto(true)} className="press inline-flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface px-5 py-3 text-sm font-bold text-text hover:border-accent hover:bg-accent-soft">
                                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                                 Solicitar ser beneficiario
-                            </button>
+                            </button>}
                         </div>
-                    </section>
+                        {estadoVol === 'Pendiente' && <p className="mt-3 text-sm text-text-muted">Tu solicitud de voluntariado está pendiente de revisión.</p>}
+                        {estadoBen === 'Pendiente' && <p className="mt-3 text-sm text-text-muted">Tu solicitud de beneficiario está pendiente de revisión.</p>}
+                    </section>}
 
                     {/* Revisión de solicitudes según permisos */}
                     {puedeAprobar && (
@@ -1102,6 +1129,17 @@ const Dashboard = () => {
                             <div className="flex justify-end gap-2"><button type="button" onClick={() => setModalBeneficiarioAbierto(false)} className="rounded-xl border border-border px-4 py-2 text-sm font-bold text-text-muted">Cancelar</button><button disabled={enviandoPostulacion} className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-on-primary disabled:opacity-50">{enviandoPostulacion ? 'Enviando…' : 'Enviar solicitud'}</button></div>
                         </form>
                     </div>}
+                    <ConfirmModal
+                        isOpen={Boolean(rechazo)}
+                        titulo="Rechazar solicitud"
+                        mensaje="Indica el motivo del rechazo. Este mensaje quedará asociado a la solicitud."
+                        campoTexto={{ etiqueta: 'Motivo obligatorio', valor: motivoRechazo, onChange: setMotivoRechazo, placeholder: 'Escribe el motivo…', requerido: true }}
+                        textoConfirmar="Rechazar"
+                        variante="peligro"
+                        cargando={procesandoId === rechazo?.id}
+                        onConfirm={() => void confirmarRechazo()}
+                        onCancel={() => { setRechazo(null); setMotivoRechazo(''); }}
+                    />
             </div>
         </div>
     );

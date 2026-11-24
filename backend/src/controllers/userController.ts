@@ -156,15 +156,6 @@ export const revisarSolicitudBeneficiario = async (req: Request, res: Response, 
 };
 
 // ---------- Postulaciones desde Dashboard ----------
-export const activarPerfilDonante = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const resultado = await usuarioService.activarPerfilDonante(getUserId(req));
-    res.status(200).json(resultado);
-  } catch (err) {
-    next(err);
-  }
-};
-
 export const postularVoluntario = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const resultado = await usuarioService.postularVoluntario(getUserId(req), req.body);

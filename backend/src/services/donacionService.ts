@@ -176,11 +176,7 @@ export const donacionService = {
   // ============================ Registro =================================
   /** CU "Registrar donación": el donante autenticado dona a su nombre. */
   async registrarPropia(actor: ActorDonacion, body: unknown) {
-    const donante = await repo.obtenerDonante(actor.id_usuario);
-    if (!donante) throw new AppError('Tu cuenta no tiene perfil de donante.', 403);
-    if (donante.estado !== 'Activo') {
-      throw new AppError('Tu cuenta no está activa. No puedes registrar donaciones.', 403);
-    }
+    await asegurarCuentaActiva(actor);
     return this.registrar({
       actor,
       body: cuerpo(body),
@@ -238,6 +234,12 @@ export const donacionService = {
     await validarCampana(datos.campana_id);
 
     const creada = await conTransaccion(async (c) => {
+      if (p.modalidad === 'ONLINE') {
+        await c.query(
+          `INSERT INTO donante (id_usuario) VALUES ($1) ON CONFLICT (id_usuario) DO NOTHING`,
+          [p.donanteId]
+        );
+      }
       const { id_donacion, codigo } = await repo.insertarDonacion(c, {
         donante_usuario_id: p.donanteId,
         registrado_por_usuario_id: p.actor.id_usuario,

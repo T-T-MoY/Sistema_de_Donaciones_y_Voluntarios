@@ -24,7 +24,7 @@ export const authApi = {
   },
 
   /**
-   * Registra una nueva cuenta de donante / beneficiario / voluntario.
+   * Registra una cuenta base; los roles se obtienen mediante acciones posteriores.
    */
   registrar: async (
     data: RegistroRequest

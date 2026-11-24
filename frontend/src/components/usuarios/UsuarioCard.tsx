@@ -12,7 +12,7 @@ import {
   getIniciales,
   getEstado,
   esActivo,
-  getRolDisplay,
+  getRolesDisplay,
 } from '../../types/usuario.types';
 
 interface UsuarioCardProps {
@@ -97,12 +97,16 @@ export const UsuarioCard = ({ usuario, onEdit, onDelete }: UsuarioCardProps) => 
           <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">
             Rol
           </p>
-          <span
-            className={`inline-flex max-w-full items-center truncate rounded-full border px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.06em] ${getRolBadgeClass(usuario.rol)}`}
-            title={getRolDisplay(usuario.rol)}
-          >
-            {getRolDisplay(usuario.rol) || '—'}
-          </span>
+          <div className="flex max-w-full flex-wrap items-center gap-1" aria-label={`Roles: ${getRolesDisplay(usuario.roles, usuario.rol).join(', ')}`}>
+            {getRolesDisplay(usuario.roles, usuario.rol).map((rol) => (
+              <span
+                key={rol}
+                className={`inline-flex max-w-full items-center whitespace-nowrap rounded-full border px-2 py-1 text-[9px] font-bold uppercase leading-none tracking-[0.04em] ${getRolBadgeClass(rol)}`}
+              >
+                {rol}
+              </span>
+            ))}
+          </div>
         </div>
         <div>
           <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.12em] text-text-subtle">

@@ -15,11 +15,16 @@ const ROLES_CANONICOS: readonly RolCanonico[] = ['Administrador', 'Donante', 'Vo
 export const actorDesdeRequest = (req: Request): ActorDonacion => {
   const u = req.usuario;
   const id = Number(u?.id_usuario);
-  const rol = u?.rol as RolCanonico | undefined;
-  if (!u || !Number.isInteger(id) || id <= 0 || !rol || !ROLES_CANONICOS.includes(rol)) {
+  const roles = Array.isArray(u?.roles) ? u.roles.filter((r: unknown): r is RolCanonico => ROLES_CANONICOS.includes(r as RolCanonico)) : [];
+  const legacy = u?.rol as RolCanonico | undefined;
+  if (!roles.length && legacy && ROLES_CANONICOS.includes(legacy)) roles.push(legacy);
+  // Las cuentas nuevas pueden registrar su primera donación; el rol se crea al confirmar.
+  if (!roles.length && u) roles.push('Donante');
+  const rol = roles.includes('Administrador') ? 'Administrador' : roles.includes('Voluntario') ? 'Voluntario' : roles.includes('Beneficiario') ? 'Beneficiario' : roles.includes('Donante') ? 'Donante' : undefined;
+  if (!u || !Number.isInteger(id) || id <= 0 || !rol) {
     throw new AppError('Acceso denegado. Tu rol no tiene acceso a este módulo.', 403);
   }
-  return { id_usuario: id, rol, nombre: u.nombre };
+  return { id_usuario: id, rol, roles, nombre: u.nombre };
 };
 
 /** Exige que el rol del JWT sea uno de los indicados. */
@@ -28,7 +33,7 @@ export const requerirRol =
   (req: Request, _res: Response, next: NextFunction): void => {
     try {
       const actor = actorDesdeRequest(req);
-      if (!permitidos.includes(actor.rol)) {
+      if (!(actor.roles || [actor.rol]).some((rol) => permitidos.includes(rol))) {
         throw new AppError('Acceso denegado. No tienes permisos para esta acción.', 403);
       }
       next();

@@ -18,7 +18,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const iniciales = usuario?.nombre ? usuario.nombre.charAt(0).toUpperCase() : 'U';
-  const rolActual = usuario?.rol || 'Usuario';
+  const rolActual = usuario?.roles?.join(' · ') || usuario?.rol || 'Usuario';
 
   const handleLogout = (): void => {
     void logout();

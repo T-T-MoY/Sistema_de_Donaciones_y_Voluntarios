@@ -17,7 +17,8 @@ const RutasAdmin = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const esAdmin = usuario?.rol === 'Administrador' || usuario?.rol === 'Admin';
+  const roles = usuario?.roles || [usuario?.rol];
+  const esAdmin = roles.includes('Administrador') || roles.includes('Admin');
 
   if (!esAdmin) {
     return <Navigate to="/dashboard" replace />;

@@ -31,7 +31,7 @@ export const LandingNavbar = () => {
   const [menuMovil, setMenuMovil] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const isAdmin = usuario?.rol === 'Admin' || usuario?.rol === 'Administrador';
+  const isAdmin = (usuario?.roles || [usuario?.rol || '']).some((rol) => ['Admin', 'Administrador'].includes(rol));
   const iniciales = usuario?.nombre ? usuario.nombre.charAt(0).toUpperCase() : 'U';
 
   const handleLogout = () => {
@@ -162,7 +162,7 @@ export const LandingNavbar = () => {
                     className="anim-fade absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl border border-border dark:border-night-line bg-surface-elevated dark:bg-night-2/98 p-1.5 shadow-deep backdrop-blur-xl"
                   >
                     <p className="px-3 pb-2 pt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-text-subtle dark:text-cream/45">
-                      {usuario?.rol || 'Sesión'}
+                      {usuario?.roles?.join(' · ') || usuario?.rol || 'Sesión'}
                     </p>
 
                     <Link
