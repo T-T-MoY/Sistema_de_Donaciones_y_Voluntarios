@@ -26,7 +26,7 @@ const opciones = [
   {
     nombre: 'Mi disponibilidad',
     ruta: '/voluntarios/mi-disponibilidad',
-    roles: ['Voluntario'],
+    roles: ['Voluntario', 'Coordinador', 'Empleado'],
   },
 ];
 

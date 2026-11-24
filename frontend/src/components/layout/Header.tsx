@@ -41,6 +41,8 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
     '/usuarios': 'Gestión de Usuarios',
     '/reportes': 'Reportes y Estadísticas',
     '/perfil': 'Mi Perfil',
+    '/mi-disponibilidad': 'Mi Disponibilidad',
+    '/voluntarios/mi-disponibilidad': 'Mi Disponibilidad',
   };
 
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';

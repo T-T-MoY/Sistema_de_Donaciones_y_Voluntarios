@@ -61,6 +61,11 @@ function App() {
             <Route path="/donaciones" element={<DonacionesPage />} />
             <Route path="/campanas" element={<CampanasPage />} />
 
+            {/* SECCIÓN 5: MI DISPONIBILIDAD (Voluntario / Coordinador) */}
+            <Route element={<RutasPorRol roles={['Voluntario', 'Empleado', 'Coordinador']} />}>
+              <Route path="/mi-disponibilidad" element={<MiDisponibilidadPage />} />
+            </Route>
+
             {/* ITERACIÓN 4: GESTIÓN DE VOLUNTARIOS */}
             <Route path="/voluntarios" element={<VoluntariosLayout />}>
               {/* Administrador */}
@@ -78,8 +83,8 @@ function App() {
                 <Route path="asistencia" element={<AsistenciaPage />} />
               </Route>
 
-              {/* Voluntario */}
-              <Route element={<RutasPorRol roles={['Voluntario', 'Empleado']} />}>
+              {/* Voluntario / Coordinador (Sección 5) */}
+              <Route element={<RutasPorRol roles={['Voluntario', 'Empleado', 'Coordinador']} />}>
                 <Route
                   path="mi-disponibilidad"
                   element={<MiDisponibilidadPage />}
