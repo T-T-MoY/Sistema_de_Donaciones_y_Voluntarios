@@ -4,7 +4,7 @@
 // ============================================================================
 import { Router } from 'express';
 import { campanaController as c } from '../controllers/campanaController';
-import { verificarToken, esAdmin, esCoordinadorOAdmin } from '../middlewares/authMiddleware';
+import {verificarToken,esAdmin,esCoordinadorOAdmin,esCoordinador} from '../middlewares/authMiddleware';
 import { asyncHandler } from '../middlewares/asyncHandler';
 
 const router = Router();
@@ -28,9 +28,11 @@ router.get('/actividades/:id(\\d+)', asyncHandler(c.obtenerActividadPorId));
 router.get('/:id(\\d+)', asyncHandler(c.obtenerPorId));
 router.get('/', asyncHandler(c.listar));
 
-// Gestión de Asistencia y Voluntarios por Actividad (Admin o Coordinador)
-router.get('/actividades/:id(\\d+)/voluntarios', esCoordinadorOAdmin, asyncHandler(c.listarVoluntariosActividad));
-router.post('/actividades/participaciones/:idParticipacion(\\d+)/asistencia', esCoordinadorOAdmin, asyncHandler(c.registrarAsistencia));
+// Solo coordinador: consultar voluntarios inscritos
+router.get('/actividades/:id(\\d+)/voluntarios',esCoordinador,asyncHandler(c.listarVoluntariosActividad));
+
+// Solo coordinador: registrar asistencia
+router.post('/actividades/participaciones/:idParticipacion(\\d+)/asistencia',esCoordinador,asyncHandler(c.registrarAsistencia));
 
 // CRUD de Campañas y Actividades (Solo Administrador)
 router.post('/', esAdmin, asyncHandler(c.crear));

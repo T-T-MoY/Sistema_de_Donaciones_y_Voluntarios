@@ -225,7 +225,6 @@ const MODULOS_ADMIN: Modulo[] = [
         iconoBg: 'bg-success-soft text-success',
         badge: 'Donaciones',
         badgeClass: 'bg-success-soft text-success',
-        enDesarrollo: true,
     },
     {
         to: '/verificar-pagos',
@@ -239,7 +238,7 @@ const MODULOS_ADMIN: Modulo[] = [
         enDesarrollo: true,
     },
     {
-        to: '/gestion-campanas',
+        to: '/campanas',
         titulo: 'Gestión de Campañas',
         descripcion: 'Creá campañas solidarias, definí metas y seguí el avance de cada una.',
         cta: 'Gestionar Campañas',
@@ -247,18 +246,16 @@ const MODULOS_ADMIN: Modulo[] = [
         iconoBg: 'bg-warning-soft text-warning',
         badge: 'Campañas',
         badgeClass: 'bg-warning-soft text-warning',
-        enDesarrollo: true,
     },
     {
-        to: '/gestion-voluntariados',
-        titulo: 'Gestión de Voluntariados',
+        to: '/voluntarios',
+        titulo: 'Gestión de Voluntarios',
         descripcion: 'Coordiná postulaciones, turnos y actividad de los voluntarios.',
-        cta: 'Ir a Gestión de Voluntariados',
+        cta: 'Ir a Gestión de Voluntarios',
         icono: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
         iconoBg: 'bg-error-soft text-error',
         badge: 'Voluntariado',
         badgeClass: 'bg-error-soft text-error',
-        enDesarrollo: true,
     },
     {
         to: '/reportes',
@@ -411,6 +408,16 @@ const MODULOS_BENEFICIARIO: Modulo[] = [
 
 const MODULOS_VOLUNTARIO: Modulo[] = [
     {
+        to: '/mi-disponibilidad',
+        titulo: 'Mi Disponibilidad',
+        descripcion: 'Organizá los días y horarios en los que podés participar de las actividades.',
+        cta: 'Gestionar mi disponibilidad',
+        icono: ICONOS.calendario,
+        iconoBg: 'bg-info-soft text-info',
+        badge: 'Disponible',
+        badgeClass: 'bg-info-soft text-info',
+    },
+    {
         to: '/convocatorias',
         titulo: 'Convocatorias',
         descripcion: 'Encontrá jornadas y actividades solidarias que necesitan voluntarios cerca de vos.',
@@ -501,7 +508,7 @@ const PANEL_VOLUNTARIO: PanelRol = {
     descripcion: 'Encontrá convocatorias y organizá tu participación solidaria.',
     cta: { etiqueta: 'Postularme', icono: ICONOS.usuarios },
     seccionTitulo: 'Tus acciones como voluntario',
-    seccionSubtitulo: 'Estos módulos estarán disponibles próximamente.',
+    seccionSubtitulo: 'Seleccioná un módulo para empezar.',
 };
 
 const PANEL_USUARIO: PanelRol = {
@@ -1045,6 +1052,16 @@ const Dashboard = () => {
                                     <select aria-label="Filtrar solicitudes por estado" value={filtroEstadoSol} onChange={e => setFiltroEstadoSol(e.target.value)} className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text">
                                         <option value="todos">Todos los estados</option><option value="Pendiente">Pendientes</option><option value="Aprobado">Aprobadas</option><option value="Verificado">Verificadas</option><option value="Rechazado">Rechazadas</option>
                                     </select>
+                                    <Link
+                                        to="/voluntarios"
+                                        className="press inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-bold text-text-muted hover:border-accent/50 hover:bg-accent-soft"
+                                        title="Abrir el módulo de Gestión de Voluntarios"
+                                    >
+                                        Ir al módulo de Voluntarios
+                                        <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </Link>
                                 </div>
                             </div>
                             {cargandoSol ? <p className="py-8 text-center text-sm text-text-muted">Cargando solicitudes…</p> : (

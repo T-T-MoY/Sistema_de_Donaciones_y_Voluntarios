@@ -28,6 +28,16 @@ import Dashboard from './pages/Dashboard';
 import SolicitarRecuperacion from './pages/SolicitarRecuperacion';
 import ResetPassword from './pages/ResetPassword';
 
+import VoluntariosLayout from './components/voluntarios/layout/VoluntariosLayout';
+import RutasPorRol from './components/guards/RutasPorRol';
+
+import SolicitudesPage from './pages/voluntarios/SolicitudesPage';
+import SeguimientoPage from './pages/voluntarios/SeguimientoPage';
+import DisponibilidadEquipoPage from './pages/voluntarios/DisponibilidadEquipoPage';
+import AsistenciaPage from './pages/voluntarios/AsistenciaPage';
+import MiDisponibilidadPage from './pages/voluntarios/MiDisponibilidadPage';
+
+
 function App() {
   return (
     <BrowserRouter>
@@ -50,6 +60,37 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/donaciones" element={<DonacionesPage />} />
             <Route path="/campanas" element={<CampanasPage />} />
+
+            {/* SECCIÓN 5: MI DISPONIBILIDAD (Voluntario / Coordinador) */}
+            <Route element={<RutasPorRol roles={['Voluntario', 'Empleado', 'Coordinador']} />}>
+              <Route path="/mi-disponibilidad" element={<MiDisponibilidadPage />} />
+            </Route>
+
+            {/* ITERACIÓN 4: GESTIÓN DE VOLUNTARIOS */}
+            <Route path="/voluntarios" element={<VoluntariosLayout />}>
+              {/* Administrador */}
+              <Route element={<RutasPorRol roles={['Administrador']} />}>
+                <Route path="solicitudes" element={<SolicitudesPage />} />
+                <Route path="seguimiento" element={<SeguimientoPage />} />
+              </Route>
+
+              {/* Coordinador */}
+              <Route element={<RutasPorRol roles={['Coordinador']} />}>
+                <Route
+                  path="disponibilidad-equipo"
+                  element={<DisponibilidadEquipoPage />}
+                />
+                <Route path="asistencia" element={<AsistenciaPage />} />
+              </Route>
+
+              {/* Voluntario / Coordinador (Sección 5) */}
+              <Route element={<RutasPorRol roles={['Voluntario', 'Empleado', 'Coordinador']} />}>
+                <Route
+                  path="mi-disponibilidad"
+                  element={<MiDisponibilidadPage />}
+                />
+              </Route>
+            </Route>
 
             {/* Solo administradores */}
             <Route element={<RutasAdmin />}>
