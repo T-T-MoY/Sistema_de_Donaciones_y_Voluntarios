@@ -50,4 +50,30 @@ const esCoordinadorOAdmin = (req: Request, res: Response, next: NextFunction) =>
     next();
 };
 
-export { verificarToken, esAdmin, esCoordinadorOAdmin };
+
+const esCoordinador = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const usuario = (req as any).usuario;
+
+    const roles = (
+        usuario?.roles || [usuario?.rol]
+    ).map((rol: string) => rol?.toLowerCase().trim());
+
+    const esCoordinadorReal =
+        usuario?.es_coordinador === true ||
+        roles.includes('coordinador');
+
+    if (!usuario || !esCoordinadorReal) {
+        return res.status(403).json({
+            error: 'Acceso denegado. Solo el coordinador puede gestionar la asistencia.'
+        });
+    }
+
+    next();
+};
+
+
+export {verificarToken,esAdmin,esCoordinadorOAdmin,esCoordinador};

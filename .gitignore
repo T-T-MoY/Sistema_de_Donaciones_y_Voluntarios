@@ -34,3 +34,7 @@ uploads/
 backend/storage/**
 !backend/storage/donaciones/.gitkeep
 frontend/.env.local
+
+# Archivos comprimidos y exportaciones locales
+*.zip
+zip/
