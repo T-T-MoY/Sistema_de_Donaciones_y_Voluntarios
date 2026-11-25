@@ -143,7 +143,7 @@ export default function ReportesNotificacionesPage() {
       doc.setFontSize(7);
       doc.setTextColor(255, 255, 255);
       columnas.forEach((col, i) => {
-        const texto = doc.splitTextToSize(col.replaceAll('_', ' ').toUpperCase(), anchoColumna - 3).slice(0, 2);
+        const texto = doc.splitTextToSize(col.replace(/_/g, ' ').toUpperCase(), anchoColumna - 3).slice(0, 2);
         doc.text(texto, margen + i * anchoColumna + 1.5, y + 3.5);
       });
       y += 11;
