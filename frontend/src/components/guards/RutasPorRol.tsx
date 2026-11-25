@@ -16,6 +16,7 @@ export default function RutasPorRol({ roles }: Props) {
   const rolesUsuario = [
     ...(usuario?.roles ?? []),
     usuario?.rol ?? '',
+    ...(usuario?.es_coordinador ? ['Coordinador'] : []),
   ].map((rol) => rol.toLowerCase().trim());
 
   const tienePermiso = roles.some((rol) =>

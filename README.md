@@ -2038,3 +2038,32 @@ Una funcionalidad está terminada cuando:
 ⬆️ [Volver arriba](#-sistema-de-donaciones-y-voluntariados)
 
 </div>
+
+---
+
+## Sprint 6 – Gestión de Notificaciones y Reportes
+
+Se incorporó el módulo `/reportes` con reportes de donaciones, voluntariado, campañas y solicitudes de ayuda; exportación CSV; envío de correos a destinatarios autorizados; programación de envíos y registro de auditoría.
+
+### Configuración local
+
+1. En la raíz del proyecto, copia `.env.example` como `.env` y revisa las credenciales. Cambia `JWT_SECRET` por una clave propia.
+2. Si la base de datos es nueva, ejecuta `docker compose up --build`; el script `database/07_sprint6_notificaciones_reportes.sql` se ejecuta automáticamente al inicializar PostgreSQL.
+3. Si ya tienes un volumen/base de datos creada, aplica la migración una sola vez desde la raíz:
+   ```bash
+   docker compose exec -T db psql -U admin -d bd_donaciones_voluntariado < database/07_sprint6_notificaciones_reportes.sql
+   ```
+   Sustituye `admin` y `bd_donaciones_voluntariado` si tu `.env` usa otros valores.
+4. Para enviar correos reales, configura `EMAIL_USER` y `EMAIL_PASS` con una cuenta Gmail y una contraseña de aplicación. Sin esas variables, los envíos quedarán pendientes y se registrará el error para reintento.
+5. Inicia el proyecto con `docker compose up --build` o, en terminales separadas, `npm run dev` dentro de `backend` y `npm run dev` dentro de `frontend`.
+6. Abre `http://localhost:5173`, inicia sesión como Administrador o Coordinador y entra a **Gestión de Reportes y Notificaciones**.
+
+### API Sprint 6
+
+- `GET /api/sprint6/reportes?tipo=donaciones|voluntariado|campanas|solicitudes&desde=YYYY-MM-DD&hasta=YYYY-MM-DD`
+- `GET /api/sprint6/destinatarios`
+- `GET /api/sprint6/notificaciones`
+- `POST /api/sprint6/notificaciones` con `asunto`, `mensaje`, `destinatarios` y opcionalmente `programadaPara`.
+- `POST /api/sprint6/notificaciones/:id/reintentar`
+
+Todas las rutas requieren el token de sesión. El backend vuelve a validar los permisos y limita los destinatarios de Coordinación a voluntarios aprobados. Los envíos programados y pendientes se revisan automáticamente cada 30 segundos.

@@ -20,6 +20,7 @@ import type { Server } from 'http';
 import app from './app';
 import { testDatabaseConnection, pool } from './config/database';
 import { sincronizarSecuencias } from './utils/syncSecuencias';
+import { procesarNotificacionesProgramadas } from './sprint6/sprint6Routes';
 
 // ============================================================================
 // VARIABLES DE ENTORNO
@@ -56,6 +57,11 @@ const startServer = async (): Promise<void> => {
       await sincronizarSecuencias();
     }
 
+    // Procesa notificaciones programadas y reintenta pendientes cada 30 segundos.
+    const colaNotificaciones = setInterval(() => { void procesarNotificacionesProgramadas(); }, 30_000);
+    colaNotificaciones.unref();
+    void procesarNotificacionesProgramadas();
+
     // 2. Iniciar servidor HTTP
     const server: Server = app.listen(PORT, () => {
       console.log('====================================================');
@@ -71,6 +77,7 @@ const startServer = async (): Promise<void> => {
     const cerrarServidor = (senal: string) => {
       console.log(`\n🛑 Recibida señal ${senal}. Cerrando servidor...`);
 
+      clearInterval(colaNotificaciones);
       server.close(async () => {
         console.log('✅ Servidor HTTP cerrado.');
 
