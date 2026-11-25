@@ -11,7 +11,7 @@ import type {
   EstadoCampana,
   TipoActividad,
 } from '../types/campana.types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 interface DonacionHistorial {
   id_donacion: number;
@@ -32,6 +32,7 @@ interface DonacionHistorial {
 export default function CampanasPage() {
   const { usuario } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const rol = (usuario?.rol || '').toLowerCase();
   const rolesArray: string[] = Array.isArray(usuario?.roles)
@@ -58,7 +59,10 @@ export default function CampanasPage() {
     ? ['actividades', 'mis-actividades', 'campanas']
     : ['campanas', 'mis-donaciones', 'actividades', 'mis-actividades'];
 
-  const [pestaña, setPestaña] = useState<string>(tabs[0]);
+  const [pestaña, setPestaña] = useState<string>(() => {
+    const solicitada = searchParams.get('seccion');
+    return solicitada && tabs.includes(solicitada) ? solicitada : tabs[0];
+  });
 
   // Filtros
   const [filtroTipoActividad, setFiltroTipoActividad] = useState<string>('TODAS');

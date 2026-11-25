@@ -39,10 +39,12 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
   const titulosPorRuta: Record<string, string> = {
     '/dashboard': 'Inicio',
     '/usuarios': 'Gestión de Usuarios',
+    '/beneficios': 'Beneficiarios y Ayudas',
     '/reportes': 'Reportes y Estadísticas',
     '/perfil': 'Mi Perfil',
     '/mi-disponibilidad': 'Mi Disponibilidad',
     '/voluntarios/mi-disponibilidad': 'Mi Disponibilidad',
+    '/voluntarios/solicitudes': 'Gestión de Solicitudes de Voluntarios',
   };
 
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';

@@ -187,6 +187,18 @@ export interface SolicitudVoluntario {
   revisado_por: number | null;
   nombre_revisor?: string | null;
   motivo_rechazo: string | null;
+  fecha_revision?: string | null;
+  historial?: HistorialVoluntario[];
+}
+
+export interface HistorialVoluntario {
+  id_historial: number;
+  estado_anterior: 'Pendiente' | 'Aprobado' | 'Rechazado' | null;
+  estado_nuevo: 'Pendiente' | 'Aprobado' | 'Rechazado';
+  cambiado_por: number | null;
+  nombre_revisor?: string | null;
+  motivo: string | null;
+  fecha_cambio: string;
 }
 
 export interface SolicitudBeneficiario {

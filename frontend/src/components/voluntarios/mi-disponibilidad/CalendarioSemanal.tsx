@@ -53,16 +53,16 @@ const CalendarioSemanal = ({
       </div>
 
       <div className="mt-5 overflow-x-auto pb-2">
-        <div className="grid min-w-[770px] grid-cols-[repeat(7,minmax(0,1fr))] gap-2">
+        <div className="grid min-w-[770px] grid-cols-7 gap-2">
           {DIAS_SEMANA.map((dia) => {
             const bloques = porDia(dia.valor);
             return (
               <div
                 key={dia.valor}
-                className="flex min-h-[220px] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-surface"
+                className="flex min-h-[220px] flex-col overflow-hidden rounded-xl border border-border bg-surface"
               >
                 <div className="flex items-center justify-between gap-1 border-b border-border bg-surface-sunken px-2 py-2.5">
-                  <span className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.06em] text-text">
+                  <span className="truncate text-[11px] font-bold uppercase tracking-[0.06em] text-text">
                     {dia.etiqueta}
                   </span>
                   <button

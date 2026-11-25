@@ -61,17 +61,17 @@ const Navbar = ({ abierto, onCerrar, colapsado, onAlternarColapsado }: NavbarPro
             roles: ['Administrador'],
         },
         {
-            path: '/donaciones',
-            name: 'Gestión de Donaciones',
-            icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
-            roles: ['Administrador', 'Voluntario', 'Beneficiario', 'Donante'],
-            enDesarrollo: false,
-        },
-        {
             path: '/campanas',
             name: 'Gestión de Campañas y Actividades',
             icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z',
             roles: ['Administrador', 'Coordinador', 'Voluntario', 'Beneficiario', 'Donante', 'Empleado', 'Cliente', 'Usuario'],
+            enDesarrollo: false,
+        },
+        {
+            path: '/donaciones',
+            name: 'Gestión de Donaciones',
+            icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+            roles: ['Administrador', 'Voluntario', 'Beneficiario', 'Donante'],
             enDesarrollo: false,
         },
         {
@@ -83,10 +83,10 @@ const Navbar = ({ abierto, onCerrar, colapsado, onAlternarColapsado }: NavbarPro
         },
         {
             path: '/beneficios',
-            name: 'Gestión de Beneficiarios y Ayudas',
+            name: 'Gestión de Beneficios y Ayuda',
             icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
             roles: ['Administrador', 'Beneficiario', 'Donante', 'Coordinador', 'Voluntario', 'Empleado', 'Cliente', 'Usuario'],
-            enDesarrollo: true,
+            enDesarrollo: false,
         },
         {
             path: '/reportes',
@@ -247,17 +247,6 @@ const Navbar = ({ abierto, onCerrar, colapsado, onAlternarColapsado }: NavbarPro
                         ))}
                     </ul>
 
-                    <div
-                        className={`mt-6 rounded-xl border border-border dark:border-cream/10 bg-surface dark:bg-cream/[0.04] p-3.5 ${colapsado ? 'md:hidden' : ''}`}
-                    >
-                        <p className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-text-subtle dark:text-cream/45">
-                            <span className="motion-safe:animate-pulse-dot h-1.5 w-1.5 rounded-full bg-primary dark:bg-gold" />
-                            Versión en curso
-                        </p>
-                        <p className="mt-2 text-[11px] leading-relaxed text-text-subtle dark:text-cream/45">
-                            Los módulos marcados se habilitarán en la próxima entrega.
-                        </p>
-                    </div>
                 </nav>
 
                 {/* Pie del sidebar */}

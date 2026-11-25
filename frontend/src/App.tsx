@@ -22,6 +22,7 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import UsuariosPage from './pages/UsuariosPage';
 import DonacionesPage from './pages/DonacionesPage';
+import BeneficiariosAyudasPage from './pages/BeneficiariosAyudasPage';
 import CampanasPage from './pages/CampanasPage';
 import Perfil from './pages/Perfil';
 import Dashboard from './pages/Dashboard';
@@ -29,6 +30,7 @@ import SolicitarRecuperacion from './pages/SolicitarRecuperacion';
 import ResetPassword from './pages/ResetPassword';
 
 import VoluntariosLayout from './components/voluntarios/layout/VoluntariosLayout';
+import VoluntariosIndexRedirect from './components/voluntarios/layout/VoluntariosIndexRedirect';
 import RutasPorRol from './components/guards/RutasPorRol';
 
 import SolicitudesPage from './pages/voluntarios/SolicitudesPage';
@@ -59,6 +61,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/donaciones" element={<DonacionesPage />} />
+            <Route path="/beneficios" element={<BeneficiariosAyudasPage />} />
             <Route path="/campanas" element={<CampanasPage />} />
 
             {/* SECCIÓN 5: MI DISPONIBILIDAD (Voluntario / Coordinador) */}
@@ -68,9 +71,14 @@ function App() {
 
             {/* ITERACIÓN 4: GESTIÓN DE VOLUNTARIOS */}
             <Route path="/voluntarios" element={<VoluntariosLayout />}>
-              {/* Administrador */}
-              <Route element={<RutasPorRol roles={['Administrador']} />}>
+              <Route index element={<VoluntariosIndexRedirect />} />
+              {/* Solicitudes: administrador o coordinador */}
+              <Route element={<RutasPorRol roles={['Administrador', 'Admin', 'Coordinador']} />}>
                 <Route path="solicitudes" element={<SolicitudesPage />} />
+              </Route>
+
+              {/* Seguimiento general: administrador */}
+              <Route element={<RutasPorRol roles={['Administrador', 'Admin']} />}>
                 <Route path="seguimiento" element={<SeguimientoPage />} />
               </Route>
 

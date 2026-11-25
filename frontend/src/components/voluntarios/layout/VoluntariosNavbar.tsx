@@ -6,7 +6,7 @@ const opciones = [
   {
     nombre: 'Solicitudes',
     ruta: '/voluntarios/solicitudes',
-    roles: ['Administrador'],
+    roles: ['Administrador', 'Admin', 'Coordinador'],
   },
   {
     nombre: 'Seguimiento general',
@@ -53,7 +53,7 @@ export default function VoluntariosNavbar() {
           className={({ isActive }) =>
             `rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-primary text-white'
+                ? 'bg-primary text-on-primary'
                 : 'bg-surface-elevated text-text hover:bg-surface-sunken'
             }`
           }

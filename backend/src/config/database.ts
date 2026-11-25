@@ -6,6 +6,10 @@
  * PROPÓSITO:
  * Gestiona la conexión a PostgreSQL (pool de 'pg'), sin ORM.
  *
+ * SOPORTA dos modos de configuración:
+ * 1. DATABASE_URL (Neon / producción): connection string completo con SSL.
+ * 2. Variables individuales DB_HOST, DB_PORT, etc. (Docker local).
+ *
  * NOTA SOBRE EL .env:
  * El archivo .env vive en la raíz del proyecto (compartido con Docker
  * Compose). Cuando el backend corre en local se carga ese archivo y, si
@@ -30,24 +34,41 @@ dotenv.config();
 
 const estaEnDocker = fs.existsSync('/.dockerenv');
 
-const hostConfigurado = process.env.DB_HOST || 'localhost';
-const host =
-  !estaEnDocker && hostConfigurado === 'db' ? 'localhost' : hostConfigurado;
+// ============================================================================
+// CONFIGURACIÓN DE CONEXIÓN
+// Prioridad: DATABASE_URL (Neon/producción) → variables individuales (Docker)
+// ============================================================================
+let dbConfig: PoolConfig;
 
-// 1. Configuración de credenciales del pool de conexiones
-const dbConfig: PoolConfig = {
-  host,
-  port: Number(process.env.DB_PORT) || 5432,
-  user: process.env.DB_USER || 'admin',
-  password: process.env.DB_PASSWORD || '123456',
-  database: process.env.DB_NAME || 'bd_donaciones_voluntariado',
-  // Número máximo de clientes simultáneos en el pool
-  max: 20,
-  // Tiempo máximo (en milisegundos) que un cliente puede estar inactivo
-  idleTimeoutMillis: 30000,
-  // Tiempo máximo de espera para obtener una conexión del pool
-  connectionTimeoutMillis: 5000,
-};
+if (process.env.DATABASE_URL) {
+  // Neon y otros proveedores en la nube usan un connection string con SSL
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  };
+} else {
+  const hostConfigurado = process.env.DB_HOST || 'localhost';
+  const host =
+    !estaEnDocker && hostConfigurado === 'db' ? 'localhost' : hostConfigurado;
+
+  // 1. Configuración de credenciales del pool de conexiones
+  dbConfig = {
+    host,
+    port: Number(process.env.DB_PORT) || 5432,
+    user: process.env.DB_USER || 'admin',
+    password: process.env.DB_PASSWORD || '123456',
+    database: process.env.DB_NAME || 'bd_donaciones_voluntariado',
+    // Número máximo de clientes simultáneos en el pool
+    max: 20,
+    // Tiempo máximo (en milisegundos) que un cliente puede estar inactivo
+    idleTimeoutMillis: 30000,
+    // Tiempo máximo de espera para obtener una conexión del pool
+    connectionTimeoutMillis: 5000,
+  };
+}
 
 // 2. Instanciación del Pool
 export const pool = new Pool(dbConfig);

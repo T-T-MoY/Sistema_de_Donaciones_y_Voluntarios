@@ -33,7 +33,12 @@ const PESTANAS: { id: Pestana; etiqueta: string }[] = [
 const DonacionesPage = () => {
   const { usuario } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [pestana, setPestana] = useState<Pestana>('donaciones');
+  const [pestana, setPestana] = useState<Pestana>(() => {
+    const solicitada = searchParams.get('seccion');
+    return PESTANAS.some((p) => p.id === solicitada)
+      ? (solicitada as Pestana)
+      : 'donaciones';
+  });
   const campanaIdDesdeUrl = searchParams.get('campanaId');
   const [campanaIdInicial, setCampanaIdInicial] = useState<number | undefined>(
     campanaIdDesdeUrl ? Number(campanaIdDesdeUrl) : undefined
