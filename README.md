@@ -1276,6 +1276,14 @@ curl -s -X POST http://localhost:4000/api/usuarios \
 
 ---
 
+### API de la iteración 5: Beneficiarios y Ayudas
+
+La quinta iteración está disponible en `/beneficios`. Reutiliza fichas y cuentas existentes y añade solicitudes, evaluación administrativa y apoyos de campañas con preparación, entrega e historial.
+
+Su API se monta bajo `/api/ayudas`: beneficiarios, solicitudes, evaluaciones, adjuntos y apoyos. Los permisos se comprueban en servidor y cada beneficiario solo accede a sus propios registros.
+
+La migración aditiva es `database/04_beneficiarios_ayudas.sql`. Consultar [la guía de Iteración 5](docs/ITERACION5_BENEFICIARIOS_AYUDAS.md) para el contrato completo, instalación sobre bases existentes y flujo.
+
 ## 11. Frontend
 
 ### 11.1 Providers y orden de inicialización

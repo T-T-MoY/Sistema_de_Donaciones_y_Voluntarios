@@ -318,15 +318,25 @@ CREATE TABLE IF NOT EXISTS inventario (
     CONSTRAINT uq_inventario_origen UNIQUE (id_inventario, id_donacion)
 );
 
--- Registro de salida futura del inventario. La FK al módulo propietario se
--- incorpora cuando Campañas/Solicitudes entreguen sus esquemas reales.
--- Exactamente uno de los destinos debe informarse.
+-- Registro de salidas hacia campanas, solicitudes o entregas a beneficiarios.
+CREATE TABLE IF NOT EXISTS entrega_donacion (
+    id_entrega SERIAL PRIMARY KEY,
+    fecha_entrega TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/La_Paz'),
+    lugar_entrega VARCHAR(180) NOT NULL,
+    responsable_usuario_id INT NOT NULL REFERENCES administrador(id_usuario) ON DELETE RESTRICT,
+    observaciones TEXT,
+    estado VARCHAR(12) NOT NULL DEFAULT 'REGISTRADA'
+        CHECK (estado IN ('REGISTRADA','ANULADA'))
+);
+
 CREATE TABLE IF NOT EXISTS inventario_destino (
     id_destino          SERIAL PRIMARY KEY,
     id_inventario       INT NOT NULL,
     id_donacion         INT NOT NULL,
     campana_id          INT,
     solicitud_ayuda_id  INT,
+    id_asignacion       INT REFERENCES asignacion_donacion(id_asignacion) ON DELETE RESTRICT,
+    id_entrega          INT REFERENCES entrega_donacion(id_entrega) ON DELETE RESTRICT,
     cantidad            NUMERIC(14,2) NOT NULL CHECK (cantidad > 0),
     fecha_salida        TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/La_Paz'),
     registrado_por_usuario_id INT NOT NULL REFERENCES administrador(id_usuario) ON DELETE RESTRICT,
@@ -336,10 +346,33 @@ CREATE TABLE IF NOT EXISTS inventario_destino (
     CONSTRAINT fk_inventario_destino_origen FOREIGN KEY (id_inventario,id_donacion)
       REFERENCES inventario(id_inventario,id_donacion) ON DELETE RESTRICT,
     CONSTRAINT chk_inventario_destino_unico CHECK (
-      (campana_id IS NOT NULL AND solicitud_ayuda_id IS NULL) OR
-      (campana_id IS NULL AND solicitud_ayuda_id IS NOT NULL)
+      (campana_id IS NOT NULL AND solicitud_ayuda_id IS NULL
+       AND id_asignacion IS NULL AND id_entrega IS NULL) OR
+      (campana_id IS NULL AND solicitud_ayuda_id IS NOT NULL
+       AND id_asignacion IS NULL AND id_entrega IS NULL) OR
+      (campana_id IS NULL AND solicitud_ayuda_id IS NULL
+       AND id_asignacion IS NOT NULL AND id_entrega IS NOT NULL)
     )
 );
+
+-- Compatibilidad con bases creadas antes de habilitar las entregas físicas.
+ALTER TABLE inventario_destino
+    ADD COLUMN IF NOT EXISTS id_asignacion INT
+        REFERENCES asignacion_donacion(id_asignacion) ON DELETE RESTRICT;
+ALTER TABLE inventario_destino
+    ADD COLUMN IF NOT EXISTS id_entrega INT
+        REFERENCES entrega_donacion(id_entrega) ON DELETE RESTRICT;
+ALTER TABLE inventario_destino
+    DROP CONSTRAINT IF EXISTS chk_inventario_destino_unico;
+ALTER TABLE inventario_destino
+    ADD CONSTRAINT chk_inventario_destino_unico CHECK (
+      (campana_id IS NOT NULL AND solicitud_ayuda_id IS NULL
+       AND id_asignacion IS NULL AND id_entrega IS NULL) OR
+      (campana_id IS NULL AND solicitud_ayuda_id IS NOT NULL
+       AND id_asignacion IS NULL AND id_entrega IS NULL) OR
+      (campana_id IS NULL AND solicitud_ayuda_id IS NULL
+       AND id_asignacion IS NOT NULL AND id_entrega IS NOT NULL)
+    );
 
 -- Las salidas futuras se descuentan del inventario dentro de la misma
 -- transacción. No se consulta ni modifica ninguna tabla de Campañas/Ayudas.
@@ -354,7 +387,9 @@ BEGIN
   IF TG_OP = 'UPDATE' THEN
     IF NEW.id_inventario <> OLD.id_inventario OR NEW.id_donacion <> OLD.id_donacion
        OR NEW.cantidad <> OLD.cantidad OR NEW.campana_id IS DISTINCT FROM OLD.campana_id
-       OR NEW.solicitud_ayuda_id IS DISTINCT FROM OLD.solicitud_ayuda_id THEN
+       OR NEW.solicitud_ayuda_id IS DISTINCT FROM OLD.solicitud_ayuda_id
+       OR NEW.id_asignacion IS DISTINCT FROM OLD.id_asignacion
+       OR NEW.id_entrega IS DISTINCT FROM OLD.id_entrega THEN
       RAISE EXCEPTION 'No se puede cambiar el origen, cantidad o destino de una salida; anule y registre una nueva.';
     END IF;
     IF OLD.estado = NEW.estado THEN RETURN NEW; END IF;
@@ -414,6 +449,9 @@ CREATE INDEX IF NOT EXISTS idx_inventario_estado ON inventario(estado, fecha_ing
 CREATE INDEX IF NOT EXISTS idx_inventario_destino_donacion ON inventario_destino(id_donacion);
 CREATE INDEX IF NOT EXISTS idx_inventario_destino_campana ON inventario_destino(campana_id) WHERE campana_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_inventario_destino_solicitud ON inventario_destino(solicitud_ayuda_id) WHERE solicitud_ayuda_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_inventario_destino_asignacion ON inventario_destino(id_asignacion) WHERE id_asignacion IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_inventario_destino_entrega ON inventario_destino(id_entrega) WHERE id_entrega IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_entrega_donacion_fecha ON entrega_donacion(fecha_entrega DESC);
 CREATE INDEX IF NOT EXISTS idx_donacion_fotos_donacion ON donacion_fotos(id_donacion);
 
 -- Cada recepción física aceptada de bienes crea automáticamente una partida

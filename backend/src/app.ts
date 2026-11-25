@@ -28,6 +28,7 @@ import campanaRoutes from './routes/campanaRoutes';
 // Gestión de voluntarios
 import disponibilidadRoutes from './routes/disponibilidadRoutes';
 import voluntarioSolicitudesRoutes from './routes/voluntarioSolicitudesRoutes';
+import ayudaRoutes from './routes/ayudaRoutes';
 
 // Seguimiento general del voluntariado
 import seguimientoRoutes from './seguimiento/seguimientoRoutes';
@@ -96,6 +97,9 @@ app.use('/api/campanas', campanaRoutes);
 // Gestión de voluntarios: Mi Disponibilidad
 app.use('/api/voluntarios', disponibilidadRoutes);
 app.use('/api/voluntarios', voluntarioSolicitudesRoutes);
+
+// Iteración 5: beneficiarios y ayudas
+app.use('/api/ayudas', ayudaRoutes);
 
 // Seguimiento general del voluntariado
 app.use('/api/seguimiento', seguimientoRoutes);
