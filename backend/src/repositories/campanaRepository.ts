@@ -51,13 +51,17 @@ export const campanaRepository = {
       LEFT JOIN LATERAL (
         SELECT COUNT(ac.id_actividad) AS total_actividades
         FROM actividad_campana ac
-        WHERE ac.id_campana = c.id_campana
+        JOIN actividad a ON a.id_actividad = ac.id_actividad
+        WHERE ac.id_campana = c.id_campana AND a.estado <> 'Cancelada'
       ) act ON TRUE
       LEFT JOIN LATERAL (
         SELECT COUNT(DISTINCT p.id_voluntario) AS total_voluntarios
         FROM actividad_campana ac2
+        JOIN actividad a2 ON a2.id_actividad = ac2.id_actividad
         JOIN participa p ON p.id_actividad = ac2.id_actividad
-        WHERE ac2.id_campana = c.id_campana AND p.estado <> 'Cancelado'
+        WHERE ac2.id_campana = c.id_campana 
+          AND a2.estado <> 'Cancelada' 
+          AND p.estado <> 'Cancelado'
       ) vol ON TRUE
       WHERE 1=1
     `;
@@ -121,13 +125,17 @@ export const campanaRepository = {
       LEFT JOIN LATERAL (
         SELECT COUNT(ac.id_actividad) AS total_actividades
         FROM actividad_campana ac
-        WHERE ac.id_campana = c.id_campana
+        JOIN actividad a ON a.id_actividad = ac.id_actividad
+        WHERE ac.id_campana = c.id_campana AND a.estado <> 'Cancelada'
       ) act ON TRUE
       LEFT JOIN LATERAL (
         SELECT COUNT(DISTINCT p.id_voluntario) AS total_voluntarios
         FROM actividad_campana ac2
+        JOIN actividad a2 ON a2.id_actividad = ac2.id_actividad
         JOIN participa p ON p.id_actividad = ac2.id_actividad
-        WHERE ac2.id_campana = c.id_campana AND p.estado <> 'Cancelado'
+        WHERE ac2.id_campana = c.id_campana 
+          AND a2.estado <> 'Cancelada' 
+          AND p.estado <> 'Cancelado'
       ) vol ON TRUE
       WHERE c.id_campana = $1
     `;
@@ -290,7 +298,7 @@ export const campanaRepository = {
     // Adjuntar campañas asociadas y participación del usuario si corresponde
     for (const act of rows) {
       const campanasRes = await pool.query(
-        `SELECT c.id_campana, c.nombre 
+        `SELECT c.id_campana, c.nombre, c.estado 
          FROM actividad_campana ac 
          JOIN campana c ON c.id_campana = ac.id_campana 
          WHERE ac.id_actividad = $1`,
@@ -308,7 +316,7 @@ export const campanaRepository = {
              p.asistio, p.estado, p.observaciones, p.horas_acreditadas,
              to_char(p.fecha_asistencia, 'YYYY-MM-DD"T"HH24:MI:SS') AS fecha_asistencia
            FROM participa p
-           WHERE p.id_actividad = $1 AND p.id_voluntario = $2`,
+           WHERE p.id_actividad = $1 AND p.id_voluntario = $2 AND p.estado <> 'Cancelado'`,
           [act.id_actividad, filtros.usuario_id]
         );
         act.mi_participacion = miPartRes.rows.length > 0 ? miPartRes.rows[0] : null;
@@ -353,7 +361,7 @@ export const campanaRepository = {
     const act = rows[0];
 
     const campanasRes = await pool.query(
-      `SELECT c.id_campana, c.nombre 
+      `SELECT c.id_campana, c.nombre, c.estado 
        FROM actividad_campana ac 
        JOIN campana c ON c.id_campana = ac.id_campana 
        WHERE ac.id_actividad = $1`,
@@ -371,7 +379,7 @@ export const campanaRepository = {
            p.asistio, p.estado, p.observaciones, p.horas_acreditadas,
            to_char(p.fecha_asistencia, 'YYYY-MM-DD"T"HH24:MI:SS') AS fecha_asistencia
          FROM participa p
-         WHERE p.id_actividad = $1 AND p.id_voluntario = $2`,
+         WHERE p.id_actividad = $1 AND p.id_voluntario = $2 AND p.estado <> 'Cancelado'`,
         [act.id_actividad, usuarioId]
       );
       act.mi_participacion = miPartRes.rows.length > 0 ? miPartRes.rows[0] : null;
@@ -524,7 +532,7 @@ export const campanaRepository = {
 
   async desinscribirVoluntario(idActividad: number, idUsuario: number): Promise<boolean> {
     const { rowCount } = await pool.query(
-      `UPDATE participa SET estado = 'Cancelado' WHERE id_actividad = $1 AND id_voluntario = $2 AND asistio = FALSE`,
+      `DELETE FROM participa WHERE id_actividad = $1 AND id_voluntario = $2 AND asistio = FALSE`,
       [idActividad, idUsuario]
     );
     return Boolean(rowCount && rowCount > 0);
@@ -576,7 +584,7 @@ export const campanaRepository = {
         p.marcado_por_usuario_id
       FROM participa p
       JOIN usuario u ON u.id_usuario = p.id_voluntario
-      WHERE p.id_actividad = $1
+      WHERE p.id_actividad = $1 AND p.estado <> 'Cancelado'
       ORDER BY p.fecha_inscripcion ASC
     `;
     const { rows } = await pool.query(query, [idActividad]);

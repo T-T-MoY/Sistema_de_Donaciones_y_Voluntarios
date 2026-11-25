@@ -65,17 +65,17 @@ Una plataforma web para gestionar el ciclo completo de la ayuda solidaria:
 
 ### 1.2 Qué resuelve hoy
 
-| Módulo | Estado | Alcance real |
-|---|---|---|
-| Autenticación | ✅ Implementado | Registro público de donante, login JWT, sesión con expiración, cierre por inactividad |
-| Recuperación de contraseña | ✅ Implementado | Solicitud por correo, token de 1 hora, validación y reset |
-| Gestión de usuarios | ✅ Implementado | CRUD admin, roles, subtipos, activar/desactivar, borrado lógico, filtros y paginación |
-| Perfil propio | ✅ Implementado | Datos personales, contraseña, foto persistida en `usuario.foto_url` y ubicación propia del donante |
-| Dashboard | 🟡 Parcialmente implementado | Postulaciones y bandejas de aprobación; KPIs de muestra y módulos de negocio deshabilitados |
-| Campañas | ⛔ Pendiente | Solo tarjetas "En desarrollo" |
-| Donaciones y pagos QR | ⛔ Pendiente | Sin tablas ni endpoints |
-| Gestión de convocatorias y turnos de voluntariado | ⛔ Pendiente | La postulación y aprobación del rol Voluntario sí existen; faltan convocatorias, asignaciones y asistencia |
-| Reportes / exportaciones | ⛔ Pendiente | Dependencias instaladas (`xlsx`, `jspdf`, `@nivo/*`) pero sin uso |
+| Módulo                                            | Estado                       | Alcance real                                                                                               |
+| ------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Autenticación                                     | ✅ Implementado              | Registro público de donante, login JWT, sesión con expiración, cierre por inactividad                      |
+| Recuperación de contraseña                        | ✅ Implementado              | Solicitud por correo, token de 1 hora, validación y reset                                                  |
+| Gestión de usuarios                               | ✅ Implementado              | CRUD admin, roles, subtipos, activar/desactivar, borrado lógico, filtros y paginación                      |
+| Perfil propio                                     | ✅ Implementado              | Datos personales, contraseña, foto persistida en `usuario.foto_url` y ubicación propia del donante         |
+| Dashboard                                         | 🟡 Parcialmente implementado | Postulaciones y bandejas de aprobación; KPIs de muestra y módulos de negocio deshabilitados                |
+| Campañas                                          | ⛔ Pendiente                 | Solo tarjetas "En desarrollo"                                                                              |
+| Donaciones y pagos QR                             | ⛔ Pendiente                 | Sin tablas ni endpoints                                                                                    |
+| Gestión de convocatorias y turnos de voluntariado | ⛔ Pendiente                 | La postulación y aprobación del rol Voluntario sí existen; faltan convocatorias, asignaciones y asistencia |
+| Reportes / exportaciones                          | ⛔ Pendiente                 | Dependencias instaladas (`xlsx`, `jspdf`, `@nivo/*`) pero sin uso                                          |
 
 ### 1.3 Principios de diseño del sistema
 
@@ -104,12 +104,12 @@ Las tablas `inventario_destino` y sus columnas `campana_id` / `solicitud_ayuda_i
 
 ### 2.1 Requisitos
 
-| Herramienta | Versión mínima |
-|---|---|
-| Node.js | 20 LTS |
-| npm | 10 |
+| Herramienta    | Versión mínima                  |
+| -------------- | ------------------------------- |
+| Node.js        | 20 LTS                          |
+| npm            | 10                              |
 | Docker Desktop | última estable (con Compose v2) |
-| Git | cualquiera reciente |
+| Git            | cualquiera reciente             |
 
 ### 2.2 Los 6 pasos
 
@@ -141,11 +141,11 @@ npm run dev
 
 ### 2.3 URLs
 
-| Servicio | URL |
-|---|---|
-| Frontend | http://localhost:5173 |
-| API | http://localhost:4000/api |
-| Health check | http://localhost:4000/api/health |
+| Servicio             | URL                                          |
+| -------------------- | -------------------------------------------- |
+| Frontend             | http://localhost:5173                        |
+| API                  | http://localhost:4000/api                    |
+| Health check         | http://localhost:4000/api/health             |
 | Documentación de API | Este README (no hay Swagger/OpenAPI todavía) |
 
 ### 2.4 Verificación en 30 segundos
@@ -211,38 +211,38 @@ Si el health check responde y el login devuelve un `token`, el entorno está ope
 
 El sistema tiene cuatro subtipos en las tablas de roles. En las respuestas y el JWT puede aparecer **Coordinador**, que es un voluntario aprobado con `es_coordinador = true`:
 
-| Rol canónico (API/JWT) | Alias aceptados de entrada | Alias heredado del frontend | Tabla de subtipo |
-|---|---|---|---|
-| `Administrador` | `admin`, `administrador` | `Admin` | `administrador` |
-| `Coordinador` | `coordinador` | `Coordinador` | `voluntario` (`es_coordinador = true`) |
-| `Beneficiario` | `beneficiario` | `Beneficiario` | `beneficiario` |
-| `Donante` | `donante`, `cliente` | `Cliente` | `donante` |
-| `Voluntario` | `voluntario`, `empleado` | `Empleado` | `voluntario` |
+| Rol canónico (API/JWT) | Alias aceptados de entrada | Alias heredado del frontend | Tabla de subtipo                       |
+| ---------------------- | -------------------------- | --------------------------- | -------------------------------------- |
+| `Administrador`        | `admin`, `administrador`   | `Admin`                     | `administrador`                        |
+| `Coordinador`          | `coordinador`              | `Coordinador`               | `voluntario` (`es_coordinador = true`) |
+| `Beneficiario`         | `beneficiario`             | `Beneficiario`              | `beneficiario`                         |
+| `Donante`              | `donante`, `cliente`       | `Cliente`                   | `donante`                              |
+| `Voluntario`           | `voluntario`, `empleado`   | `Empleado`                  | `voluntario`                           |
 
 El administrador crea coordinadores desde el formulario de usuario al seleccionar el rol de voluntario y activar la opción de coordinador. El esquema exige que todo coordinador esté aprobado.
 
 ### 4.2 Matriz de permisos
 
-| Acción | Público | Donante | Voluntario | Coordinador | Beneficiario | Administrador |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| Ver landing | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Registrarse como Donante, Beneficiario o Voluntario | ✅ | — | — | — | — | — |
-| Ver y editar perfil propio / foto | — | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Enviar solicitud de voluntariado o beneficiario | — | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Revisar solicitudes de voluntariado | — | — | — | ✅ | — | ✅ |
-| Revisar solicitudes de beneficiario | — | — | — | — | — | ✅ |
-| Listar, crear, editar y desactivar usuarios | — | — | — | — | — | ✅ |
-| Eliminar usuario (lógico) | — | — | — | — | — | ✅ |
+| Acción                                              | Público | Donante | Voluntario | Coordinador | Beneficiario | Administrador |
+| --------------------------------------------------- | :-----: | :-----: | :--------: | :---------: | :----------: | :-----------: |
+| Ver landing                                         |   ✅    |   ✅    |     ✅     |     ✅      |      ✅      |      ✅       |
+| Registrarse como Donante, Beneficiario o Voluntario |   ✅    |    —    |     —      |      —      |      —       |       —       |
+| Ver y editar perfil propio / foto                   |    —    |   ✅    |     ✅     |     ✅      |      ✅      |      ✅       |
+| Enviar solicitud de voluntariado o beneficiario     |    —    |   ✅    |     ✅     |     ✅      |      ✅      |      ✅       |
+| Revisar solicitudes de voluntariado                 |    —    |    —    |     —      |     ✅      |      —       |      ✅       |
+| Revisar solicitudes de beneficiario                 |    —    |    —    |     —      |      —      |      —       |      ✅       |
+| Listar, crear, editar y desactivar usuarios         |    —    |    —    |     —      |      —      |      —       |      ✅       |
+| Eliminar usuario (lógico)                           |    —    |    —    |     —      |      —      |      —       |      ✅       |
 
 El esquema actual no tiene niveles `SUPERADMIN`/`GENERAL`; todas las cuentas de administrador usan el mismo middleware.
 
 ### 4.3 Estados de cuenta
 
-| Estado | Significado | Puede iniciar sesión | Aparece en listados |
-|---|---|:---:|:---:|
-| `Activo` | Cuenta operativa | ✅ | ✅ |
-| `Inactivo` | Desactivada temporalmente | ❌ (403) | ✅ |
-| `Eliminado` | Borrado lógico, conserva historial | ❌ (401) | ❌ |
+| Estado      | Significado                        | Puede iniciar sesión | Aparece en listados |
+| ----------- | ---------------------------------- | :------------------: | :-----------------: |
+| `Activo`    | Cuenta operativa                   |          ✅          |         ✅          |
+| `Inactivo`  | Desactivada temporalmente          |       ❌ (403)       |         ✅          |
+| `Eliminado` | Borrado lógico, conserva historial |       ❌ (401)       |         ❌          |
 
 Reglas:
 
@@ -310,18 +310,18 @@ routes → middlewares → controllers → services → repositories → Postgre
 
 ### 5.3 Capas del backend
 
-| Carpeta | Responsabilidad | Archivos actuales |
-|---|---|---|
-| `config/` | Conexión a PostgreSQL y SMTP | `database.ts`, `mailer.ts` |
-| `routes/` | Declaración de rutas y middlewares por endpoint | `authRoutes.ts`, `userRoutes.ts` |
-| `middlewares/` | Autenticación, autorización, errores, utilidades | `authMiddleware.ts`, `errorMiddleware.ts`, `asyncHandler.ts` |
-| `controllers/` | Traducir HTTP a llamadas de servicio | `authController.ts`, `userController.ts` |
-| `services/` | Reglas de negocio y validación | `authService.ts`, `usuarioService.ts`, `emailService.ts` |
-| `repositories/` | Acceso a datos y transacciones | `usuarioRepository.ts` |
-| `models/` | Tipos de dominio y DTOs | `usuarioModel.ts` |
-| `validators/` | Validaciones HTTP opcionales | `usuarioValidator.ts` (hoy sin uso) |
-| `utils/` | Errores y validaciones reutilizables | `AppError.ts`, `validaciones.ts` |
-| `types/` | Extensión de tipos de Express | `express.d.ts` |
+| Carpeta         | Responsabilidad                                  | Archivos actuales                                            |
+| --------------- | ------------------------------------------------ | ------------------------------------------------------------ |
+| `config/`       | Conexión a PostgreSQL y SMTP                     | `database.ts`, `mailer.ts`                                   |
+| `routes/`       | Declaración de rutas y middlewares por endpoint  | `authRoutes.ts`, `userRoutes.ts`                             |
+| `middlewares/`  | Autenticación, autorización, errores, utilidades | `authMiddleware.ts`, `errorMiddleware.ts`, `asyncHandler.ts` |
+| `controllers/`  | Traducir HTTP a llamadas de servicio             | `authController.ts`, `userController.ts`                     |
+| `services/`     | Reglas de negocio y validación                   | `authService.ts`, `usuarioService.ts`, `emailService.ts`     |
+| `repositories/` | Acceso a datos y transacciones                   | `usuarioRepository.ts`                                       |
+| `models/`       | Tipos de dominio y DTOs                          | `usuarioModel.ts`                                            |
+| `validators/`   | Validaciones HTTP opcionales                     | `usuarioValidator.ts` (hoy sin uso)                          |
+| `utils/`        | Errores y validaciones reutilizables             | `AppError.ts`, `validaciones.ts`                             |
+| `types/`        | Extensión de tipos de Express                    | `express.d.ts`                                               |
 
 ### 5.4 Ciclo de una petición autenticada
 
@@ -368,18 +368,18 @@ main.tsx
                             └── Usuarios
 ```
 
-| Capa | Responsabilidad |
-|---|---|
-| `pages/` | Composición de pantallas completas |
-| `components/layout/` | Chrome de la app: navbar, header, footer, layouts |
-| `components/ui/` | Piezas reutilizables: modales, errores de campo, toggle de tema |
-| `components/usuarios/` | Dominio de usuarios: lista, card, modal |
-| `components/guards/` | Protección de rutas por sesión y rol |
-| `context/` | Estado global: auth, tema, toasts |
-| `hooks/` | Lógica reutilizable: usuarios, foto, auth |
-| `api/` | Cliente Axios y funciones por dominio |
-| `types/` | Contratos TypeScript |
-| `utils/` | Validaciones y formateo |
+| Capa                   | Responsabilidad                                                 |
+| ---------------------- | --------------------------------------------------------------- |
+| `pages/`               | Composición de pantallas completas                              |
+| `components/layout/`   | Chrome de la app: navbar, header, footer, layouts               |
+| `components/ui/`       | Piezas reutilizables: modales, errores de campo, toggle de tema |
+| `components/usuarios/` | Dominio de usuarios: lista, card, modal                         |
+| `components/guards/`   | Protección de rutas por sesión y rol                            |
+| `context/`             | Estado global: auth, tema, toasts                               |
+| `hooks/`               | Lógica reutilizable: usuarios, foto, auth                       |
+| `api/`                 | Cliente Axios y funciones por dominio                           |
+| `types/`               | Contratos TypeScript                                            |
+| `utils/`               | Validaciones y formateo                                         |
 
 ### 5.6 Topología de despliegue
 
@@ -408,33 +408,33 @@ flowchart TB
 
 ### 6.1 Backend
 
-| Tecnología | Versión | Uso |
-|---|---|---|
-| Node.js | 20 | Runtime |
-| Express | 4.19 | Framework HTTP |
-| TypeScript | 5.4 | Tipado estricto, compilado a CommonJS |
-| `pg` | 8.11 | Pool de conexiones y SQL puro |
-| `jsonwebtoken` | 9.0 | Emisión y verificación de JWT |
-| `bcrypt` | 5.1 | Hash de contraseñas (10 rondas) |
-| `multer` | 1.4 | Subida de archivos (foto de perfil) |
-| `nodemailer` | 6.9 | Envío de correo por Gmail SMTP |
-| `cors` | 2.8 | CORS restringido a `FRONTEND_URL` |
-| `dotenv` | 16.4 | Variables de entorno |
-| `ts-node` + `nodemon` | 10 / 3 | Hot reload en desarrollo |
+| Tecnología            | Versión | Uso                                   |
+| --------------------- | ------- | ------------------------------------- |
+| Node.js               | 20      | Runtime                               |
+| Express               | 4.19    | Framework HTTP                        |
+| TypeScript            | 5.4     | Tipado estricto, compilado a CommonJS |
+| `pg`                  | 8.11    | Pool de conexiones y SQL puro         |
+| `jsonwebtoken`        | 9.0     | Emisión y verificación de JWT         |
+| `bcrypt`              | 5.1     | Hash de contraseñas (10 rondas)       |
+| `multer`              | 1.4     | Subida de archivos (foto de perfil)   |
+| `nodemailer`          | 6.9     | Envío de correo por Gmail SMTP        |
+| `cors`                | 2.8     | CORS restringido a `FRONTEND_URL`     |
+| `dotenv`              | 16.4    | Variables de entorno                  |
+| `ts-node` + `nodemon` | 10 / 3  | Hot reload en desarrollo              |
 
 ### 6.2 Frontend
 
-| Tecnología | Versión | Uso |
-|---|---|---|
-| React | 18.2 | UI |
-| Vite | 8.2 | Bundler y dev server |
-| TypeScript | 5.4 | Tipado estricto |
-| React Router | 7.18 | Ruteo SPA |
-| Axios | 1.6 | Cliente HTTP e interceptores |
-| Tailwind CSS | 4.3 | Estilos mediante `@theme` y utilidades |
-| `@tailwindcss/vite` | 4.3 | Plugin oficial, sin PostCSS |
-| `jwt-decode` | 4.0 | Lectura del payload JWT en cliente |
-| `vite-plugin-svgr` | 5.2 | Importar SVG como componente React |
+| Tecnología          | Versión | Uso                                    |
+| ------------------- | ------- | -------------------------------------- |
+| React               | 18.2    | UI                                     |
+| Vite                | 8.2     | Bundler y dev server                   |
+| TypeScript          | 5.4     | Tipado estricto                        |
+| React Router        | 7.18    | Ruteo SPA                              |
+| Axios               | 1.6     | Cliente HTTP e interceptores           |
+| Tailwind CSS        | 4.3     | Estilos mediante `@theme` y utilidades |
+| `@tailwindcss/vite` | 4.3     | Plugin oficial, sin PostCSS            |
+| `jwt-decode`        | 4.0     | Lectura del payload JWT en cliente     |
+| `vite-plugin-svgr`  | 5.2     | Importar SVG como componente React     |
 
 ### 6.3 Dependencias instaladas sin uso actual
 
@@ -444,12 +444,12 @@ Están previstas para reportes/exportaciones. Si no se usarán a corto plazo, co
 
 ### 6.4 Infraestructura y calidad
 
-| Herramienta | Uso |
-|---|---|
-| Docker Compose | Orquestación local de db + backend + frontend |
-| PostgreSQL 15 Alpine | Base de datos, TZ `America/La_Paz` |
-| SonarQube (local :9000) | Análisis estático de backend y frontend |
-| `scan-sonar.ps1` | Ejecuta el scanner en contenedor |
+| Herramienta             | Uso                                           |
+| ----------------------- | --------------------------------------------- |
+| Docker Compose          | Orquestación local de db + backend + frontend |
+| PostgreSQL 15 Alpine    | Base de datos, TZ `America/La_Paz`            |
+| SonarQube (local :9000) | Análisis estático de backend y frontend       |
+| `scan-sonar.ps1`        | Ejecuta el scanner en contenedor              |
 
 > No hay ESLint, Prettier, Vitest, Jest ni pipeline CI configurados. Los únicos chequeos automáticos son `tsc` y Sonar.
 
@@ -623,63 +623,63 @@ Las tablas de subtipo permiten que un usuario acumule participaciones. El formul
 
 #### `usuario` (entidad padre)
 
-| Columna | Tipo | Restricciones |
-|---|---|---|
-| `id_usuario` | `SERIAL` | PK |
-| `nombre` | `VARCHAR(100)` | NOT NULL |
-| `apellido` | `VARCHAR(100)` | NOT NULL |
-| `correo` | `VARCHAR(150)` | NOT NULL, UNIQUE |
-| `telefono` | `VARCHAR(20)` | opcional |
-| `password` | `VARCHAR(255)` | NOT NULL (hash bcrypt) |
-| `foto_url` | `VARCHAR(500)` | opcional; ruta de la foto de perfil |
-| `estado` | `VARCHAR(20)` | NOT NULL, default `Activo`; CHECK `Activo`/`Inactivo`/`Eliminado` |
-| `fecha_registro` | `TIMESTAMP` | NOT NULL, default `CURRENT_TIMESTAMP` |
+| Columna          | Tipo           | Restricciones                                                     |
+| ---------------- | -------------- | ----------------------------------------------------------------- |
+| `id_usuario`     | `SERIAL`       | PK                                                                |
+| `nombre`         | `VARCHAR(100)` | NOT NULL                                                          |
+| `apellido`       | `VARCHAR(100)` | NOT NULL                                                          |
+| `correo`         | `VARCHAR(150)` | NOT NULL, UNIQUE                                                  |
+| `telefono`       | `VARCHAR(20)`  | opcional                                                          |
+| `password`       | `VARCHAR(255)` | NOT NULL (hash bcrypt)                                            |
+| `foto_url`       | `VARCHAR(500)` | opcional; ruta de la foto de perfil                               |
+| `estado`         | `VARCHAR(20)`  | NOT NULL, default `Activo`; CHECK `Activo`/`Inactivo`/`Eliminado` |
+| `fecha_registro` | `TIMESTAMP`    | NOT NULL, default `CURRENT_TIMESTAMP`                             |
 
 > El esquema guarda **un solo apellido**. La API lo divide en `paterno` y `materno` por el primer espacio y los vuelve a unir al escribir. Ver limitaciones en 18.3.
 
 #### `administrador`
 
-| Columna | Tipo | Restricciones |
-|---|---|---|
+| Columna      | Tipo  | Restricciones                        |
+| ------------ | ----- | ------------------------------------ |
 | `id_usuario` | `INT` | PK, FK → `usuario` ON DELETE CASCADE |
 
 #### `beneficiario`
 
-| Columna | Tipo | Restricciones |
-|---|---|---|
-| `id_usuario` | `INT` | PK, FK → `usuario` ON DELETE CASCADE |
-| `tipo_beneficiario` | `VARCHAR(30)` | CHECK `Persona`/`Familia`/`Institucion` |
-| `documento` | `VARCHAR(30)` | NOT NULL, UNIQUE (CI, NIT o personería) |
-| `direccion` | `VARCHAR(255)` | NOT NULL |
-| `necesidad` | `VARCHAR(150)` | NOT NULL |
-| `descripcion` | `TEXT` | opcional |
-| `estado` | `VARCHAR(20)` | default `Pendiente`; CHECK `Pendiente`/`Verificado`/`Rechazado` |
-| `revisado_por` | `INT` | FK a `usuario`; se limpia al borrar al revisor |
-| `fecha_revision` | `TIMESTAMP` | opcional |
-| `motivo_rechazo` | `TEXT` | opcional |
+| Columna             | Tipo           | Restricciones                                                   |
+| ------------------- | -------------- | --------------------------------------------------------------- |
+| `id_usuario`        | `INT`          | PK, FK → `usuario` ON DELETE CASCADE                            |
+| `tipo_beneficiario` | `VARCHAR(30)`  | CHECK `Persona`/`Familia`/`Institucion`                         |
+| `documento`         | `VARCHAR(30)`  | NOT NULL, UNIQUE (CI, NIT o personería)                         |
+| `direccion`         | `VARCHAR(255)` | NOT NULL                                                        |
+| `necesidad`         | `VARCHAR(150)` | NOT NULL                                                        |
+| `descripcion`       | `TEXT`         | opcional                                                        |
+| `estado`            | `VARCHAR(20)`  | default `Pendiente`; CHECK `Pendiente`/`Verificado`/`Rechazado` |
+| `revisado_por`      | `INT`          | FK a `usuario`; se limpia al borrar al revisor                  |
+| `fecha_revision`    | `TIMESTAMP`    | opcional                                                        |
+| `motivo_rechazo`    | `TEXT`         | opcional                                                        |
 
 #### `donante`
 
-| Columna | Tipo | Restricciones |
-|---|---|---|
-| `id_usuario` | `INT` | PK, FK → `usuario` ON DELETE CASCADE |
-| `direccion` | `VARCHAR(255)` | opcional |
-| `ubi_latitud` | `DECIMAL(10,8)` | opcional, entre -90 y 90 |
-| `ubi_longitud` | `DECIMAL(11,8)` | opcional, entre -180 y 180 |
+| Columna        | Tipo            | Restricciones                        |
+| -------------- | --------------- | ------------------------------------ |
+| `id_usuario`   | `INT`           | PK, FK → `usuario` ON DELETE CASCADE |
+| `direccion`    | `VARCHAR(255)`  | opcional                             |
+| `ubi_latitud`  | `DECIMAL(10,8)` | opcional, entre -90 y 90             |
+| `ubi_longitud` | `DECIMAL(11,8)` | opcional, entre -180 y 180           |
 
 #### `voluntario`
 
-| Columna | Tipo | Restricciones |
-|---|---|---|
-| `id_usuario` | `INT` | PK, FK → `usuario` ON DELETE CASCADE |
-| `habilidades` | `TEXT[]` | NOT NULL, default `{}` |
-| `disponibilidad` | `VARCHAR(100)` | NOT NULL |
-| `fecha_registro` | `TIMESTAMP` | default `CURRENT_TIMESTAMP` |
-| `es_coordinador` | `BOOLEAN` | NOT NULL, default `false`; requiere estado `Aprobado` |
-| `estado` | `VARCHAR(20)` | default `Pendiente`; CHECK `Pendiente`/`Aprobado`/`Rechazado` |
-| `revisado_por` | `INT` | FK a `usuario`; no puede ser el mismo voluntario |
-| `fecha_revision` | `TIMESTAMP` | opcional |
-| `motivo_rechazo` | `TEXT` | opcional |
+| Columna          | Tipo           | Restricciones                                                 |
+| ---------------- | -------------- | ------------------------------------------------------------- |
+| `id_usuario`     | `INT`          | PK, FK → `usuario` ON DELETE CASCADE                          |
+| `habilidades`    | `TEXT[]`       | NOT NULL, default `{}`                                        |
+| `disponibilidad` | `VARCHAR(100)` | NOT NULL                                                      |
+| `fecha_registro` | `TIMESTAMP`    | default `CURRENT_TIMESTAMP`                                   |
+| `es_coordinador` | `BOOLEAN`      | NOT NULL, default `false`; requiere estado `Aprobado`         |
+| `estado`         | `VARCHAR(20)`  | default `Pendiente`; CHECK `Pendiente`/`Aprobado`/`Rechazado` |
+| `revisado_por`   | `INT`          | FK a `usuario`; no puede ser el mismo voluntario              |
+| `fecha_revision` | `TIMESTAMP`    | opcional                                                      |
+| `motivo_rechazo` | `TEXT`         | opcional                                                      |
 
 ### 8.3 Índices
 
@@ -753,11 +753,11 @@ Si `DB_HOST=db` y **no** está dentro de Docker, se traduce automáticamente a `
 
 Pool de PostgreSQL:
 
-| Parámetro | Valor |
-|---|---|
-| `max` | 20 clientes |
-| `idleTimeoutMillis` | 30 s |
-| `connectionTimeoutMillis` | 5 s |
+| Parámetro                 | Valor       |
+| ------------------------- | ----------- |
+| `max`                     | 20 clientes |
+| `idleTimeoutMillis`       | 30 s        |
+| `connectionTimeoutMillis` | 5 s         |
 
 Si un cliente inactivo falla, el proceso termina (`process.exit(-1)`).
 
@@ -790,38 +790,38 @@ Si un cliente inactivo falla, el proceso termina (`process.exit(-1)`).
 
 ### 9.4 Middlewares
 
-| Middleware | Qué hace |
-|---|---|
-| `verificarToken` | Lee `Authorization`, valida JWT, asigna `req.usuario`; 401 si falta/expira, 403 si es inválido |
-| `esAdmin` | Exige rol `admin` o `administrador`; 403 en caso contrario |
-| `esAdminOEmpleado` | Legado, sin uso |
-| `esCliente` | Legado, sin uso |
-| `errorMiddleware` | Traduce `AppError`, errores PostgreSQL y Multer a JSON |
-| `notFoundMiddleware` | 404 uniforme para rutas inexistentes |
-| `asyncHandler` | Envuelve handlers async; hoy sin uso porque los controllers usan `try/catch` |
+| Middleware           | Qué hace                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| `verificarToken`     | Lee `Authorization`, valida JWT, asigna `req.usuario`; 401 si falta/expira, 403 si es inválido |
+| `esAdmin`            | Exige rol `admin` o `administrador`; 403 en caso contrario                                     |
+| `esAdminOEmpleado`   | Legado, sin uso                                                                                |
+| `esCliente`          | Legado, sin uso                                                                                |
+| `errorMiddleware`    | Traduce `AppError`, errores PostgreSQL y Multer a JSON                                         |
+| `notFoundMiddleware` | 404 uniforme para rutas inexistentes                                                           |
+| `asyncHandler`       | Envuelve handlers async; hoy sin uso porque los controllers usan `try/catch`                   |
 
 ### 9.5 Validaciones de negocio
 
 Viven en `backend/src/utils/validaciones.ts` y se invocan desde los servicios.
 
-| Campo | Regla |
-|---|---|
-| `nombre` | 2–50 caracteres, solo letras/espacios/apóstrofes/guiones |
-| `paterno` | 2–50, obligatorio, solo letras |
-| `materno` | 2–50, opcional, solo letras |
-| `correo` | Formato estándar, máx. 150 caracteres |
-| `telefono` | Exactamente 8 dígitos numéricos (formato Bolivia) |
-| `contraseña` | 8–100 caracteres, al menos 1 mayúscula, 1 minúscula y 1 número |
-| `ci_nit` / `documento` | 5–15 dígitos numéricos |
-| `tipo_beneficiario` | `Persona`, `Familia`, `Institucion` |
-| `direccion` (beneficiario) | Obligatoria, máx. 255 |
-| `necesidad` | Obligatoria, máx. 150 |
-| `descripcion` | Opcional, máx. 2000 |
-| `estado_beneficiario` | `Pendiente`, `Verificado`, `Rechazado` |
-| `habilidades` | Al menos 1, máx. 20, cada una ≤ 60 caracteres; acepta string separado por comas o array |
-| `disponibilidad` | Obligatoria, máx. 100 |
-| `nivel_acceso` | Validación heredada; no existe como columna en `administrador` |
-| Coordenadas | Latitud -90..90, longitud -180..180; si una viene, ambas |
+| Campo                      | Regla                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------- |
+| `nombre`                   | 2–50 caracteres, solo letras/espacios/apóstrofes/guiones                                |
+| `paterno`                  | 2–50, obligatorio, solo letras                                                          |
+| `materno`                  | 2–50, opcional, solo letras                                                             |
+| `correo`                   | Formato estándar, máx. 150 caracteres                                                   |
+| `telefono`                 | Exactamente 8 dígitos numéricos (formato Bolivia)                                       |
+| `contraseña`               | 8–100 caracteres, al menos 1 mayúscula, 1 minúscula y 1 número                          |
+| `ci_nit` / `documento`     | 5–15 dígitos numéricos                                                                  |
+| `tipo_beneficiario`        | `Persona`, `Familia`, `Institucion`                                                     |
+| `direccion` (beneficiario) | Obligatoria, máx. 255                                                                   |
+| `necesidad`                | Obligatoria, máx. 150                                                                   |
+| `descripcion`              | Opcional, máx. 2000                                                                     |
+| `estado_beneficiario`      | `Pendiente`, `Verificado`, `Rechazado`                                                  |
+| `habilidades`              | Al menos 1, máx. 20, cada una ≤ 60 caracteres; acepta string separado por comas o array |
+| `disponibilidad`           | Obligatoria, máx. 100                                                                   |
+| `nivel_acceso`             | Validación heredada; no existe como columna en `administrador`                          |
+| Coordenadas                | Latitud -90..90, longitud -180..180; si una viene, ambas                                |
 
 > El login solo exige contraseña de **6+ caracteres** por compatibilidad histórica, no la política completa. Ver 18.3.
 
@@ -829,14 +829,14 @@ Viven en `backend/src/utils/validaciones.ts` y se invocan desde los servicios.
 
 `AppError(message, statusCode)` se lanza desde los servicios y se traduce en `errorMiddleware`:
 
-| Caso | Status | Cuerpo |
-|---|---|---|
-| Validación / duplicado | 400 | `{ "error": "mensaje" }` |
-| Credenciales inválidas / sin token | 401 | `{ "error": "mensaje" }` |
-| Cuenta desactivada / sin permisos | 403 | `{ "error": "mensaje" }` |
-| No encontrado | 404 | `{ "error": "mensaje" }` |
-| Error inesperado | 500 | `{ "error": "Error interno del servidor" }` (en dev, mensaje real) |
-| Ruta inexistente | 404 | `{ "success": false, "message": "La ruta [METHOD] /url no existe..." }` |
+| Caso                               | Status | Cuerpo                                                                  |
+| ---------------------------------- | ------ | ----------------------------------------------------------------------- |
+| Validación / duplicado             | 400    | `{ "error": "mensaje" }`                                                |
+| Credenciales inválidas / sin token | 401    | `{ "error": "mensaje" }`                                                |
+| Cuenta desactivada / sin permisos  | 403    | `{ "error": "mensaje" }`                                                |
+| No encontrado                      | 404    | `{ "error": "mensaje" }`                                                |
+| Error inesperado                   | 500    | `{ "error": "Error interno del servidor" }` (en dev, mensaje real)      |
+| Ruta inexistente                   | 404    | `{ "success": false, "message": "La ruta [METHOD] /url no existe..." }` |
 
 Errores PostgreSQL traducidos:
 
@@ -900,45 +900,45 @@ Checklist de calidad:
 
 ### 10.1 Convenciones
 
-| Aspecto | Convención |
-|---|---|
-| Base URL | `http://localhost:4000/api` |
-| Formato | JSON UTF-8; perfil acepta `multipart/form-data` |
-| Auth | `Authorization: Bearer <JWT>` |
-| Éxito | `200` / `201` con `{ mensaje?, ...datos }` |
-| Error | `400/401/403/404/500` con `{ error }` |
-| Fechas | ISO 8601 (`timestamp` de PostgreSQL) |
-| Idioma | Campos, mensajes y rutas en español |
-| Versión | Sin versionado (`/v1` no existe) |
+| Aspecto    | Convención                                              |
+| ---------- | ------------------------------------------------------- |
+| Base URL   | `http://localhost:4000/api`                             |
+| Formato    | JSON UTF-8; perfil acepta `multipart/form-data`         |
+| Auth       | `Authorization: Bearer <JWT>`                           |
+| Éxito      | `200` / `201` con `{ mensaje?, ...datos }`              |
+| Error      | `400/401/403/404/500` con `{ error }`                   |
+| Fechas     | ISO 8601 (`timestamp` de PostgreSQL)                    |
+| Idioma     | Campos, mensajes y rutas en español                     |
+| Versión    | Sin versionado (`/v1` no existe)                        |
 | Paginación | No hay paginación de servidor; el listado devuelve todo |
 
 ### 10.2 Resumen de endpoints
 
-| Método | Ruta | Auth | Rol | Descripción |
-|---|---|---|:---:|---|
-| `GET` | `/api/health` | No | — | Estado del backend |
-| `POST` | `/api/auth/registrar` | No | — | Registro público de Donante, Beneficiario o Voluntario |
-| `POST` | `/api/auth/login` | No | — | Login, devuelve JWT |
-| `POST` | `/api/auth/solicitar-recuperacion` | No | — | Envía correo de recuperación |
-| `GET` | `/api/auth/validar-token/:token` | No | — | Valida token de recuperación |
-| `POST` | `/api/auth/reset-password` | No | — | Cambia contraseña con token |
-| `GET` | `/api/usuarios/perfil` | Sí | Cualquiera | Perfil propio |
-| `PUT` | `/api/usuarios/perfil` | Sí | Cualquiera | Actualiza perfil (multipart) |
-| `GET` | `/api/usuarios/ubicaciones` | Sí | Cualquiera | Lista donantes con coordenadas guardadas |
-| `POST` | `/api/usuarios/mi-ubicacion` | Sí | Cualquiera | Guarda las coordenadas propias |
-| `POST` | `/api/usuarios/postular/donante` | Sí | Cualquiera | Habilita el subtipo Donante (sin revisión) |
-| `POST` | `/api/usuarios/postular/voluntario` | Sí | Cualquiera | Envía/actualiza la solicitud de voluntariado |
-| `POST` | `/api/usuarios/postular/beneficiario` | Sí | Cualquiera | Envía/actualiza la solicitud de beneficiario |
-| `GET` | `/api/usuarios/solicitudes/voluntarios` | Sí | Coordinador o Admin | Lista solicitudes; acepta `?estado=` |
-| `PATCH` | `/api/usuarios/solicitudes/voluntarios/:id` | Sí | Coordinador o Admin | Aprueba o rechaza una solicitud |
-| `GET` | `/api/usuarios/solicitudes/beneficiarios` | Sí | Admin | Lista solicitudes; acepta `?estado=` |
-| `PATCH` | `/api/usuarios/solicitudes/beneficiarios/:id` | Sí | Admin | Verifica o rechaza una solicitud |
-| `GET` | `/api/usuarios` | Sí | Admin | Lista usuarios no eliminados |
-| `POST` | `/api/usuarios` | Sí | Admin | Crea usuario con cualquier rol |
-| `GET` | `/api/usuarios/:id` | Sí | Admin | Detalle de usuario |
-| `PUT` | `/api/usuarios/:id` | Sí | Admin | Actualiza usuario |
-| `PUT` | `/api/usuarios/estado/:id` | Sí | Admin | Activa/desactiva |
-| `DELETE` | `/api/usuarios/:id` | Sí | Admin | Borrado lógico |
+| Método   | Ruta                                          | Auth |         Rol         | Descripción                                            |
+| -------- | --------------------------------------------- | ---- | :-----------------: | ------------------------------------------------------ |
+| `GET`    | `/api/health`                                 | No   |          —          | Estado del backend                                     |
+| `POST`   | `/api/auth/registrar`                         | No   |          —          | Registro público de Donante, Beneficiario o Voluntario |
+| `POST`   | `/api/auth/login`                             | No   |          —          | Login, devuelve JWT                                    |
+| `POST`   | `/api/auth/solicitar-recuperacion`            | No   |          —          | Envía correo de recuperación                           |
+| `GET`    | `/api/auth/validar-token/:token`              | No   |          —          | Valida token de recuperación                           |
+| `POST`   | `/api/auth/reset-password`                    | No   |          —          | Cambia contraseña con token                            |
+| `GET`    | `/api/usuarios/perfil`                        | Sí   |     Cualquiera      | Perfil propio                                          |
+| `PUT`    | `/api/usuarios/perfil`                        | Sí   |     Cualquiera      | Actualiza perfil (multipart)                           |
+| `GET`    | `/api/usuarios/ubicaciones`                   | Sí   |     Cualquiera      | Lista donantes con coordenadas guardadas               |
+| `POST`   | `/api/usuarios/mi-ubicacion`                  | Sí   |     Cualquiera      | Guarda las coordenadas propias                         |
+| `POST`   | `/api/usuarios/postular/donante`              | Sí   |     Cualquiera      | Habilita el subtipo Donante (sin revisión)             |
+| `POST`   | `/api/usuarios/postular/voluntario`           | Sí   |     Cualquiera      | Envía/actualiza la solicitud de voluntariado           |
+| `POST`   | `/api/usuarios/postular/beneficiario`         | Sí   |     Cualquiera      | Envía/actualiza la solicitud de beneficiario           |
+| `GET`    | `/api/usuarios/solicitudes/voluntarios`       | Sí   | Coordinador o Admin | Lista solicitudes; acepta `?estado=`                   |
+| `PATCH`  | `/api/usuarios/solicitudes/voluntarios/:id`   | Sí   | Coordinador o Admin | Aprueba o rechaza una solicitud                        |
+| `GET`    | `/api/usuarios/solicitudes/beneficiarios`     | Sí   |        Admin        | Lista solicitudes; acepta `?estado=`                   |
+| `PATCH`  | `/api/usuarios/solicitudes/beneficiarios/:id` | Sí   |        Admin        | Verifica o rechaza una solicitud                       |
+| `GET`    | `/api/usuarios`                               | Sí   |        Admin        | Lista usuarios no eliminados                           |
+| `POST`   | `/api/usuarios`                               | Sí   |        Admin        | Crea usuario con cualquier rol                         |
+| `GET`    | `/api/usuarios/:id`                           | Sí   |        Admin        | Detalle de usuario                                     |
+| `PUT`    | `/api/usuarios/:id`                           | Sí   |        Admin        | Actualiza usuario                                      |
+| `PUT`    | `/api/usuarios/estado/:id`                    | Sí   |        Admin        | Activa/desactiva                                       |
+| `DELETE` | `/api/usuarios/:id`                           | Sí   |        Admin        | Borrado lógico                                         |
 
 ### 10.3 Autenticación
 
@@ -1016,12 +1016,12 @@ Las bandejas aceptan filtro opcional `?estado=Pendiente`. Para revisar se envía
 
 Errores:
 
-| Status | Caso | Mensaje |
-|---|---|---|
-| 400 | Faltan campos / formato | `Correo y contraseña son obligatorios.` |
-| 401 | Credenciales incorrectas | `Credenciales inválidas` |
-| 401 | Cuenta eliminada | `Credenciales inválidas` |
-| 403 | Cuenta inactiva | `Tu cuenta ha sido desactivada` |
+| Status | Caso                     | Mensaje                                 |
+| ------ | ------------------------ | --------------------------------------- |
+| 400    | Faltan campos / formato  | `Correo y contraseña son obligatorios.` |
+| 401    | Credenciales incorrectas | `Credenciales inválidas`                |
+| 401    | Cuenta eliminada         | `Credenciales inválidas`                |
+| 403    | Cuenta inactiva          | `Tu cuenta ha sido desactivada`         |
 
 ---
 
@@ -1049,10 +1049,10 @@ Errores:
 { "valido": true, "correo": "diego.ramirez@gmail.com" }
 ```
 
-| Status | Caso |
-|---|---|
-| 400 | Token expirado o vacío |
-| 404 | Token inválido o ya usado |
+| Status | Caso                      |
+| ------ | ------------------------- |
+| 400    | Token expirado o vacío    |
+| 404    | Token inválido o ya usado |
 
 ---
 
@@ -1120,20 +1120,20 @@ El token se elimina después del cambio. La nueva contraseña pasa la política 
 
 `multipart/form-data` (también acepta campos de texto).
 
-| Campo | Obligatorio | Notas |
-|---|:---:|---|
-| `nombre` | ✅ | |
-| `paterno` | ✅ | |
-| `materno` | ❌ | |
-| `correo` | ✅ | Debe ser único |
-| `telefono` | ✅ | 8 dígitos |
-| `passwordActual` | Solo si cambia contraseña | |
-| `passwordNueva` | Solo si cambia contraseña | Política completa |
-| `foto` | ❌ | Imagen ≤ 5 MB; guarda su ruta en `usuario.foto_url` |
-| `direccion` o `calle`+`zona`+`ciudad` | Según rol | Donante |
-| `tipo_beneficiario`, `documento`/`ci_nit`, `direccion`, `necesidad`, `descripcion`, `estado_beneficiario` | Beneficiario | |
-| `habilidades`, `disponibilidad` | Voluntario | `habilidades` puede ser string con comas |
-| `ubi_latitud`, `ubi_longitud` | ❌ | Donante, ambas o ninguna |
+| Campo                                                                                                     |        Obligatorio        | Notas                                               |
+| --------------------------------------------------------------------------------------------------------- | :-----------------------: | --------------------------------------------------- |
+| `nombre`                                                                                                  |            ✅             |                                                     |
+| `paterno`                                                                                                 |            ✅             |                                                     |
+| `materno`                                                                                                 |            ❌             |                                                     |
+| `correo`                                                                                                  |            ✅             | Debe ser único                                      |
+| `telefono`                                                                                                |            ✅             | 8 dígitos                                           |
+| `passwordActual`                                                                                          | Solo si cambia contraseña |                                                     |
+| `passwordNueva`                                                                                           | Solo si cambia contraseña | Política completa                                   |
+| `foto`                                                                                                    |            ❌             | Imagen ≤ 5 MB; guarda su ruta en `usuario.foto_url` |
+| `direccion` o `calle`+`zona`+`ciudad`                                                                     |         Según rol         | Donante                                             |
+| `tipo_beneficiario`, `documento`/`ci_nit`, `direccion`, `necesidad`, `descripcion`, `estado_beneficiario` |       Beneficiario        |                                                     |
+| `habilidades`, `disponibilidad`                                                                           |        Voluntario         | `habilidades` puede ser string con comas            |
+| `ubi_latitud`, `ubi_longitud`                                                                             |            ❌             | Donante, ambas o ninguna                            |
 
 **200**
 
@@ -1181,12 +1181,12 @@ Devuelve `UsuarioResponse[]` de todos los usuarios con `estado <> 'Eliminado'`, 
 
 Campos por rol:
 
-| Rol | Campos específicos |
-|---|---|
-| `Administrador` | Sin campos adicionales en el esquema actual |
-| `Beneficiario` | `tipo_beneficiario`, `documento` (5–15 dígitos, único), `direccion`, `necesidad`, `descripcion?`, `estado_beneficiario` |
-| `Donante` | `direccion?`, `ubi_latitud?`, `ubi_longitud?` |
-| `Voluntario` | `habilidades` (string con comas o array), `disponibilidad`; `es_coordinador` se configura desde la gestión administrativa y exige estado aprobado |
+| Rol             | Campos específicos                                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Administrador` | Sin campos adicionales en el esquema actual                                                                                                       |
+| `Beneficiario`  | `tipo_beneficiario`, `documento` (5–15 dígitos, único), `direccion`, `necesidad`, `descripcion?`, `estado_beneficiario`                           |
+| `Donante`       | `direccion?`, `ubi_latitud?`, `ubi_longitud?`                                                                                                     |
+| `Voluntario`    | `habilidades` (string con comas o array), `disponibilidad`; `es_coordinador` se configura desde la gestión administrativa y exige estado aprobado |
 
 Acepta alias de rol (`Cliente`, `Empleado`, `Admin`).
 
@@ -1281,10 +1281,16 @@ curl -s -X POST http://localhost:4000/api/usuarios \
 ### 11.1 Providers y orden de inicialización
 
 ```tsx
-<ThemeProvider>      // tema + localStorage("theme") + meta theme-color
-  <ToastProvider>    // notificaciones globales vía portal
-    <AuthProvider>   // token + usuario decodificado + AFK 15 min
-      <App />        // BrowserRouter y rutas
+<ThemeProvider>
+  {" "}
+  // tema + localStorage("theme") + meta theme-color
+  <ToastProvider>
+    {" "}
+    // notificaciones globales vía portal
+    <AuthProvider>
+      {" "}
+      // token + usuario decodificado + AFK 15 min
+      <App /> // BrowserRouter y rutas
     </AuthProvider>
   </ToastProvider>
 </ThemeProvider>
@@ -1292,17 +1298,17 @@ curl -s -X POST http://localhost:4000/api/usuarios \
 
 ### 11.2 Ruteo
 
-| Ruta | Layout | Protección | Pantalla |
-|---|---|---|---|
-| `/` | `PublicLayout` | Pública | Landing |
-| `/login` | — | Pública (sin chrome) | Login |
-| `/registro` | — | Pública | Registro |
-| `/solicitar-recuperacion` | — | Pública | Solicitud de recuperación |
-| `/reset-password` | — | Pública (requiere `?token=`) | Nueva contraseña |
-| `/dashboard` | `AppLayout` | `RutasProtegidas` | Dashboard |
-| `/perfil` | `AppLayout` | `RutasProtegidas` | Perfil |
-| `/usuarios` | `AppLayout` | `RutasProtegidas` + `RutasAdmin` | Admin de usuarios |
-| `*` | — | — | Redirige a `/` |
+| Ruta                      | Layout         | Protección                       | Pantalla                  |
+| ------------------------- | -------------- | -------------------------------- | ------------------------- |
+| `/`                       | `PublicLayout` | Pública                          | Landing                   |
+| `/login`                  | —              | Pública (sin chrome)             | Login                     |
+| `/registro`               | —              | Pública                          | Registro                  |
+| `/solicitar-recuperacion` | —              | Pública                          | Solicitud de recuperación |
+| `/reset-password`         | —              | Pública (requiere `?token=`)     | Nueva contraseña          |
+| `/dashboard`              | `AppLayout`    | `RutasProtegidas`                | Dashboard                 |
+| `/perfil`                 | `AppLayout`    | `RutasProtegidas`                | Perfil                    |
+| `/usuarios`               | `AppLayout`    | `RutasProtegidas` + `RutasAdmin` | Admin de usuarios         |
+| `*`                       | —              | —                                | Redirige a `/`            |
 
 ### 11.3 Guards
 
@@ -1331,7 +1337,7 @@ api/usuario.api.ts→ CRUD admin + perfil
 `API_URL` se resuelve así:
 
 ```ts
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 ```
 
 > [!NOTE]
@@ -1356,20 +1362,20 @@ Patrón actual:
 
 ### 11.8 Componentes principales
 
-| Componente | Responsabilidad |
-|---|---|
-| `UsuarioList` | Tabla desktop + cards móvil, búsqueda, filtros, paginación, acciones |
-| `UsuarioCard` | Tarjeta de usuario para móvil/preview |
-| `UsuarioModal` | Alta/edición con campos condicionados por rol |
-| `MiUbicacion` / `Mapa` | Selección y visualización de la ubicación propia del donante con Leaflet |
-| `ConfirmModal` | Confirmaciones destructivas e informativas |
-| `Navbar` | Sidebar fijo desktop / drawer móvil, filtrado por rol |
-| `Header` | Título de ruta, menú de perfil, tema, logout |
-| `LandingNavbar` / `Footer` | Chrome público |
-| `ThemeToggle` | Cambio claro/oscuro con variantes para superficies oscuras |
-| `Reveal` | Aparición al hacer scroll con IntersectionObserver |
-| `FieldError` | Mensaje de error accesible por campo |
-| `ToastContext` | Notificaciones success/error/info/warning con pausa al hover |
+| Componente                 | Responsabilidad                                                          |
+| -------------------------- | ------------------------------------------------------------------------ |
+| `UsuarioList`              | Tabla desktop + cards móvil, búsqueda, filtros, paginación, acciones     |
+| `UsuarioCard`              | Tarjeta de usuario para móvil/preview                                    |
+| `UsuarioModal`             | Alta/edición con campos condicionados por rol                            |
+| `MiUbicacion` / `Mapa`     | Selección y visualización de la ubicación propia del donante con Leaflet |
+| `ConfirmModal`             | Confirmaciones destructivas e informativas                               |
+| `Navbar`                   | Sidebar fijo desktop / drawer móvil, filtrado por rol                    |
+| `Header`                   | Título de ruta, menú de perfil, tema, logout                             |
+| `LandingNavbar` / `Footer` | Chrome público                                                           |
+| `ThemeToggle`              | Cambio claro/oscuro con variantes para superficies oscuras               |
+| `Reveal`                   | Aparición al hacer scroll con IntersectionObserver                       |
+| `FieldError`               | Mensaje de error accesible por campo                                     |
+| `ToastContext`             | Notificaciones success/error/info/warning con pausa al hover             |
 
 ### 11.9 Cómo agregar una pantalla
 
@@ -1394,82 +1400,82 @@ La identidad combina **azul institucional** (confianza, transparencia) con **gui
 
 ### 12.2 Tokens semánticos — modo claro
 
-| Token | Valor | Uso |
-|---|---|---|
-| `--color-primary` | `#35649e` | Acciones primarias, enlaces |
-| `--color-primary-hover` | `#294e7c` | Hover primario |
-| `--color-primary-active` | `#273b75` | Active primario |
-| `--color-primary-soft` | `#c2d7ed` | Fondos suaves, badges |
-| `--color-on-primary` | `#ffffff` | Texto sobre primario |
-| `--color-accent` | `#9a336f` | Acento, foco, énfasis |
-| `--color-accent-hover` | `#7d2959` | Hover acento |
-| `--color-accent-soft` | `#f2d1e5` | Fondo de acento |
-| `--color-on-accent` | `#ffffff` | Texto sobre acento |
-| `--color-accent-text` | `#591b40` | Texto de acento sobre fondo claro |
-| `--color-surface` | `#d4e7f2` | Superficie base |
-| `--color-surface-elevated` | `#e3f0f7` | Tarjetas elevadas |
-| `--color-surface-sunken` | `#b0d1e6` | Fondo de página |
-| `--color-surface-inset` | `#9bc2db` | Inputs y zonas hundidas |
-| `--color-border` | `#739ebc` | Bordes |
-| `--color-border-strong` | `#4f7999` | Bordes fuertes |
-| `--color-ring` | `#35649e` | Anillo de foco |
-| `--color-text` | `#122136` | Texto principal |
-| `--color-text-muted` | `#29476b` | Texto secundario |
-| `--color-text-subtle` | `#3f608a` | Texto terciario |
-| `--color-success` / soft | `#237a4b` / `#c8f2d8` | Éxito |
-| `--color-error` / soft | `#a82e4a` / `#f7d4dc` | Error |
-| `--color-warning` / soft | `#b87014` / `#faebd0` | Advertencia |
-| `--color-info` / soft | `#3b92b0` / `#bde4f2` | Información |
+| Token                      | Valor                 | Uso                               |
+| -------------------------- | --------------------- | --------------------------------- |
+| `--color-primary`          | `#35649e`             | Acciones primarias, enlaces       |
+| `--color-primary-hover`    | `#294e7c`             | Hover primario                    |
+| `--color-primary-active`   | `#273b75`             | Active primario                   |
+| `--color-primary-soft`     | `#c2d7ed`             | Fondos suaves, badges             |
+| `--color-on-primary`       | `#ffffff`             | Texto sobre primario              |
+| `--color-accent`           | `#9a336f`             | Acento, foco, énfasis             |
+| `--color-accent-hover`     | `#7d2959`             | Hover acento                      |
+| `--color-accent-soft`      | `#f2d1e5`             | Fondo de acento                   |
+| `--color-on-accent`        | `#ffffff`             | Texto sobre acento                |
+| `--color-accent-text`      | `#591b40`             | Texto de acento sobre fondo claro |
+| `--color-surface`          | `#d4e7f2`             | Superficie base                   |
+| `--color-surface-elevated` | `#e3f0f7`             | Tarjetas elevadas                 |
+| `--color-surface-sunken`   | `#b0d1e6`             | Fondo de página                   |
+| `--color-surface-inset`    | `#9bc2db`             | Inputs y zonas hundidas           |
+| `--color-border`           | `#739ebc`             | Bordes                            |
+| `--color-border-strong`    | `#4f7999`             | Bordes fuertes                    |
+| `--color-ring`             | `#35649e`             | Anillo de foco                    |
+| `--color-text`             | `#122136`             | Texto principal                   |
+| `--color-text-muted`       | `#29476b`             | Texto secundario                  |
+| `--color-text-subtle`      | `#3f608a`             | Texto terciario                   |
+| `--color-success` / soft   | `#237a4b` / `#c8f2d8` | Éxito                             |
+| `--color-error` / soft     | `#a82e4a` / `#f7d4dc` | Error                             |
+| `--color-warning` / soft   | `#b87014` / `#faebd0` | Advertencia                       |
+| `--color-info` / soft      | `#3b92b0` / `#bde4f2` | Información                       |
 
 Degradado de titulares claro: `#a7e4f5 → #63c4e0 → #3b92b0`.
 
 ### 12.3 Tokens semánticos — modo oscuro (`.dark`)
 
-| Token | Valor | Uso |
-|---|---|---|
-| `--color-primary` | `#3b6ea8` | Acciones primarias |
-| `--color-primary-hover` | `#4a82c0` | Hover |
-| `--color-primary-active` | `#325d8d` | Active |
-| `--color-primary-soft` | `#16283f` | Fondos suaves |
-| `--color-accent` | `#9f1239` | Acento guindo |
-| `--color-accent-hover` | `#be123c` | Hover |
-| `--color-accent-soft` | `#2b0a14` | Fondo de acento |
-| `--color-accent-text` | `#e7a6b7` | Texto de acento |
-| `--color-surface` | `#14233a` | Sidebar y tarjetas |
-| `--color-surface-elevated` | `#1d2f4d` | Header, dropdowns |
-| `--color-surface-sunken` | `#0d1a2b` | Fondo general |
-| `--color-surface-inset` | `#0a1524` | Inputs |
-| `--color-border` | `#223350` | Bordes |
-| `--color-border-strong` | `#334a70` | Bordes fuertes |
-| `--color-ring` | `#4a82c0` | Foco |
-| `--color-text` | `#f8fafc` | Texto principal |
-| `--color-text-muted` | `#9fb0cc` | Texto secundario |
-| `--color-text-subtle` | `#7185a6` | Texto terciario |
-| `--color-success` / soft | `#3cb371` / `#143826` | Éxito |
-| `--color-error` / soft | `#e65c7b` / `#4a1c27` | Error |
-| `--color-warning` / soft | `#f0ad4e` / `#4a3512` | Advertencia |
-| `--color-info` / soft | `#3b92b0` / `#173342` | Información |
+| Token                      | Valor                 | Uso                |
+| -------------------------- | --------------------- | ------------------ |
+| `--color-primary`          | `#3b6ea8`             | Acciones primarias |
+| `--color-primary-hover`    | `#4a82c0`             | Hover              |
+| `--color-primary-active`   | `#325d8d`             | Active             |
+| `--color-primary-soft`     | `#16283f`             | Fondos suaves      |
+| `--color-accent`           | `#9f1239`             | Acento guindo      |
+| `--color-accent-hover`     | `#be123c`             | Hover              |
+| `--color-accent-soft`      | `#2b0a14`             | Fondo de acento    |
+| `--color-accent-text`      | `#e7a6b7`             | Texto de acento    |
+| `--color-surface`          | `#14233a`             | Sidebar y tarjetas |
+| `--color-surface-elevated` | `#1d2f4d`             | Header, dropdowns  |
+| `--color-surface-sunken`   | `#0d1a2b`             | Fondo general      |
+| `--color-surface-inset`    | `#0a1524`             | Inputs             |
+| `--color-border`           | `#223350`             | Bordes             |
+| `--color-border-strong`    | `#334a70`             | Bordes fuertes     |
+| `--color-ring`             | `#4a82c0`             | Foco               |
+| `--color-text`             | `#f8fafc`             | Texto principal    |
+| `--color-text-muted`       | `#9fb0cc`             | Texto secundario   |
+| `--color-text-subtle`      | `#7185a6`             | Texto terciario    |
+| `--color-success` / soft   | `#3cb371` / `#143826` | Éxito              |
+| `--color-error` / soft     | `#e65c7b` / `#4a1c27` | Error              |
+| `--color-warning` / soft   | `#f0ad4e` / `#4a3512` | Advertencia        |
+| `--color-info` / soft      | `#3b92b0` / `#173342` | Información        |
 
 Degradado de titulares oscuro: `#dbeafe → #93c5fd → #60a5fa`.
 
 ### 12.4 Familia de marca fija (no cambia con el tema)
 
-| Token | Valor | Uso |
-|---|---|---|
-| `night` | `#111726` | Fondo de hero, login, dashboard hero |
-| `night-2` | `#1a2438` | Degradados |
-| `night-3` | `#293a5e` | Degradados |
-| `night-line` | `#334770` | Líneas |
-| `cream` | `#e3f0f7` | Texto sobre navy |
-| `gold` | `#63c4e0` | Acento celeste (nombre heredado) |
-| `gold-bright` | `#8fd8ee` | Acento brillante |
+| Token         | Valor     | Uso                                  |
+| ------------- | --------- | ------------------------------------ |
+| `night`       | `#111726` | Fondo de hero, login, dashboard hero |
+| `night-2`     | `#1a2438` | Degradados                           |
+| `night-3`     | `#293a5e` | Degradados                           |
+| `night-line`  | `#334770` | Líneas                               |
+| `cream`       | `#e3f0f7` | Texto sobre navy                     |
+| `gold`        | `#63c4e0` | Acento celeste (nombre heredado)     |
+| `gold-bright` | `#8fd8ee` | Acento brillante                     |
 
 ### 12.5 Tipografía
 
-| Rol | Fuente | Peso |
-|---|---|---|
-| Cuerpo | `Plus Jakarta Sans` | 400–800 |
-| Títulos (`h1`–`h4`, `font-display`) | `Sora` | 500–800 |
+| Rol                                 | Fuente              | Peso    |
+| ----------------------------------- | ------------------- | ------- |
+| Cuerpo                              | `Plus Jakarta Sans` | 400–800 |
+| Títulos (`h1`–`h4`, `font-display`) | `Sora`              | 500–800 |
 
 - `line-height` base: `1.6`.
 - Títulos con `letter-spacing: -0.025em`.
@@ -1478,43 +1484,43 @@ Degradado de titulares oscuro: `#dbeafe → #93c5fd → #60a5fa`.
 
 ### 12.6 Radios, sombras y easing
 
-| Token | Valor |
-|---|---|
-| `radius-xs` | `0.5rem` (8 px) |
-| `radius-sm` | `0.625rem` (10 px) |
-| `radius-md` | `0.875rem` (14 px) |
-| `radius-lg` | `1.25rem` (20 px) |
-| `radius-xl` | `1.5rem` (24 px) |
-| `radius-2xl` | `2rem` (32 px) |
-| `radius-3xl` | `2.5rem` (40 px) |
+| Token        | Valor              |
+| ------------ | ------------------ |
+| `radius-xs`  | `0.5rem` (8 px)    |
+| `radius-sm`  | `0.625rem` (10 px) |
+| `radius-md`  | `0.875rem` (14 px) |
+| `radius-lg`  | `1.25rem` (20 px)  |
+| `radius-xl`  | `1.5rem` (24 px)   |
+| `radius-2xl` | `2rem` (32 px)     |
+| `radius-3xl` | `2.5rem` (40 px)   |
 
-| Sombra | Uso |
-|---|---|
+| Sombra        | Uso                          |
+| ------------- | ---------------------------- |
 | `shadow-soft` | Tarjetas y botones en reposo |
-| `shadow-lift` | Hover/elevación |
-| `shadow-deep` | Superficies nocturnas |
-| `shadow-glow` | CTA destacado |
+| `shadow-lift` | Hover/elevación              |
+| `shadow-deep` | Superficies nocturnas        |
+| `shadow-glow` | CTA destacado                |
 
-| Easing | Curva |
-|---|---|
-| `ease-out-soft` | `cubic-bezier(0.22, 1, 0.36, 1)` |
-| `ease-in-soft` | `cubic-bezier(0.55, 0, 1, 0.45)` |
-| `ease-spring` | `cubic-bezier(0.34, 1.4, 0.64, 1)` |
+| Easing          | Curva                              |
+| --------------- | ---------------------------------- |
+| `ease-out-soft` | `cubic-bezier(0.22, 1, 0.36, 1)`   |
+| `ease-in-soft`  | `cubic-bezier(0.55, 0, 1, 0.45)`   |
+| `ease-spring`   | `cubic-bezier(0.34, 1.4, 0.64, 1)` |
 
 ### 12.7 Animaciones
 
-| Utilidad | Keyframe | Duración |
-|---|---|---|
-| `anim-rise` | `rise-in` (opacidad + translateY) | 620 ms |
-| `anim-fade` | `soft-fade` | 340 ms |
-| `anim-scale` | `modal-in` (escala + translateY) | 280 ms |
-| `anim-toast` | `toast-in` | 320 ms |
-| `anim-toast-out` | `toast-out` | 180 ms |
-| `animate-modal-in` | `modal-in` | 280 ms |
-| `animate-overlay-in` | `overlay-in` | 200 ms |
-| `animate-float-slow` | `float-slow` | 16 s alterno |
-| `animate-marquee` | `marquee` | 38 s lineal |
-| `animate-pulse-dot` | `pulse-dot` | 2.4 s |
+| Utilidad             | Keyframe                          | Duración     |
+| -------------------- | --------------------------------- | ------------ |
+| `anim-rise`          | `rise-in` (opacidad + translateY) | 620 ms       |
+| `anim-fade`          | `soft-fade`                       | 340 ms       |
+| `anim-scale`         | `modal-in` (escala + translateY)  | 280 ms       |
+| `anim-toast`         | `toast-in`                        | 320 ms       |
+| `anim-toast-out`     | `toast-out`                       | 180 ms       |
+| `animate-modal-in`   | `modal-in`                        | 280 ms       |
+| `animate-overlay-in` | `overlay-in`                      | 200 ms       |
+| `animate-float-slow` | `float-slow`                      | 16 s alterno |
+| `animate-marquee`    | `marquee`                         | 38 s lineal  |
+| `animate-pulse-dot`  | `pulse-dot`                       | 2.4 s        |
 
 Animación de scroll: `.reveal` + `.is-visible`, con retardos `.reveal-d1`…`.reveal-d5` (80–400 ms).
 
@@ -1522,20 +1528,20 @@ Animación de scroll: `.reveal` + `.is-visible`, con retardos `.reveal-d1`…`.r
 
 ### 12.8 Utilidades propias
 
-| Utilidad | Qué hace |
-|---|---|
-| `anim-rise` / `anim-fade` / `anim-scale` | Entradas |
-| `anim-toast` / `anim-toast-out` | Toasts |
-| `grid-paper` | Grid de fondo azul (claro) |
-| `grid-paper-light` | Grid de fondo celeste |
-| `dot-grid` | Puntos de acento |
-| `glass-night` | Vidrio oscuro con blur |
-| `text-gold-gradient` | Titular con degradado |
-| `auth-photo` | Imagen de fondo de auth |
-| `marquee-track` / `marquee-mask` | Cinta animada |
-| `.press` | Feedback táctil (`scale(0.97)` en active) |
-| `.lift` | Elevación en hover (solo pointer fino) |
-| `.reveal` | Aparición al scroll |
+| Utilidad                                 | Qué hace                                  |
+| ---------------------------------------- | ----------------------------------------- |
+| `anim-rise` / `anim-fade` / `anim-scale` | Entradas                                  |
+| `anim-toast` / `anim-toast-out`          | Toasts                                    |
+| `grid-paper`                             | Grid de fondo azul (claro)                |
+| `grid-paper-light`                       | Grid de fondo celeste                     |
+| `dot-grid`                               | Puntos de acento                          |
+| `glass-night`                            | Vidrio oscuro con blur                    |
+| `text-gold-gradient`                     | Titular con degradado                     |
+| `auth-photo`                             | Imagen de fondo de auth                   |
+| `marquee-track` / `marquee-mask`         | Cinta animada                             |
+| `.press`                                 | Feedback táctil (`scale(0.97)` en active) |
+| `.lift`                                  | Elevación en hover (solo pointer fino)    |
+| `.reveal`                                | Aparición al scroll                       |
 
 ### 12.9 Patrones de componentes
 
@@ -1595,17 +1601,17 @@ Reglas:
 
 ## 13. Pantallas y rutas
 
-| Ruta | Pantalla | Estado | Notas |
-|---|---|---|---|
-| `/` | Landing | ✅ | Hero, pasos, roles, servicios, cinta animada |
-| `/login` | Login | ✅ | Fondo fotográfico, panel, toggle de tema |
-| `/registro` | Registro | ✅ | Crea Donante, Beneficiario o Voluntario; solicitudes sujetas a revisión |
-| `/solicitar-recuperacion` | Recuperación | ✅ | Envío de correo |
-| `/reset-password?token=` | Nueva contraseña | ✅ | Valida token al entrar |
-| `/dashboard` | Dashboard | 🟡 | Postulaciones y bandejas de revisión; KPIs estáticos y módulos futuros deshabilitados |
-| `/perfil` | Perfil | ✅ | Datos, contraseña, foto y ubicación propia del donante |
-| `/usuarios` | Admin de usuarios | ✅ | Solo admin; tabla + cards + modal |
-| `/campanas`, `/donaciones`, `/voluntarios`, `/beneficios`, `/reportes` | Módulos futuros del sidebar | ⛔ | Se muestran con iconos como módulos en desarrollo; no hay rutas registradas |
+| Ruta                                                                   | Pantalla                    | Estado | Notas                                                                                 |
+| ---------------------------------------------------------------------- | --------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| `/`                                                                    | Landing                     | ✅     | Hero, pasos, roles, servicios, cinta animada                                          |
+| `/login`                                                               | Login                       | ✅     | Fondo fotográfico, panel, toggle de tema                                              |
+| `/registro`                                                            | Registro                    | ✅     | Crea Donante, Beneficiario o Voluntario; solicitudes sujetas a revisión               |
+| `/solicitar-recuperacion`                                              | Recuperación                | ✅     | Envío de correo                                                                       |
+| `/reset-password?token=`                                               | Nueva contraseña            | ✅     | Valida token al entrar                                                                |
+| `/dashboard`                                                           | Dashboard                   | 🟡     | Postulaciones y bandejas de revisión; KPIs estáticos y módulos futuros deshabilitados |
+| `/perfil`                                                              | Perfil                      | ✅     | Datos, contraseña, foto y ubicación propia del donante                                |
+| `/usuarios`                                                            | Admin de usuarios           | ✅     | Solo admin; tabla + cards + modal                                                     |
+| `/campanas`, `/donaciones`, `/voluntarios`, `/beneficios`, `/reportes` | Módulos futuros del sidebar | ⛔     | Se muestran con iconos como módulos en desarrollo; no hay rutas registradas           |
 
 > El fallback `*` redirige a `/`. Si un equipo agrega tarjetas con enlaces a rutas no registradas, el usuario terminará en la landing.
 
@@ -1689,11 +1695,11 @@ npm run dev
 docker compose up -d --build
 ```
 
-| Contenedor | Nombre | Puerto |
-|---|---|---|
-| db | `postgres-db-donaciones_y_voluntariado` | 5432 |
-| backend | `donaciones_backend` | 4000 |
-| frontend | `donaciones_frontend` | 5173 |
+| Contenedor | Nombre                                  | Puerto |
+| ---------- | --------------------------------------- | ------ |
+| db         | `postgres-db-donaciones_y_voluntariado` | 5432   |
+| backend    | `donaciones_backend`                    | 4000   |
+| frontend   | `donaciones_frontend`                   | 5173   |
 
 - Backend compila con `tsc` y arranca `dist/server.js`.
 - Frontend corre Vite dev con `--host`.
@@ -1742,20 +1748,20 @@ Antes de desplegar:
 > [!NOTE]
 > Datos cargados por `database/02_inserts.sql`. Todas las cuentas usan la misma contraseña: **`Passw123`** (verificada contra el hash).
 
-| Rol | Correo | Contraseña | Estado |
-|---|---|---|---|
-| Administrador | `carla.admin@donacionesbo.org` | `Passw123` | Activo |
-| Administrador | `jorge.admin@donacionesbo.org` | `Passw123` | Activo |
-| Beneficiario (Persona) | `rosa.chambi@gmail.com` | `Passw123` | Activo |
-| Beneficiario (Familia) | `hector.poma@gmail.com` | `Passw123` | Activo |
-| Beneficiario (Institución) | `comedor.esperanza@gmail.com` | `Passw123` | Activo |
-| Donante | `diego.ramirez@gmail.com` | `Passw123` | Activo |
-| Donante | `sofia.paredes@gmail.com` | `Passw123` | Activo |
-| Donante | `andres.guzman@gmail.com` | `Passw123` | Activo |
-| Donante | `paola.duran@gmail.com` | `Passw123` | Inactivo |
-| Voluntario | `luis.choque@gmail.com` | `Passw123` | Activo |
-| Voluntario | `valeria.nina@gmail.com` | `Passw123` | Activo |
-| Voluntario | `sebastian.vega@gmail.com` | `Passw123` | Activo |
+| Rol                        | Correo                         | Contraseña | Estado   |
+| -------------------------- | ------------------------------ | ---------- | -------- |
+| Administrador              | `carla.admin@donacionesbo.org` | `Passw123` | Activo   |
+| Administrador              | `jorge.admin@donacionesbo.org` | `Passw123` | Activo   |
+| Beneficiario (Persona)     | `rosa.chambi@gmail.com`        | `Passw123` | Activo   |
+| Beneficiario (Familia)     | `hector.poma@gmail.com`        | `Passw123` | Activo   |
+| Beneficiario (Institución) | `comedor.esperanza@gmail.com`  | `Passw123` | Activo   |
+| Donante                    | `diego.ramirez@gmail.com`      | `Passw123` | Activo   |
+| Donante                    | `sofia.paredes@gmail.com`      | `Passw123` | Activo   |
+| Donante                    | `andres.guzman@gmail.com`      | `Passw123` | Activo   |
+| Donante                    | `paola.duran@gmail.com`        | `Passw123` | Inactivo |
+| Voluntario                 | `luis.choque@gmail.com`        | `Passw123` | Activo   |
+| Voluntario                 | `valeria.nina@gmail.com`       | `Passw123` | Activo   |
+| Voluntario                 | `sebastian.vega@gmail.com`     | `Passw123` | Activo   |
 
 > [!WARNING]
 > Credenciales solo para desarrollo local. No las uses en entornos reales. El comentario de `02_inserts.sql` indica `123456`, pero la contraseña correspondiente al hash es `Passw123`.
@@ -1834,14 +1840,14 @@ docker exec postgres-db-donaciones_y_voluntariado `
 
 Los módulos pendientes se pueden repartir sin tocar el núcleo de usuarios:
 
-| Equipo / vertical | Alcance sugerido | Dependencias |
-|---|---|---|
-| **Auth y Usuarios** | Mantener registro/login/perfil; unificar roles y persistir foto | Núcleo actual |
-| **Campañas** | Tabla `campana`, CRUD, estados, metas, beneficiarios asociados | `usuario`, `beneficiario` |
-| **Donaciones y Pagos** | `donacion`, `comprobante`, verificación QR, estados | `usuario`, `campana` |
-| **Voluntariados** | `voluntariado`, `postulacion`, turnos, asistencia | `usuario`, `campana` |
-| **Reportes** | Consultas agregadas, exportación XLSX/PDF, gráficos Nivo | Datos de todos |
-| **Infra y Calidad** | Docker productivo, CI, tests, OpenAPI, Sonar | Todo |
+| Equipo / vertical      | Alcance sugerido                                                | Dependencias              |
+| ---------------------- | --------------------------------------------------------------- | ------------------------- |
+| **Auth y Usuarios**    | Mantener registro/login/perfil; unificar roles y persistir foto | Núcleo actual             |
+| **Campañas**           | Tabla `campana`, CRUD, estados, metas, beneficiarios asociados  | `usuario`, `beneficiario` |
+| **Donaciones y Pagos** | `donacion`, `comprobante`, verificación QR, estados             | `usuario`, `campana`      |
+| **Voluntariados**      | `voluntariado`, `postulacion`, turnos, asistencia               | `usuario`, `campana`      |
+| **Reportes**           | Consultas agregadas, exportación XLSX/PDF, gráficos Nivo        | Datos de todos            |
+| **Infra y Calidad**    | Docker productivo, CI, tests, OpenAPI, Sonar                    | Todo                      |
 
 ### 17.2 Reglas de integración
 
@@ -1927,32 +1933,32 @@ Una funcionalidad está terminada cuando:
 
 ### 18.1 Prioridad P0 — seguridad y correctitud
 
-| Problema | Evidencia | Acción recomendada |
-|---|---|---|
-| Credenciales reales en `.env` local | `EMAIL_PASS`, `JWT_SECRET` débiles | Rotar secretos; usar gestor de secretos; verificar historial de Git |
-| Fallback de contraseña en texto plano | `authService.login` compara texto si no es hash | Eliminar el fallback y migrar datos legados |
-| Sin rate limiting | Login y recuperación sin límite | Agregar `express-rate-limit` (login, reset, registro) |
-| Tokens de recuperación en memoria | `Map` en `usuarioRepository` | Persistir en tabla `password_reset_token` con expiración e índice único |
-| 403 cierra sesión | Interceptor de Axios | Diferenciar 401 (sesión) de 403 (permisos) |
-| Uploads públicos y predecibles | `/uploads` estático + `Date.now()` | Servir con auth o nombres aleatorios; validar contenido real |
-| Sin `helmet` ni límite de body | `app.ts` | Agregar `helmet` y `express.json({ limit: '1mb' })` |
-| CORS de un solo origen | `origin: frontendUrl` | Soportar lista de orígenes por entorno |
+| Problema                              | Evidencia                                       | Acción recomendada                                                      |
+| ------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------- |
+| Credenciales reales en `.env` local   | `EMAIL_PASS`, `JWT_SECRET` débiles              | Rotar secretos; usar gestor de secretos; verificar historial de Git     |
+| Fallback de contraseña en texto plano | `authService.login` compara texto si no es hash | Eliminar el fallback y migrar datos legados                             |
+| Sin rate limiting                     | Login y recuperación sin límite                 | Agregar `express-rate-limit` (login, reset, registro)                   |
+| Tokens de recuperación en memoria     | `Map` en `usuarioRepository`                    | Persistir en tabla `password_reset_token` con expiración e índice único |
+| 403 cierra sesión                     | Interceptor de Axios                            | Diferenciar 401 (sesión) de 403 (permisos)                              |
+| Uploads públicos y predecibles        | `/uploads` estático + `Date.now()`              | Servir con auth o nombres aleatorios; validar contenido real            |
+| Sin `helmet` ni límite de body        | `app.ts`                                        | Agregar `helmet` y `express.json({ limit: '1mb' })`                     |
+| CORS de un solo origen                | `origin: frontendUrl`                           | Soportar lista de orígenes por entorno                                  |
 
 ### 18.2 Prioridad P1 — funcionalidad y mantenibilidad
 
-| Problema | Impacto | Acción |
-|---|---|---|
-| Roles canónicos y alias heredados conviven | Compatibilidad y filtros más complejos | Retirar alias gradualmente y mantener normalización en un solo punto |
-| Administración conserva campos de nivel heredados en algunos formularios/tipos | El esquema `administrador` solo contiene `id_usuario` | Retirar campos `nivel_acceso` residuales del frontend y validadores |
-| Llamadas Axios dispersas | Comportamiento inconsistente | Centralizar todo en `api/client.ts` |
-| Listado sin paginación de servidor | Escala mal | Agregar `?page=&limit=&q=&rol=&estado=` |
-| Sin OpenAPI/Swagger | Integración manual | Generar OpenAPI 3 y publicarlo |
-| Sin tests | Regresiones silenciosas | Vitest/Jest + Supertest |
-| Sin CI | Calidad manual | GitHub Actions: `tsc`, build, tests, Sonar |
-| Sin linter/formatter | Estilo inconsistente | ESLint + Prettier |
-| Apellido único en BD | `paterno`/`materno` se reconstruyen mal | Agregar columnas separadas o mantenerlas en `usuario` |
-| Docker frontend en modo dev | No apto para producción | Build multi-stage + Nginx |
-| Dependencias sin uso | Peso y superficie | Retirar o implementar reportes |
+| Problema                                                                       | Impacto                                               | Acción                                                               |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------- |
+| Roles canónicos y alias heredados conviven                                     | Compatibilidad y filtros más complejos                | Retirar alias gradualmente y mantener normalización en un solo punto |
+| Administración conserva campos de nivel heredados en algunos formularios/tipos | El esquema `administrador` solo contiene `id_usuario` | Retirar campos `nivel_acceso` residuales del frontend y validadores  |
+| Llamadas Axios dispersas                                                       | Comportamiento inconsistente                          | Centralizar todo en `api/client.ts`                                  |
+| Listado sin paginación de servidor                                             | Escala mal                                            | Agregar `?page=&limit=&q=&rol=&estado=`                              |
+| Sin OpenAPI/Swagger                                                            | Integración manual                                    | Generar OpenAPI 3 y publicarlo                                       |
+| Sin tests                                                                      | Regresiones silenciosas                               | Vitest/Jest + Supertest                                              |
+| Sin CI                                                                         | Calidad manual                                        | GitHub Actions: `tsc`, build, tests, Sonar                           |
+| Sin linter/formatter                                                           | Estilo inconsistente                                  | ESLint + Prettier                                                    |
+| Apellido único en BD                                                           | `paterno`/`materno` se reconstruyen mal               | Agregar columnas separadas o mantenerlas en `usuario`                |
+| Docker frontend en modo dev                                                    | No apto para producción                               | Build multi-stage + Nginx                                            |
+| Dependencias sin uso                                                           | Peso y superficie                                     | Retirar o implementar reportes                                       |
 
 ### 18.3 Inconsistencias conocidas (leer antes de tocar)
 
@@ -1972,56 +1978,56 @@ Una funcionalidad está terminada cuando:
 
 ### 18.4 Roadmap sugerido
 
-| Fase | Objetivo | Entregables |
-|---|---|---|
-| 1 | Endurecer núcleo | Rate limit, helmet, tokens en BD, quitar plaintext y unificar manejo de 403 |
-| 2 | Unificar contrato | Roles canónicos, cliente HTTP único, OpenAPI, tests base, CI |
-| 3 | Campañas | Esquema, CRUD, estados, metas, asociación con beneficiarios |
-| 4 | Donaciones | Registro, comprobantes, verificación manual/QR, historial |
-| 5 | Voluntariados | Convocatorias, postulaciones, turnos, asistencia |
-| 6 | Reportes | Agregados, exportación XLSX/PDF, gráficos Nivo, dashboard real |
-| 7 | Producción | Build estático, HTTPS, backups, observabilidad, despliegue |
+| Fase | Objetivo          | Entregables                                                                 |
+| ---- | ----------------- | --------------------------------------------------------------------------- |
+| 1    | Endurecer núcleo  | Rate limit, helmet, tokens en BD, quitar plaintext y unificar manejo de 403 |
+| 2    | Unificar contrato | Roles canónicos, cliente HTTP único, OpenAPI, tests base, CI                |
+| 3    | Campañas          | Esquema, CRUD, estados, metas, asociación con beneficiarios                 |
+| 4    | Donaciones        | Registro, comprobantes, verificación manual/QR, historial                   |
+| 5    | Voluntariados     | Convocatorias, postulaciones, turnos, asistencia                            |
+| 6    | Reportes          | Agregados, exportación XLSX/PDF, gráficos Nivo, dashboard real              |
+| 7    | Producción        | Build estático, HTTPS, backups, observabilidad, despliegue                  |
 
 ---
 
 ## 19. Troubleshooting
 
-| Síntoma | Causa probable | Solución |
-|---|---|---|
-| `No se pudo conectar a la base de datos` | Docker apagado o `DB_HOST` incorrecto | `docker compose up -d db`; en local el backend traduce `db`→`localhost` |
-| La base está vacía o no existen tablas | El volumen ya existía y los scripts no se re-ejecutan | `docker compose down -v` y volver a levantar (solo dev) |
-| `CORS policy` en el navegador | `FRONTEND_URL` no coincide con el origen | Ajustar `FRONTEND_URL` en `.env` y reiniciar backend |
-| Login devuelve 401 con credenciales correctas | Usuario inactivo/eliminado o contraseña distinta | Revisar estado y usar `Passw123` del seed |
-| Todo request autenticado redirige a login | Interceptor recibe 403 (permisos, no sesión) | Revisar rol; corregir interceptor (deuda P0) |
-| Las llamadas de recuperación usan una URL `undefined` | Esas dos pantallas no usan el fallback del cliente compartido | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite |
-| La recuperación de contraseña falla con URL `undefined` | `SolicitarRecuperacion`/`ResetPassword` necesitan `VITE_API_URL` explícita | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite |
-| El correo de recuperación no llega | Credenciales SMTP inválidas o Gmail bloqueó | Usar contraseña de aplicación; revisar consola del backend |
-| El enlace de recuperación expiró | Token de 1 h o backend reiniciado | Solicitar uno nuevo |
-| `npm install` falla con `bcrypt` en Windows | Falta toolchain nativa | Instalar Visual Studio Build Tools o usar Docker |
-| El puerto 4000/5173 está ocupado | Otro proceso lo usa | Cambiar `PORT`/puerto de Vite o detener el proceso |
-| `docker compose up` reconstruye lento | `npm install` dentro del contenedor | Usar caché de capas; no copiar `node_modules` |
-| Sonar no conecta | `--network host` en Docker Desktop | Usar `host.docker.internal:9000` |
-| La foto de perfil no aparece | Ruta `/uploads` no accesible, URL de API incorrecta o archivo inválido/mayor a 5 MB | Verificar respuesta de perfil, archivo en `backend/uploads/perfiles` y URL base del backend |
-| El nombre se parte mal | `paterno`/`materno` derivados de un solo `apellido` | Cambiar el esquema (deuda P1) |
-| `tsc` falla por variables no usadas | `noUnusedLocals`/`noUnusedParameters` activos | Eliminar imports/variables o justificar |
-| El build de Docker del frontend no refleja cambios | Volumen montado + Vite dev | Reiniciar contenedor o usar modo local |
+| Síntoma                                                 | Causa probable                                                                      | Solución                                                                                    |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `No se pudo conectar a la base de datos`                | Docker apagado o `DB_HOST` incorrecto                                               | `docker compose up -d db`; en local el backend traduce `db`→`localhost`                     |
+| La base está vacía o no existen tablas                  | El volumen ya existía y los scripts no se re-ejecutan                               | `docker compose down -v` y volver a levantar (solo dev)                                     |
+| `CORS policy` en el navegador                           | `FRONTEND_URL` no coincide con el origen                                            | Ajustar `FRONTEND_URL` en `.env` y reiniciar backend                                        |
+| Login devuelve 401 con credenciales correctas           | Usuario inactivo/eliminado o contraseña distinta                                    | Revisar estado y usar `Passw123` del seed                                                   |
+| Todo request autenticado redirige a login               | Interceptor recibe 403 (permisos, no sesión)                                        | Revisar rol; corregir interceptor (deuda P0)                                                |
+| Las llamadas de recuperación usan una URL `undefined`   | Esas dos pantallas no usan el fallback del cliente compartido                       | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite        |
+| La recuperación de contraseña falla con URL `undefined` | `SolicitarRecuperacion`/`ResetPassword` necesitan `VITE_API_URL` explícita          | Definir `VITE_API_URL=http://localhost:4000/api` en `frontend/.env` y reiniciar Vite        |
+| El correo de recuperación no llega                      | Credenciales SMTP inválidas o Gmail bloqueó                                         | Usar contraseña de aplicación; revisar consola del backend                                  |
+| El enlace de recuperación expiró                        | Token de 1 h o backend reiniciado                                                   | Solicitar uno nuevo                                                                         |
+| `npm install` falla con `bcrypt` en Windows             | Falta toolchain nativa                                                              | Instalar Visual Studio Build Tools o usar Docker                                            |
+| El puerto 4000/5173 está ocupado                        | Otro proceso lo usa                                                                 | Cambiar `PORT`/puerto de Vite o detener el proceso                                          |
+| `docker compose up` reconstruye lento                   | `npm install` dentro del contenedor                                                 | Usar caché de capas; no copiar `node_modules`                                               |
+| Sonar no conecta                                        | `--network host` en Docker Desktop                                                  | Usar `host.docker.internal:9000`                                                            |
+| La foto de perfil no aparece                            | Ruta `/uploads` no accesible, URL de API incorrecta o archivo inválido/mayor a 5 MB | Verificar respuesta de perfil, archivo en `backend/uploads/perfiles` y URL base del backend |
+| El nombre se parte mal                                  | `paterno`/`materno` derivados de un solo `apellido`                                 | Cambiar el esquema (deuda P1)                                                               |
+| `tsc` falla por variables no usadas                     | `noUnusedLocals`/`noUnusedParameters` activos                                       | Eliminar imports/variables o justificar                                                     |
+| El build de Docker del frontend no refleja cambios      | Volumen montado + Vite dev                                                          | Reiniciar contenedor o usar modo local                                                      |
 
 ---
 
 ## 20. Glosario
 
-| Término | Significado |
-|---|---|
-| **JWT** | JSON Web Token firmado; contiene identidad y rol, expira en 8 h |
-| **AFK** | Cierre de sesión por 15 min de inactividad en el cliente |
-| **Borrado lógico** | Cambiar `estado` a `Eliminado` sin borrar la fila |
-| **Subtipos** | Tablas `administrador`, `beneficiario`, `donante`, `voluntario` que heredan de `usuario` |
-| **Token de recuperación** | Cadena aleatoria de 32 bytes con 1 h de vigencia |
-| **Token semántico** | Variable de color/estilo (`surface`, `text-muted`) usada en lugar de un hex |
-| **`night` / `cream` / `gold`** | Familia de marca fija para superficies oscuras |
-| **Guard** | Componente que protege una ruta por sesión o rol |
-| **DoD** | Definition of Done; criterios para considerar terminada una tarea |
-| **Seed** | Datos de prueba de `02_inserts.sql` |
+| Término                        | Significado                                                                              |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| **JWT**                        | JSON Web Token firmado; contiene identidad y rol, expira en 8 h                          |
+| **AFK**                        | Cierre de sesión por 15 min de inactividad en el cliente                                 |
+| **Borrado lógico**             | Cambiar `estado` a `Eliminado` sin borrar la fila                                        |
+| **Subtipos**                   | Tablas `administrador`, `beneficiario`, `donante`, `voluntario` que heredan de `usuario` |
+| **Token de recuperación**      | Cadena aleatoria de 32 bytes con 1 h de vigencia                                         |
+| **Token semántico**            | Variable de color/estilo (`surface`, `text-muted`) usada en lugar de un hex              |
+| **`night` / `cream` / `gold`** | Familia de marca fija para superficies oscuras                                           |
+| **Guard**                      | Componente que protege una ruta por sesión o rol                                         |
+| **DoD**                        | Definition of Done; criterios para considerar terminada una tarea                        |
+| **Seed**                       | Datos de prueba de `02_inserts.sql`                                                      |
 
 ---
 

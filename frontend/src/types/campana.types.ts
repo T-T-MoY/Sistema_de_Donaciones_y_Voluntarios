@@ -54,7 +54,7 @@ export interface Actividad {
   creador_nombre?: string;
   fecha_creacion: string;
   fecha_actualizacion: string;
-  campanas_asociadas?: { id_campana: number; nombre: string }[];
+  campanas_asociadas?: { id_campana: number; nombre: string; estado?: EstadoCampana }[];
   voluntarios_inscritos?: number;
   cupos_disponibles?: number;
   mi_participacion?: ParticipacionItem | null;

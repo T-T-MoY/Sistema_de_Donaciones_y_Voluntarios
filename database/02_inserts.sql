@@ -22,7 +22,14 @@ INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, e
 -- Voluntarios (IDs 10, 11 y 12)
 (10, 'Luis', 'Choque Apaza', 'luis.choque@gmail.com', '76003301', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-10 08:30:00'),
 (11, 'Valeria', 'Nina Choque', 'valeria.nina@gmail.com', '76003302', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-11 10:15:00'),
-(12, 'Sebastian', 'Vega Luna', 'sebastian.vega@gmail.com', '76003303', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-12 17:00:00');
+(12, 'Sebastian', 'Vega Luna', 'sebastian.vega@gmail.com', '76003303', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-12 17:00:00'),
+
+-- Nuevos usuarios para casos de prueba en campañas y actividades (IDs 13 a 17)
+(13, 'Mariana', 'Rios Gomez', 'mariana.rios@gmail.com', '76004401', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-15 10:00:00'),
+(14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-16 11:30:00'),
+(15, 'Gabriela', 'Morales Quiroga', 'gabriela.morales@gmail.com', '76004403', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-17 14:00:00'),
+(16, 'Fernando', 'Castro Flores', 'fernando.castro@gmail.com', '76004404', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-18 16:15:00'),
+(17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00');
 
 
 -- =========================================================
@@ -47,7 +54,12 @@ INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 (9, 'Av. 6 de Agosto #300, Sopocachi, La Paz', -16.50765400, -68.12891000),
 (10, NULL, NULL, NULL),
 (11, NULL, NULL, NULL),
-(12, NULL, NULL, NULL);
+(12, NULL, NULL, NULL),
+(13, NULL, NULL, NULL),
+(14, NULL, NULL, NULL),
+(15, 'Calle 21 de Calacoto #450, La Paz', -16.53812000, -68.08234000),
+(16, NULL, NULL, NULL),
+(17, NULL, NULL, NULL);
 
 -- ---------- VOLUNTARIO ----------
 -- Luis (10): coordinador, aprobado por el admin Carla (1)
@@ -56,7 +68,10 @@ INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, fecha_registro, es_coordinador, estado, revisado_por, fecha_revision) VALUES
 (10, ARRAY['Logistica', 'Conduccion y Transporte', 'Carga'], 'Fines de semana', '2026-02-10 08:30:00', TRUE, 'Aprobado', 1, '2026-02-10 12:00:00'),
 (11, ARRAY['Primeros Auxilios', 'Atencion Social', 'Organizacion'], 'Tardes (14:00 - 19:00)', '2026-02-11 10:15:00', FALSE, 'Aprobado', 10, '2026-02-12 09:00:00'),
-(12, ARRAY['Cocina y Alimentacion', 'Inventario', 'Logistica'], 'Tiempo completo', '2026-02-12 17:00:00', FALSE, 'Pendiente', NULL, NULL);
+(12, ARRAY['Cocina y Alimentacion', 'Inventario', 'Logistica'], 'Tiempo completo', '2026-02-12 17:00:00', FALSE, 'Pendiente', NULL, NULL),
+(13, ARRAY['Educacion', 'Apoyo Pedagogico', 'Atencion Infantil'], 'Tardes y fines de semana', '2026-02-15 10:00:00', FALSE, 'Aprobado', 1, '2026-02-15 12:00:00'),
+(14, ARRAY['Rescate', 'Primeros Auxilios', 'Bombero', 'Logistica'], 'Disponibilidad inmediata para emergencias', '2026-02-16 11:30:00', TRUE, 'Aprobado', 1, '2026-02-16 14:00:00'),
+(17, ARRAY['Clasificacion', 'Inventario', 'Logistica'], 'Fines de semana', '2026-02-19 09:20:00', FALSE, 'Aprobado', 10, '2026-02-20 09:00:00');
 
 -- ---------- BENEFICIARIO ----------
 -- Rosa (3): verificada por Carla (1)
@@ -105,7 +120,7 @@ ON CONFLICT (tipo, nombre) DO NOTHING;
 -- 5. MÓDULO 3: GESTIÓN DE CAMPAÑAS Y ACTIVIDADES
 -- =========================================================
 
--- ---------- CAMPAÑAS (Activas, Planificadas/Futuras y Finalizadas) ----------
+-- ---------- CAMPAÑAS (Activas, Planificadas/Futuras, Pausadas y Finalizadas) ----------
 INSERT INTO campana (id_campana, nombre, descripcion, portada_url, fecha_inicio, fecha_fin, objetivo_recaudacion, estado, id_administrador, fecha_creacion) VALUES
 (1, 'Campaña Solidaria Incendios Chiquitanía 2026',
     'Recaudación de víveres, agua, herramientas y fondos para bomberos voluntarios y familias afectadas por los incendios forestales en la Chiquitanía.',
@@ -122,11 +137,27 @@ INSERT INTO campana (id_campana, nombre, descripcion, portada_url, fecha_inicio,
 (4, 'Campaña Mochila Solidaria Escolar 2026',
     'Dotación de material pedagógico, cuadernos y mochilas para 200 estudiantes de primaria en zonas periurbanas de La Paz y El Alto.',
     'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800',
-    '2026-01-15', '2026-02-20', 15000.00, 'Finalizada', 1, '2026-01-10 09:00:00')
+    '2026-01-15', '2026-02-20', 15000.00, 'Finalizada', 1, '2026-01-10 09:00:00'),
+(5, 'Campaña Reconstrucción Comunitaria Yungas 2026',
+    'Apoyo a comunidades afectadas por deslizamientos en la región de los Yungas con materiales, vituallas y cuadrillas de reconstrucción.',
+    'https://images.unsplash.com/photo-1590402494682-cd3fb53b1f70?w=800',
+    '2026-02-01', '2026-11-30', 40000.00, 'Activa', 1, '2026-02-01 08:00:00'),
+(6, 'Campaña Brigadas de Salud y Atención Médica Rural',
+    'Jornadas de atención médica primaria, triaje odontológico y entrega de insumos de salud en comunidades rurales dispersas.',
+    'https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800',
+    '2026-03-01', '2026-10-31', 30000.00, 'Pausada', 2, '2026-02-15 09:00:00'),
+(7, 'Campaña Reforestación y Protección Ambiental Illimani',
+    'Iniciativa ecológica comunitaria para plantación de árboles nativos y cuidado de vertientes (Campaña inicial con 0 actividades asociadas).',
+    'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800',
+    '2026-06-01', '2026-12-15', 20000.00, 'Planificada', 1, '2026-02-20 10:00:00'),
+(8, 'Campaña Emergencia Inundaciones Río Abajo 2025',
+    'Campaña finalizada tras la provisión de gaviones, herramientas pesadas y alimentos de emergencia para comunidades de Río Abajo.',
+    'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=800',
+    '2025-11-01', '2025-12-31', 18000.00, 'Finalizada', 1, '2025-10-20 09:00:00')
 ON CONFLICT (id_campana) DO UPDATE 
 SET nombre = EXCLUDED.nombre, descripcion = EXCLUDED.descripcion, portada_url = EXCLUDED.portada_url, estado = EXCLUDED.estado, fecha_inicio = EXCLUDED.fecha_inicio, fecha_fin = EXCLUDED.fecha_fin;
 
-SELECT setval('campana_id_campana_seq', COALESCE((SELECT MAX(id_campana) FROM campana), 1));
+SELECT setval('campana_id_campana_seq', COALESCE((SELECT MAX(id_campana) FROM campana), 8));
 
 -- ---------- DONACIONES DE PRUEBA (Campañas, Solicitudes e Inventario) ----------
 INSERT INTO donacion (id_donacion, codigo, donante_usuario_id, registrado_por_usuario_id, voluntario_usuario_id, tipo_donacion, modalidad, cantidad, cantidad_recibida, descripcion, fecha_donacion, campana_id, estado) VALUES
@@ -141,7 +172,9 @@ INSERT INTO donacion (id_donacion, codigo, donante_usuario_id, registrado_por_us
 (2, 'DON-2026-0002', 7, 1, 10, 'MATERIAL', 'PRESENCIAL', 30.00, 30.00, 'Donación física de chompas de lana en sede central para almacén general', '2026-03-03 14:00:00', NULL, 'REGISTRADA'),
 (6, 'DON-2026-0006', 8, 1, 10, 'MATERIAL', 'PRESENCIAL', 20.00, 20.00, 'Frazadas térmicas entregadas en oficina de acopio', '2026-03-04 17:00:00', NULL, 'REGISTRADA'),
 -- Donación orientada a Solicitud de Ayuda Familiar
-(7, 'DON-2026-0007', 6, 1, NULL, 'ALIMENTO', 'ONLINE', 25.00, 25.00, 'Canasta con víveres para apoyo a familias vulnerables', '2026-03-05 09:15:00', NULL, 'ASIGNADA_TOTAL')
+(7, 'DON-2026-0007', 6, 1, NULL, 'ALIMENTO', 'ONLINE', 25.00, 25.00, 'Canasta con víveres para apoyo a familias vulnerables', '2026-03-05 09:15:00', NULL, 'ASIGNADA_TOTAL'),
+-- Donación Campaña 5 (Yungas)
+(8, 'DON-2026-0008', 15, 1, NULL, 'ECONOMICO', 'TRANSFERENCIA', 5000.00, 5000.00, 'Aporte solidario para compra de herramientas y cemento (Campaña Yungas)', '2026-02-18 10:00:00', 5, 'REGISTRADA')
 ON CONFLICT (id_donacion) DO UPDATE 
 SET codigo = EXCLUDED.codigo, campana_id = EXCLUDED.campana_id, estado = EXCLUDED.estado;
 
@@ -159,10 +192,11 @@ ON CONFLICT (id_donacion) DO NOTHING;
 
 INSERT INTO detalle_economico (id_donacion, monto, moneda_codigo, metodo_pago, referencia_pago) VALUES
 (3, 1500.00, 'BOB', 'QR', 'BCP-QR-891230491'),
-(4, 800.00, 'BOB', 'TRANSFERENCIA', 'BNB-TR-40019283')
+(4, 800.00, 'BOB', 'TRANSFERENCIA', 'BNB-TR-40019283'),
+(8, 5000.00, 'BOB', 'TRANSFERENCIA', 'BNB-TR-99081234')
 ON CONFLICT (id_donacion) DO NOTHING;
 
-SELECT setval('donacion_codigo_seq', COALESCE((SELECT MAX(id_donacion) FROM donacion), 7));
+SELECT setval('donacion_codigo_seq', COALESCE((SELECT MAX(id_donacion) FROM donacion), 8));
 
 -- Asignación de Donaciones a Beneficiarios y Solicitudes
 INSERT INTO asignacion_donacion (id_asignacion, donacion_id, beneficiario_usuario_id, solicitud_ayuda_id, cantidad, fecha_asignacion, administrador_usuario_id, estado, observaciones) VALUES
@@ -215,11 +249,49 @@ INSERT INTO actividad (id_actividad, nombre, descripcion, fecha, hora_inicio, ho
     '2026-03-05', '10:00:00', '12:30:00', 'Zona Sur - Calacoto', 4, 'INVENTARIO', NULL, 2, 'Finalizada', 1, '2026-03-03 15:00:00'),
 (11, 'Jornada general de conteo e inventariado en almacén',
     'Organización de estantes, recuento físico de bienes y control de stock en almacén central.',
-    '2026-03-25', '09:00:00', '15:00:00', 'Almacén General Miraflores', 6, 'INVENTARIO', NULL, NULL, 'Planificada', 1, '2026-03-05 08:30:00')
+    '2026-03-25', '09:00:00', '15:00:00', 'Almacén General Miraflores', 6, 'INVENTARIO', NULL, NULL, 'Planificada', 1, '2026-03-05 08:30:00'),
+
+-- Actividades para Campaña 5 (Yungas - Activa)
+(12, 'Cuadrilla de remoción y limpieza de vías de acceso',
+    'Apoyo a vecinos en desmonte de piedras y habilitación de caminos comunitarios de herradura.',
+    '2026-03-22', '07:30:00', '13:00:00', 'Municipio de Chulumani, Sector Puente', 3, 'CAMPANA', NULL, NULL, 'Planificada', 1, '2026-02-15 10:00:00'),
+(13, 'Inspección técnica y censo comunal de necesidades',
+    'Levantamiento de fichas técnicas para cuantificar daños y priorizar entregas humanitarias.',
+    '2026-03-23', '08:00:00', '14:00:00', 'Comunidad Huancané, Yungas', 10, 'CAMPANA', NULL, NULL, 'Planificada', 1, '2026-02-16 11:00:00'),
+
+-- Actividad para Campaña 8 (Inundaciones - Finalizada)
+(14, 'Distribución de kits de aseo e higiene en albergue',
+    'Entrega de jabón, desinfectante y bidones para agua a damnificados por desborde de río.',
+    '2025-12-20', '09:00:00', '13:00:00', 'Albergue Comunal Mecapaca', 5, 'CAMPANA', NULL, NULL, 'Finalizada', 1, '2025-12-10 09:00:00'),
+
+-- Actividad Cancelada de prueba para Campaña 1 (NO debe contar en total_actividades)
+(15, 'Feria barrial ecológica y colecta de herramientas',
+    'Actividad cancelada por condiciones meteorológicas adversas en el punto de encuentro.',
+    '2026-03-11', '10:00:00', '14:00:00', 'Parque Urbano Central', 8, 'CAMPANA', NULL, NULL, 'Cancelada', 1, '2026-02-18 10:00:00'),
+
+-- Actividad para Campaña 6 (Salud Rural - Pausada)
+(16, 'Jornada médica preventiva y triaje de campo',
+    'Atención médica básica y registro preventivo de niños y adultos mayores.',
+    '2026-04-10', '08:30:00', '16:00:00', 'Centro de Salud Rural Palca', 6, 'CAMPANA', NULL, NULL, 'Planificada', 2, '2026-02-20 14:00:00'),
+
+-- Actividad General sin Campaña (Autónoma)
+(17, 'Taller de capacitación de brigadistas en primeros auxilios',
+    'Entrenamiento intensivo en maniobras RCP, vendajes y protocolos de evacuación ciudadana.',
+    '2026-04-05', '09:00:00', '13:00:00', 'Auditorio Central Miraflores', 15, 'GENERAL', NULL, NULL, 'Planificada', 1, '2026-02-22 09:00:00'),
+
+-- Actividad de Inventario
+(18, 'Clasificación de medicinas e insumos médicos recibidos',
+    'Separación de lotes, control de precintos y fechas de caducidad en estantes sanitarios.',
+    '2026-03-28', '14:00:00', '18:00:00', 'Almacén Central - Sección Sanitaria', 5, 'INVENTARIO', NULL, NULL, 'Planificada', 1, '2026-02-25 15:00:00'),
+
+-- Actividad en Curso con Asistencias y Faltas
+(19, 'Jornada de entrega comunitaria en comedor popular',
+    'Recepción y entrega de raciones calientes en el Comedor Infantil Achachicala.',
+    '2026-03-19', '11:00:00', '15:00:00', 'Comedor Achachicala', 4, 'CAMPANA', NULL, NULL, 'En_Curso', 1, '2026-03-01 12:00:00')
 ON CONFLICT (id_actividad) DO UPDATE
 SET nombre = EXCLUDED.nombre, descripcion = EXCLUDED.descripcion, fecha = EXCLUDED.fecha, estado = EXCLUDED.estado;
 
-SELECT setval('actividad_id_actividad_seq', COALESCE((SELECT MAX(id_actividad) FROM actividad), 11));
+SELECT setval('actividad_id_actividad_seq', COALESCE((SELECT MAX(id_actividad) FROM actividad), 19));
 
 -- ---------- ASIGNACIÓN ACTIVIDAD - CAMPAÑA (ACTIVIDAD_CAMPAÑA) ----------
 INSERT INTO actividad_campana (id_actividad, id_campana, fecha_asignacion) VALUES
@@ -227,13 +299,22 @@ INSERT INTO actividad_campana (id_actividad, id_campana, fecha_asignacion) VALUE
 (1, 1, '2026-03-01 10:30:00'),
 (2, 1, '2026-03-01 11:30:00'),
 (6, 1, '2026-03-02 14:30:00'),
+(15, 1, '2026-02-18 10:30:00'), -- Cancelada, para probar que no suma
 -- Campaña 2 (Frío Cero)
 (3, 2, '2026-03-02 10:00:00'),
 (7, 2, '2026-03-03 10:30:00'),
 -- Campaña 3 (Banco Alimentos)
 (8, 3, '2026-03-03 16:30:00'),
--- Campaña 4 (Mochilas)
-(9, 4, '2026-01-20 09:30:00')
+(19, 3, '2026-03-01 12:30:00'),
+-- Campaña 4 (Mochilas - Finalizada)
+(9, 4, '2026-01-20 09:30:00'),
+-- Campaña 5 (Yungas - Activa)
+(12, 5, '2026-02-15 10:30:00'),
+(13, 5, '2026-02-16 11:30:00'),
+-- Campaña 6 (Salud Rural - Pausada)
+(16, 6, '2026-02-20 14:30:00'),
+-- Campaña 8 (Inundaciones - Finalizada)
+(14, 8, '2025-12-10 09:30:00')
 ON CONFLICT (id_actividad, id_campana) DO NOTHING;
 
 -- ---------- PARTICIPACIÓN DE VOLUNTARIOS (PARTICIPA) ----------
@@ -263,11 +344,41 @@ INSERT INTO participa (id_participacion, id_voluntario, id_actividad, fecha_insc
 (12, 6,  9, '2026-02-16 10:00:00', TRUE, 'Asistio', 'Apoyo logístico y transporte de material', 4.00, '2026-02-18 12:30:00', 1),
 
 -- Actividad 11 (Inventario): Sebastian inscrito
-(13, 12, 11, '2026-03-07 15:00:00', FALSE, 'Inscrito', 'Conteo y rotulado en almacén central', 0.00, NULL, NULL)
+(13, 12, 11, '2026-03-07 15:00:00', FALSE, 'Inscrito', 'Conteo y rotulado en almacén central', 0.00, NULL, NULL),
+
+-- Actividad 12 (Campaña 5 - max 3, CUPOS AGOTADOS para pruebas de límite de inscripción)
+(14, 10, 12, '2026-03-01 08:00:00', FALSE, 'Inscrito', 'Coordinador de cuadrilla', 0.00, NULL, NULL),
+(15, 14, 12, '2026-03-01 08:30:00', FALSE, 'Confirmado', 'Encargado de primeros auxilios y rescate', 0.00, NULL, NULL),
+(16, 11, 12, '2026-03-01 09:00:00', FALSE, 'Inscrito', 'Voluntaria de apoyo logístico', 0.00, NULL, NULL),
+
+-- Actividad 13 (Campaña 5 - max 10, con cupos disponibles)
+(17, 13, 13, '2026-03-02 10:00:00', FALSE, 'Inscrito', 'Levantamiento de fichas familiares', 0.00, NULL, NULL),
+(18, 17, 13, '2026-03-02 11:00:00', FALSE, 'Inscrito', 'Apoyo logístico', 0.00, NULL, NULL),
+
+-- Actividad 14 (Campaña 8 Finalizada - max 5, asistencias históricas acreditadas)
+(19, 10, 14, '2025-12-15 09:00:00', TRUE, 'Asistio', 'Entrega formal de donaciones a familias de Mecapaca', 4.00, '2025-12-20 13:00:00', 1),
+(20, 11, 14, '2025-12-15 09:30:00', TRUE, 'Asistio', 'Registro de actas y recepción de firmas', 4.00, '2025-12-20 13:00:00', 1),
+
+-- Actividad 16 (Campaña 6 Pausada - max 6)
+(21, 14, 16, '2026-03-03 14:00:00', FALSE, 'Inscrito', 'Triaje y primeros auxilios', 0.00, NULL, NULL),
+
+-- Actividad 17 (GENERAL sin campaña - max 15, multi-rol)
+(22, 6,  17, '2026-03-04 09:00:00', FALSE, 'Inscrito', 'Donante participando activamente en voluntariado', 0.00, NULL, NULL),
+(23, 13, 17, '2026-03-04 09:30:00', FALSE, 'Inscrito', 'Capacitación brigadista', 0.00, NULL, NULL),
+(24, 17, 17, '2026-03-04 10:00:00', FALSE, 'Inscrito', 'Participante nueva en inducción', 0.00, NULL, NULL),
+
+-- Actividad 18 (INVENTARIO - max 5)
+(25, 11, 18, '2026-03-05 11:00:00', FALSE, 'Inscrito', 'Revisión técnica de medicamentos', 0.00, NULL, NULL),
+(26, 12, 18, '2026-03-05 11:30:00', FALSE, 'Inscrito', 'Estibado y control de precintos', 0.00, NULL, NULL),
+
+-- Actividad 19 (En_Curso en Campaña 3 - max 4): 1 Asistió, 1 No_Asistio, 1 Cancelado previo para prueba de exclusión
+(27, 10, 19, '2026-03-06 08:00:00', TRUE, 'Asistio', 'Coordinó la mesa de entrega', 3.00, '2026-03-19 14:00:00', 1),
+(28, 8,  19, '2026-03-06 08:30:00', FALSE, 'No_Asistio', 'Inasistencia reportada por emergencia laboral', 0.00, NULL, 1),
+(29, 7,  19, '2026-03-06 09:00:00', FALSE, 'Cancelado', 'Inscripción cancelada previamente por el voluntario', 0.00, NULL, NULL)
 ON CONFLICT (id_participacion) DO UPDATE
 SET asistio = EXCLUDED.asistio, estado = EXCLUDED.estado, horas_acreditadas = EXCLUDED.horas_acreditadas;
 
-SELECT setval('participa_id_participacion_seq', COALESCE((SELECT MAX(id_participacion) FROM participa), 13));
+SELECT setval('participa_id_participacion_seq', COALESCE((SELECT MAX(id_participacion) FROM participa), 29));
 
 -- =========================================================
 -- SINCRONIZACIÓN GENERAL DE SECUENCIAS
