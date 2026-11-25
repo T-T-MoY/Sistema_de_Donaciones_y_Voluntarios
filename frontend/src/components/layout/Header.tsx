@@ -40,7 +40,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
     '/dashboard': 'Inicio',
     '/usuarios': 'Gestión de Usuarios',
     '/beneficios': 'Beneficiarios y Ayudas',
-    '/reportes': 'Reportes y Estadísticas',
+    '/reportes': 'Reportes y Notificaciones',
     '/perfil': 'Mi Perfil',
     '/mi-disponibilidad': 'Mi Disponibilidad',
     '/voluntarios/mi-disponibilidad': 'Mi Disponibilidad',

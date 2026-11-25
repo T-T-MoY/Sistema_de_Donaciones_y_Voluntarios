@@ -32,6 +32,7 @@ import ayudaRoutes from './routes/ayudaRoutes';
 
 // Seguimiento general del voluntariado
 import seguimientoRoutes from './seguimiento/seguimientoRoutes';
+import sprint6Routes from './sprint6/sprint6Routes';
 
 // ============================================================================
 // IMPORTACIÓN DE MIDDLEWARES GLOBALES
@@ -103,6 +104,9 @@ app.use('/api/ayudas', ayudaRoutes);
 
 // Seguimiento general del voluntariado
 app.use('/api/seguimiento', seguimientoRoutes);
+
+// Sprint 6: reportes, notificaciones, destinatarios y auditoría
+app.use('/api/sprint6', sprint6Routes);
 
 // ============================================================================
 // RUTA PRINCIPAL
