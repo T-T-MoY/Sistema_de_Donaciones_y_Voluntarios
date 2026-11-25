@@ -12,6 +12,7 @@ import type {
   RolData,
   RolUsuario,
   UbicacionResponse,
+  HistorialVoluntarioResponse,
   SolicitudVoluntarioResponse,
   SolicitudBeneficiarioResponse,
 } from '../models/usuarioModel';
@@ -659,6 +660,41 @@ export const usuarioRepository = {
     return rows;
   },
 
+  async obtenerSolicitudesVoluntariosAdmin(filtroEstado?: string) {
+    const solicitudes = await usuarioRepository.obtenerSolicitudesVoluntarios(filtroEstado);
+    if (solicitudes.length === 0) return solicitudes.map((solicitud) => ({ ...solicitud, historial: [] }));
+
+    const ids = solicitudes.map((solicitud) => solicitud.id_usuario);
+    const { rows } = await pool.query<HistorialVoluntarioResponse & { id_voluntario: number }>(
+      `SELECT
+         h.id_voluntario,
+         h.id_historial,
+         h.estado_anterior,
+         h.estado_nuevo,
+         h.cambiado_por,
+         u.nombre || ' ' || u.apellido AS nombre_revisor,
+         h.motivo,
+         h.fecha_cambio
+       FROM historial_voluntario h
+       LEFT JOIN usuario u ON u.id_usuario = h.cambiado_por
+       WHERE h.id_voluntario = ANY($1::int[])
+       ORDER BY h.id_voluntario, h.fecha_cambio ASC, h.id_historial ASC`,
+      [ids]
+    );
+    const historialPorVoluntario = new Map<number, HistorialVoluntarioResponse[]>();
+    for (const evento of rows) {
+      const { id_voluntario, ...historial } = evento;
+      const eventos = historialPorVoluntario.get(id_voluntario) ?? [];
+      eventos.push(historial);
+      historialPorVoluntario.set(id_voluntario, eventos);
+    }
+
+    return solicitudes.map((solicitud) => ({
+      ...solicitud,
+      historial: historialPorVoluntario.get(solicitud.id_usuario) ?? [],
+    }));
+  },
+
   async revisarSolicitudVoluntario(
     id_voluntario: number | string,
     nuevoEstado: 'Aprobado' | 'Rechazado',
@@ -668,6 +704,56 @@ export const usuarioRepository = {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+
+      await client.query(
+        `UPDATE voluntario
+         SET estado = $1, revisado_por = $2, fecha_revision = CURRENT_TIMESTAMP, motivo_rechazo = $3
+         WHERE id_usuario = $4`,
+        [nuevoEstado, revisorId, motivoRechazo?.trim() || null, id_voluntario]
+      );
+
+      if (nuevoEstado === 'Aprobado') {
+        await client.query(
+          `UPDATE usuario SET estado = 'Activo' WHERE id_usuario = $1 AND estado <> 'Eliminado'`,
+          [id_voluntario]
+        );
+      }
+
+      await client.query('COMMIT');
+      return { id_usuario: Number(id_voluntario), estado: nuevoEstado };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  },
+
+  async revisarSolicitudVoluntarioAdmin(
+    id_voluntario: number | string,
+    nuevoEstado: 'Aprobado' | 'Rechazado',
+    revisorId: number,
+    motivoRechazo?: string
+  ): Promise<{
+    id_usuario: number;
+    estado: string;
+    historial: HistorialVoluntarioResponse;
+  } | null> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const solicitud = await client.query<{ estado: 'Pendiente' | 'Aprobado' | 'Rechazado' }>(
+        `SELECT estado
+         FROM voluntario
+         WHERE id_usuario = $1
+         FOR UPDATE`,
+        [id_voluntario]
+      );
+      if (solicitud.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return null;
+      }
 
       await client.query(
         `UPDATE voluntario
@@ -686,8 +772,29 @@ export const usuarioRepository = {
         );
       }
 
+      const { rows: historialRows } = await client.query<HistorialVoluntarioResponse>(
+        `SELECT
+           h.id_historial,
+           h.estado_anterior,
+           h.estado_nuevo,
+           h.cambiado_por,
+           u.nombre || ' ' || u.apellido AS nombre_revisor,
+           h.motivo,
+           h.fecha_cambio
+         FROM historial_voluntario h
+         LEFT JOIN usuario u ON u.id_usuario = h.cambiado_por
+         WHERE h.id_voluntario = $1
+         ORDER BY h.id_historial DESC
+         LIMIT 1`,
+        [id_voluntario]
+      );
+
       await client.query('COMMIT');
-      return { id_usuario: Number(id_voluntario), estado: nuevoEstado };
+      return {
+        id_usuario: Number(id_voluntario),
+        estado: nuevoEstado,
+        historial: historialRows[0],
+      };
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;

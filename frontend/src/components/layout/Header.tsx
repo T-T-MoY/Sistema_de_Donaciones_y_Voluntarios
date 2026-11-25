@@ -43,6 +43,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
     '/perfil': 'Mi Perfil',
     '/mi-disponibilidad': 'Mi Disponibilidad',
     '/voluntarios/mi-disponibilidad': 'Mi Disponibilidad',
+    '/voluntarios/solicitudes': 'Gestión de Solicitudes de Voluntarios',
   };
 
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';

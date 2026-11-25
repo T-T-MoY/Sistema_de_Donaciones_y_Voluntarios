@@ -470,7 +470,7 @@ interface PanelRol {
 
 const PANEL_ADMIN: PanelRol = {
     kpis: KPIS_ADMIN,
-    modulos: MODULOS_ADMIN,
+    modulos: MODULOS_ADMIN.filter((modulo) => modulo.to !== '/gestion-voluntariados'),
     descripcion: 'Supervisá usuarios, beneficiarios y actividad de la plataforma en tiempo real.',
     cta: { etiqueta: 'Ver usuarios', to: '/usuarios', icono: ICONOS.usuarios },
     seccionTitulo: 'Módulos de gestión',
@@ -675,8 +675,7 @@ const Dashboard = () => {
     const [descBenefPostulacion, setDescBenefPostulacion] = useState<string>('');
     const [enviandoPostulacion, setEnviandoPostulacion] = useState<boolean>(false);
 
-    // Estado de solicitudes (para coordinadores y admin)
-    const [pestanaSolicitudes, setPestanaSolicitudes] = useState<'voluntarios' | 'beneficiarios'>('voluntarios');
+    // Bandeja de solicitudes: voluntarios para Coordinación, beneficiarios para Admin.
     const [filtroEstadoSol, setFiltroEstadoSol] = useState<string>('todos');
     const [solicitudesVol, setSolicitudesVol] = useState<SolicitudVoluntario[]>([]);
     const [solicitudesBen, setSolicitudesBen] = useState<SolicitudBeneficiario[]>([]);
@@ -694,7 +693,7 @@ const Dashboard = () => {
         if (!puedeAprobar) return;
         setCargandoSol(true);
         try {
-            if (esCoordinador || esAdmin) {
+            if (esCoordinador && !esAdmin) {
                 const vols = await usuarioApi.getSolicitudesVoluntarios();
                 setSolicitudesVol(vols);
             }
@@ -711,7 +710,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         void cargarSolicitudes();
-    }, [puedeAprobar]);
+    }, [puedeAprobar, esAdmin, esCoordinador]);
 
     const handleRevisarVoluntario = async (id: number, nuevoEstado: 'Aprobado' | 'Rechazado') => {
         if (nuevoEstado === 'Rechazado') {
@@ -1032,24 +1031,27 @@ const Dashboard = () => {
                         <section className="anim-rise rounded-3xl border border-border bg-surface-elevated p-5 shadow-soft sm:p-6">
                             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                                 <div>
-                                    <h2 className="font-display text-xl font-bold text-text">Revisión de solicitudes</h2>
-                                    <p className="mt-1 text-sm text-text-muted">{esAdmin ? 'Revisá postulaciones de voluntariado y solicitudes de beneficiarios.' : 'Revisá las solicitudes para incorporarse como voluntario.'}</p>
+                                    <h2 className="font-display text-xl font-bold text-text">
+                                        {esAdmin ? 'Solicitudes de beneficiarios' : 'Solicitudes de voluntarios'}
+                                    </h2>
+                                    <p className="mt-1 text-sm text-text-muted">
+                                        {esAdmin
+                                            ? 'Revisá las solicitudes de apoyo recibidas.'
+                                            : 'Revisá las solicitudes para incorporarse como voluntario.'}
+                                    </p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    <button type="button" onClick={() => setPestanaSolicitudes('voluntarios')} className={`rounded-lg px-3 py-2 text-xs font-bold ${pestanaSolicitudes === 'voluntarios' ? 'bg-primary text-on-primary' : 'border border-border text-text-muted'}`}>
-                                        Voluntarios ({solicitudesVol.filter(s => s.estado === 'Pendiente').length})
-                                    </button>
-                                    {esAdmin && <button type="button" onClick={() => setPestanaSolicitudes('beneficiarios')} className={`rounded-lg px-3 py-2 text-xs font-bold ${pestanaSolicitudes === 'beneficiarios' ? 'bg-primary text-on-primary' : 'border border-border text-text-muted'}`}>
-                                        Beneficiarios ({solicitudesBen.filter(s => s.estado === 'Pendiente').length})
-                                    </button>}
                                     <select aria-label="Filtrar solicitudes por estado" value={filtroEstadoSol} onChange={e => setFiltroEstadoSol(e.target.value)} className="rounded-lg border border-border bg-surface px-3 py-2 text-xs text-text">
-                                        <option value="todos">Todos los estados</option><option value="Pendiente">Pendientes</option><option value="Aprobado">Aprobadas</option><option value="Verificado">Verificadas</option><option value="Rechazado">Rechazadas</option>
+                                        <option value="todos">Todos los estados</option>
+                                        <option value="Pendiente">Pendientes</option>
+                                        <option value={esAdmin ? 'Verificado' : 'Aprobado'}>{esAdmin ? 'Verificadas' : 'Aprobadas'}</option>
+                                        <option value="Rechazado">Rechazadas</option>
                                     </select>
                                 </div>
                             </div>
                             {cargandoSol ? <p className="py-8 text-center text-sm text-text-muted">Cargando solicitudes…</p> : (
                                 <div className="mt-5 grid gap-3 lg:grid-cols-2">
-                                    {pestanaSolicitudes === 'voluntarios' ? solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
+                                    {!esAdmin && solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
                                         <article key={s.id_usuario} className="rounded-2xl border border-border bg-surface p-4">
                                             <div className="flex items-start gap-3">
                                                 {getAvatarUrl(s.foto_url) ? <img src={getAvatarUrl(s.foto_url)!} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft font-bold text-primary">{s.nombre[0]}{s.apellido?.[0]}</div>}
@@ -1058,7 +1060,8 @@ const Dashboard = () => {
                                             </div>
                                             {s.estado === 'Pendiente' && <div className="mt-4 flex justify-end gap-2"><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarVoluntario(s.id_usuario, 'Rechazado')} className="rounded-lg border border-error/30 px-3 py-2 text-xs font-bold text-error disabled:opacity-50">Rechazar</button><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarVoluntario(s.id_usuario, 'Aprobado')} className="rounded-lg bg-success px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Aprobar</button></div>}
                                         </article>
-                                    )) : solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
+                                    ))}
+                                    {esAdmin && solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).map(s => (
                                         <article key={s.id_usuario} className="rounded-2xl border border-border bg-surface p-4">
                                             <div className="flex items-start gap-3">
                                                 {getAvatarUrl(s.foto_url) ? <img src={getAvatarUrl(s.foto_url)!} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft font-bold text-primary">{s.nombre[0]}{s.apellido?.[0]}</div>}
@@ -1068,7 +1071,9 @@ const Dashboard = () => {
                                             {s.estado === 'Pendiente' && <div className="mt-4 flex justify-end gap-2"><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarBeneficiario(s.id_usuario, 'Rechazado')} className="rounded-lg border border-error/30 px-3 py-2 text-xs font-bold text-error disabled:opacity-50">Rechazar</button><button disabled={procesandoId === s.id_usuario} onClick={() => void handleRevisarBeneficiario(s.id_usuario, 'Verificado')} className="rounded-lg bg-success px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Verificar</button></div>}
                                         </article>
                                     ))}
-                                    {((pestanaSolicitudes === 'voluntarios' && solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0) || (pestanaSolicitudes === 'beneficiarios' && solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0)) && <p className="py-8 text-center text-sm text-text-muted lg:col-span-2">No hay solicitudes para mostrar.</p>}
+                                    {((!esAdmin && solicitudesVol.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0)
+                                        || (esAdmin && solicitudesBen.filter(s => filtroEstadoSol === 'todos' || s.estado === filtroEstadoSol).length === 0))
+                                        && <p className="py-8 text-center text-sm text-text-muted lg:col-span-2">No hay solicitudes para mostrar.</p>}
                                 </div>
                             )}
                         </section>

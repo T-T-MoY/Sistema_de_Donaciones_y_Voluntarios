@@ -482,6 +482,10 @@ export const usuarioService = {
     return await usuarioRepository.obtenerSolicitudesVoluntarios(filtroEstado);
   },
 
+  async obtenerSolicitudesVoluntariosAdmin(filtroEstado?: string) {
+    return await usuarioRepository.obtenerSolicitudesVoluntariosAdmin(filtroEstado);
+  },
+
   async revisarSolicitudVoluntario(
     id_voluntario: number | string,
     nuevoEstado: string,
@@ -504,6 +508,39 @@ export const usuarioService = {
       revisorId,
       motivoRechazo
     );
+  },
+
+  async revisarSolicitudVoluntarioAdmin(
+    id_voluntario: number | string,
+    nuevoEstado: string,
+    revisorId: number,
+    motivoRechazo?: string
+  ) {
+    const estadoNorm = (nuevoEstado || '').toLowerCase().trim();
+    if (!['aprobado', 'rechazado'].includes(estadoNorm)) {
+      throw new AppError('El estado debe ser "Aprobado" o "Rechazado".', 400);
+    }
+    const estadoFinal = estadoNorm === 'aprobado' ? 'Aprobado' : 'Rechazado';
+    const motivo = motivoRechazo?.trim() || undefined;
+    if (estadoFinal === 'Rechazado' && !motivo) {
+      throw new AppError('Debes indicar el motivo del rechazo.', 400);
+    }
+    if (motivo && motivo.length > 1000) {
+      throw new AppError('El motivo del rechazo no puede superar 1000 caracteres.', 400);
+    }
+    if (Number(id_voluntario) === revisorId) {
+      throw new AppError('No puedes aprobar ni rechazar tu propia solicitud.', 400);
+    }
+    const usuario = await usuarioRepository.obtenerPorId(id_voluntario);
+    if (!usuario) throw new AppError('Solicitud de voluntariado no encontrada.', 404);
+    const resultado = await usuarioRepository.revisarSolicitudVoluntarioAdmin(
+      id_voluntario,
+      estadoFinal,
+      revisorId,
+      motivo
+    );
+    if (!resultado) throw new AppError('Solicitud de voluntariado no encontrada.', 404);
+    return resultado;
   },
 
   // ---------- Solicitudes de Beneficiarios ----------
