@@ -1,3 +1,4 @@
+
 /**
  * ============================================================================
  * ARCHIVO: app.ts
@@ -6,11 +7,6 @@
  * PROPÓSITO:
  * Centraliza la configuración de Express y el registro de todas las rutas
  * del sistema de donaciones y voluntariado.
- *
- * NOTA ARQUITECTURA MULTICAPA:
- * El manejo de errores y el 404 se delegan a middlewares dedicados
- * (errorMiddleware / notFoundMiddleware) para mantener la capa de
- * presentación limpia y centralizada.
  * ============================================================================
  */
 
@@ -28,7 +24,13 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import donacionRoutes from './routes/donacionRoutes';
 import campanaRoutes from './routes/campanaRoutes';
+
+// Gestión de voluntarios
 import disponibilidadRoutes from './routes/disponibilidadRoutes';
+import voluntarioSolicitudesRoutes from './routes/voluntarioSolicitudesRoutes';
+
+// Seguimiento general del voluntariado
+import seguimientoRoutes from './seguimiento/seguimientoRoutes';
 
 // ============================================================================
 // IMPORTACIÓN DE MIDDLEWARES GLOBALES
@@ -48,9 +50,6 @@ app.disable('x-powered-by');
 // MIDDLEWARES GLOBALES
 // ============================================================================
 
-// CORS
-// Se utiliza la variable de entorno FRONTEND_URL para permitir solo peticiones 
-// desde tu frontend. Si no está definida, usa localhost:5173 por defecto.
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 app.use(
@@ -61,10 +60,8 @@ app.use(
   })
 );
 
-// Permite recibir JSON
 app.use(express.json());
 
-// Archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Logger simple
@@ -89,20 +86,19 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // RUTAS DE LA API
 // ============================================================================
 
-// Autenticación
 app.use('/api/auth', authRoutes);
-
-// Gestión de usuarios
 app.use('/api/usuarios', userRoutes);
-
-// Gestión de donaciones: módulo aislado, reutiliza la autenticación existente.
 app.use('/api/donaciones', donacionRoutes);
 
-// Gestión de campañas y actividades (Sprint 3)
+// Gestión de campañas y actividades
 app.use('/api/campanas', campanaRoutes);
 
-// Gestión de voluntarios: sección "Mi Disponibilidad" (Iteración 4)
+// Gestión de voluntarios: Mi Disponibilidad
 app.use('/api/voluntarios', disponibilidadRoutes);
+app.use('/api/voluntarios', voluntarioSolicitudesRoutes);
+
+// Seguimiento general del voluntariado
+app.use('/api/seguimiento', seguimientoRoutes);
 
 // ============================================================================
 // RUTA PRINCIPAL
@@ -115,15 +111,10 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 // ============================================================================
-// RUTA 404 (middleware dedicado)
+// RUTA 404 Y MANEJO GLOBAL DE ERRORES
 // ============================================================================
 
 app.use(notFoundMiddleware);
-
-// ============================================================================
-// MANEJO GLOBAL DE ERRORES (middleware dedicado)
-// ============================================================================
-
 app.use(errorMiddleware);
 
 export default app;

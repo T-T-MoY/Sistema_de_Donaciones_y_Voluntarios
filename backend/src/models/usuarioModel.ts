@@ -193,6 +193,18 @@ export interface SolicitudVoluntarioResponse {
   revisado_por: number | null;
   nombre_revisor?: string | null;
   motivo_rechazo: string | null;
+  fecha_revision?: Date | string | null;
+  historial?: HistorialVoluntarioResponse[];
+}
+
+export interface HistorialVoluntarioResponse {
+  id_historial: number;
+  estado_anterior: 'Pendiente' | 'Aprobado' | 'Rechazado' | null;
+  estado_nuevo: 'Pendiente' | 'Aprobado' | 'Rechazado';
+  cambiado_por: number | null;
+  nombre_revisor: string | null;
+  motivo: string | null;
+  fecha_cambio: Date | string;
 }
 
 /** Solicitud de beneficiario para administradores */

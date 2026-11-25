@@ -29,6 +29,7 @@ import SolicitarRecuperacion from './pages/SolicitarRecuperacion';
 import ResetPassword from './pages/ResetPassword';
 
 import VoluntariosLayout from './components/voluntarios/layout/VoluntariosLayout';
+import VoluntariosIndexRedirect from './components/voluntarios/layout/VoluntariosIndexRedirect';
 import RutasPorRol from './components/guards/RutasPorRol';
 
 import SolicitudesPage from './pages/voluntarios/SolicitudesPage';
@@ -68,8 +69,9 @@ function App() {
 
             {/* ITERACIÓN 4: GESTIÓN DE VOLUNTARIOS */}
             <Route path="/voluntarios" element={<VoluntariosLayout />}>
+              <Route index element={<VoluntariosIndexRedirect />} />
               {/* Administrador */}
-              <Route element={<RutasPorRol roles={['Administrador']} />}>
+              <Route element={<RutasPorRol roles={['Administrador', 'Admin']} />}>
                 <Route path="solicitudes" element={<SolicitudesPage />} />
                 <Route path="seguimiento" element={<SeguimientoPage />} />
               </Route>
