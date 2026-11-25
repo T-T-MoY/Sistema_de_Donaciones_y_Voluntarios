@@ -3,11 +3,11 @@ import {
   cambiarEstadoSolicitudVoluntarioAdmin,
   listarSolicitudesVoluntariosAdmin,
 } from '../controllers/voluntarioSolicitudesController';
-import { esAdmin, verificarToken } from '../middlewares/authMiddleware';
+import { esCoordinadorOAdmin, verificarToken } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-router.get('/solicitudes', verificarToken, esAdmin, listarSolicitudesVoluntariosAdmin);
-router.patch('/solicitudes/:id', verificarToken, esAdmin, cambiarEstadoSolicitudVoluntarioAdmin);
+router.get('/solicitudes', verificarToken, esCoordinadorOAdmin, listarSolicitudesVoluntariosAdmin);
+router.patch('/solicitudes/:id', verificarToken, esCoordinadorOAdmin, cambiarEstadoSolicitudVoluntarioAdmin);
 
 export default router;

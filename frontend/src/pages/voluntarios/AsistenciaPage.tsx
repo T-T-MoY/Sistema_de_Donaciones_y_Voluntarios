@@ -206,7 +206,7 @@ export default function AsistenciaPage() {
         </select>
 
         {actividadSeleccionada && (
-          <div className="mt-4 grid gap-2 rounded-lg bg-surface-secondary p-3 text-sm text-text-subtle">
+          <div className="mt-4 grid gap-2 rounded-lg bg-surface-sunken p-3 text-sm text-text-subtle">
             <p>
               <strong className="text-text">Fecha:</strong>{' '}
               {actividadSeleccionada.fecha}
@@ -226,13 +226,13 @@ export default function AsistenciaPage() {
 
       {/* Mensajes */}
       {error && (
-        <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+        <div className="rounded-lg border border-error/30 bg-error-soft p-3 text-sm text-error">
           {error}
         </div>
       )}
 
       {mensaje && (
-        <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
+        <div className="rounded-lg border border-success/30 bg-success-soft p-3 text-sm text-success">
           {mensaje}
         </div>
       )}
@@ -248,12 +248,12 @@ export default function AsistenciaPage() {
             <Tarjeta
               titulo="Asistencias"
               valor={totalAsistencias}
-              color="primary"
+              color="success"
             />
             <Tarjeta
               titulo="Ausencias"
               valor={totalAusencias}
-              color="secondary"
+              color="error"
             />
             <Tarjeta
               titulo="Horas acreditadas"
@@ -279,7 +279,7 @@ export default function AsistenciaPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="bg-surface-secondary text-text-subtle">
+                  <thead className="bg-surface-sunken text-text-subtle">
                     <tr>
                       <th className="p-3">Voluntario</th>
                       <th className="p-3">Estado</th>
@@ -299,7 +299,7 @@ export default function AsistenciaPage() {
                         return (
                           <tr
                             key={p.id_participacion}
-                            className="border-t border-border transition-colors duration-200 hover:bg-surface-secondary/50"
+                            className="border-t border-border transition-colors duration-200 hover:bg-surface-sunken/50"
                           >
                             <td className="p-3">
                               <p className="font-semibold text-text">
@@ -361,8 +361,8 @@ export default function AsistenciaPage() {
                                   onClick={() => void registrar(p, true)}
                                   className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 hover:brightness-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${
                                     p.estado === 'Asistio'
-                                      ? 'bg-primary/10 text-primary ring-1 ring-primary/30'
-                                      : 'bg-primary text-white hover:-translate-y-0.5'
+                                      ? 'bg-success-soft text-success ring-1 ring-success/30'
+                                      : 'bg-success text-white hover:-translate-y-0.5'
                                   }`}
                                 >
                                   {guardando ? (
@@ -386,8 +386,8 @@ export default function AsistenciaPage() {
                                   onClick={() => void registrar(p, false)}
                                   className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200 hover:brightness-95 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 ${
                                     p.estado === 'No_Asistio'
-                                      ? 'bg-sky-100 text-sky-700 ring-1 ring-sky-300'
-                                      : 'border border-sky-300 bg-sky-50 text-sky-700 hover:-translate-y-0.5 hover:bg-sky-100'
+                                      ? 'bg-error-soft text-error ring-1 ring-error/30'
+                                      : 'border border-error/30 bg-error-soft text-error hover:-translate-y-0.5 hover:border-error/50 hover:bg-error/10'
                                   }`}
                                 >
                                   {guardando ? (
@@ -426,14 +426,16 @@ function Tarjeta({
 }: {
   titulo: string;
   valor: string | number;
-  color?: 'default' | 'primary' | 'secondary';
+  color?: 'default' | 'primary' | 'success' | 'error';
 }) {
   const colorValor =
-    color === 'primary'
-      ? 'text-primary'
-      : color === 'secondary'
-        ? 'text-sky-600'
-        : 'text-text';
+    color === 'success'
+      ? 'text-success'
+      : color === 'error'
+        ? 'text-error'
+        : color === 'primary'
+          ? 'text-primary'
+          : 'text-text';
 
   return (
     <div className="rounded-xl border border-border bg-surface-elevated p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
@@ -452,7 +454,7 @@ function EstadoAsistencia({
 }) {
   if (estado === 'Asistio') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+      <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success">
         ✓ Asistió
       </span>
     );
@@ -460,14 +462,14 @@ function EstadoAsistencia({
 
   if (estado === 'No_Asistio') {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+      <span className="inline-flex items-center gap-1 rounded-full bg-error-soft px-3 py-1 text-xs font-semibold text-error">
         ⏻ Ausente
       </span>
     );
   }
 
   return (
-    <span className="rounded-full bg-surface-secondary px-3 py-1 text-xs font-semibold text-text-subtle">
+    <span className="rounded-full bg-surface-sunken px-3 py-1 text-xs font-semibold text-text-subtle">
       Pendiente
     </span>
   );

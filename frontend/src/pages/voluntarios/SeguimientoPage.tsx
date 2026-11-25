@@ -38,13 +38,13 @@ function textoEstado(estado: string) {
 function colorEstado(estado: string) {
   switch (estado) {
     case 'Asistio':
-      return 'bg-green-100 text-green-700';
+      return 'bg-success-soft text-success';
     case 'No_Asistio':
-      return 'bg-red-100 text-red-700';
+      return 'bg-error-soft text-error';
     case 'Cancelado':
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-surface-sunken text-text-subtle';
     default:
-      return 'bg-yellow-100 text-yellow-700';
+      return 'bg-warning-soft text-warning';
   }
 }
 
@@ -111,7 +111,7 @@ export default function SeguimientoPage() {
               onChange={(e) =>
                 actualizarFiltros({ desde: e.target.value })
               }
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
+              className="w-full rounded-lg border border-border bg-surface-inset px-3 py-2 text-text"
             />
           </div>
 
@@ -125,7 +125,7 @@ export default function SeguimientoPage() {
               onChange={(e) =>
                 actualizarFiltros({ hasta: e.target.value })
               }
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
+              className="w-full rounded-lg border border-border bg-surface-inset px-3 py-2 text-text"
             />
           </div>
 
@@ -143,7 +143,7 @@ export default function SeguimientoPage() {
                 })
               }
               disabled={cargandoFiltros}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
+              className="w-full rounded-lg border border-border bg-surface-inset px-3 py-2 text-text"
             >
               <option value="">Todas las actividades</option>
               {actividades.map((actividad) => (
@@ -171,7 +171,7 @@ export default function SeguimientoPage() {
                 })
               }
               disabled={cargandoFiltros}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
+              className="w-full rounded-lg border border-border bg-surface-inset px-3 py-2 text-text"
             >
               <option value="">Todos los voluntarios</option>
               {voluntarios.map((voluntario) => (
@@ -190,7 +190,7 @@ export default function SeguimientoPage() {
           <button
             type="button"
             onClick={() => void aplicarFiltros()}
-            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700"
+            className="rounded-lg bg-primary px-5 py-2 font-medium text-on-primary hover:bg-primary-hover"
           >
             Aplicar filtros
           </button>
@@ -198,7 +198,7 @@ export default function SeguimientoPage() {
           <button
             type="button"
             onClick={() => void limpiarFiltros()}
-            className="rounded-lg border border-border px-5 py-2 font-medium text-text hover:bg-background"
+            className="rounded-lg border border-border px-5 py-2 font-medium text-text hover:bg-surface-sunken"
           >
             Limpiar filtros
           </button>
@@ -207,7 +207,7 @@ export default function SeguimientoPage() {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-lg border border-error/30 bg-error-soft p-4 text-sm text-error">
           {error}
         </div>
       )}
@@ -223,21 +223,21 @@ export default function SeguimientoPage() {
 
         <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <p className="text-sm text-text-subtle">Asistencias</p>
-          <p className="mt-2 text-3xl font-bold text-green-600">
+          <p className="mt-2 text-3xl font-bold text-success">
             {cargando ? '...' : formatoNumero(estadisticas?.total_asistencias)}
           </p>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <p className="text-sm text-text-subtle">Ausencias</p>
-          <p className="mt-2 text-3xl font-bold text-red-600">
+          <p className="mt-2 text-3xl font-bold text-error">
             {cargando ? '...' : formatoNumero(estadisticas?.total_ausencias)}
           </p>
         </div>
 
         <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
           <p className="text-sm text-text-subtle">Horas acreditadas</p>
-          <p className="mt-2 text-3xl font-bold text-blue-600">
+          <p className="mt-2 text-3xl font-bold text-primary">
             {cargando ? '...' : formatoNumero(estadisticas?.total_horas)}
           </p>
         </div>
@@ -275,7 +275,7 @@ export default function SeguimientoPage() {
                       {cantidad}
                     </span>
                     <div
-                      className="w-full max-w-12 rounded-t-md bg-blue-500"
+                      className="w-full max-w-12 rounded-t-md bg-primary"
                       style={{ height: `${altura}%` }}
                     />
                     <span className="text-center text-xs text-text-subtle">
@@ -306,10 +306,10 @@ export default function SeguimientoPage() {
                 const porcentaje = (cantidad / totalDistribucion) * 100;
                 const color =
                   item.estado === 'Asistencias'
-                    ? 'bg-green-500'
+                    ? 'bg-success'
                     : item.estado === 'Ausencias'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-500';
+                      ? 'bg-error'
+                      : 'bg-warning';
 
                 return (
                   <div key={item.estado}>
@@ -321,7 +321,7 @@ export default function SeguimientoPage() {
                         {cantidad} ({porcentaje.toFixed(1)}%)
                       </span>
                     </div>
-                    <div className="h-3 overflow-hidden rounded-full bg-background">
+                    <div className="h-3 overflow-hidden rounded-full bg-surface-sunken">
                       <div
                         className={`h-full rounded-full ${color}`}
                         style={{ width: `${porcentaje}%` }}
@@ -357,7 +357,7 @@ export default function SeguimientoPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm">
-              <thead className="bg-background text-text-subtle">
+              <thead className="bg-surface-sunken text-text-subtle">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Voluntario</th>
                   <th className="px-4 py-3 font-semibold">Actividad</th>
@@ -373,7 +373,7 @@ export default function SeguimientoPage() {
                 {participaciones.map((participacion) => (
                   <tr
                     key={participacion.id_participacion}
-                    className="hover:bg-background"
+                    className="hover:bg-surface-sunken"
                   >
                     <td className="px-4 py-3 font-medium text-text">
                       {participacion.voluntario_nombre}
@@ -403,7 +403,7 @@ export default function SeguimientoPage() {
                         onClick={() =>
                           void abrirHistorial(participacion.id_voluntario)
                         }
-                        className="font-medium text-blue-600 hover:underline"
+                        className="font-medium text-primary hover:underline"
                       >
                         Ver historial
                       </button>
@@ -419,7 +419,7 @@ export default function SeguimientoPage() {
       {/* Ventana del historial individual */}
       {mostrarHistorial && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-night/55 p-4"
           onClick={cerrarHistorial}
         >
           <div
@@ -446,7 +446,7 @@ export default function SeguimientoPage() {
                 type="button"
                 onClick={cerrarHistorial}
                 aria-label="Cerrar historial"
-                className="rounded-lg px-3 py-2 text-xl text-text-subtle hover:bg-background"
+                className="rounded-lg px-3 py-2 text-xl text-text-subtle hover:bg-surface-sunken"
               >
                 ×
               </button>
@@ -457,7 +457,7 @@ export default function SeguimientoPage() {
                 Cargando historial...
               </p>
             ) : errorHistorial ? (
-              <p className="p-8 text-center text-red-600">
+              <p className="p-8 text-center text-error">
                 {errorHistorial}
               </p>
             ) : historial ? (
@@ -472,7 +472,7 @@ export default function SeguimientoPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                  <div className="rounded-lg bg-background p-4">
+                  <div className="rounded-lg bg-surface-sunken p-4">
                     <p className="text-xs text-text-subtle">Participaciones</p>
                     <p className="mt-1 text-2xl font-bold text-text">
                       {formatoNumero(
@@ -480,25 +480,25 @@ export default function SeguimientoPage() {
                       )}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-background p-4">
+                  <div className="rounded-lg bg-surface-sunken p-4">
                     <p className="text-xs text-text-subtle">Asistencias</p>
-                    <p className="mt-1 text-2xl font-bold text-green-600">
+                    <p className="mt-1 text-2xl font-bold text-success">
                       {formatoNumero(
                         historial.estadisticas.total_asistencias,
                       )}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-background p-4">
+                  <div className="rounded-lg bg-surface-sunken p-4">
                     <p className="text-xs text-text-subtle">Ausencias</p>
-                    <p className="mt-1 text-2xl font-bold text-red-600">
+                    <p className="mt-1 text-2xl font-bold text-error">
                       {formatoNumero(
                         historial.estadisticas.total_ausencias,
                       )}
                     </p>
                   </div>
-                  <div className="rounded-lg bg-background p-4">
+                  <div className="rounded-lg bg-surface-sunken p-4">
                     <p className="text-xs text-text-subtle">Horas acreditadas</p>
-                    <p className="mt-1 text-2xl font-bold text-blue-600">
+                    <p className="mt-1 text-2xl font-bold text-primary">
                       {formatoNumero(historial.estadisticas.total_horas)}
                     </p>
                   </div>
@@ -516,7 +516,7 @@ export default function SeguimientoPage() {
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full min-w-[600px] text-left text-sm">
-                        <thead className="bg-background text-text-subtle">
+                        <thead className="bg-surface-sunken text-text-subtle">
                           <tr>
                             <th className="px-3 py-3">Actividad</th>
                             <th className="px-3 py-3">Fecha</th>
@@ -557,7 +557,7 @@ export default function SeguimientoPage() {
               <button
                 type="button"
                 onClick={cerrarHistorial}
-                className="rounded-lg border border-border px-5 py-2 font-medium text-text hover:bg-background"
+                className="rounded-lg border border-border px-5 py-2 font-medium text-text hover:bg-surface-sunken"
               >
                 Cerrar
               </button>

@@ -178,7 +178,7 @@ export default function CalendarioSemanalVoluntario({
                 key={h.id_disponibilidad}
                 className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium border ${
                   filtroDia === h.dia_semana
-                    ? 'border-primary bg-primary text-white font-semibold'
+                    ? 'border-primary bg-primary text-on-primary font-semibold'
                     : 'border-border/80 bg-surface text-text-muted'
                 }`}
               >
@@ -230,7 +230,7 @@ export default function CalendarioSemanalVoluntario({
                   title={dia.etiqueta}
                   className={`py-2 text-center transition-colors border-r last:border-r-0 border-border/60 ${
                     esDiaFiltrado
-                      ? 'bg-primary text-white font-bold'
+                      ? 'bg-primary text-on-primary font-bold'
                       : 'text-text'
                   }`}
                 >
@@ -267,7 +267,7 @@ export default function CalendarioSemanalVoluntario({
                         }
                         className={`h-6 flex items-center justify-center border-r last:border-r-0 border-border/40 transition-all ${
                           disponible
-                            ? 'bg-primary text-white shadow-xs font-bold'
+                            ? 'bg-primary text-on-primary shadow-xs font-bold'
                             : esDiaFiltrado
                               ? 'bg-primary-soft/15 hover:bg-primary-soft/25'
                               : 'bg-surface hover:bg-surface-sunken/50'

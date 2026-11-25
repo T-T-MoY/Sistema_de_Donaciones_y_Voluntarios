@@ -70,9 +70,13 @@ function App() {
             {/* ITERACIÓN 4: GESTIÓN DE VOLUNTARIOS */}
             <Route path="/voluntarios" element={<VoluntariosLayout />}>
               <Route index element={<VoluntariosIndexRedirect />} />
-              {/* Administrador */}
-              <Route element={<RutasPorRol roles={['Administrador', 'Admin']} />}>
+              {/* Solicitudes: administrador o coordinador */}
+              <Route element={<RutasPorRol roles={['Administrador', 'Admin', 'Coordinador']} />}>
                 <Route path="solicitudes" element={<SolicitudesPage />} />
+              </Route>
+
+              {/* Seguimiento general: administrador */}
+              <Route element={<RutasPorRol roles={['Administrador', 'Admin']} />}>
                 <Route path="seguimiento" element={<SeguimientoPage />} />
               </Route>
 

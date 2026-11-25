@@ -125,7 +125,7 @@ export default function SolicitudesPage() {
         </div>
         <span className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-subtle">
           <span className="h-2 w-2 rounded-full bg-primary" />
-          Rol: Administrador
+          Rol: Coordinador o Administrador
         </span>
       </div>
 
@@ -161,7 +161,7 @@ export default function SolicitudesPage() {
                 aria-pressed={filtro === estado}
                 className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
                   filtro === estado
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-on-primary'
                     : 'bg-surface-sunken text-text-subtle hover:text-text'
                 }`}
               >

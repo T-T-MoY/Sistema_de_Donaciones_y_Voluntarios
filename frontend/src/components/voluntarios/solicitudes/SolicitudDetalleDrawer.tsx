@@ -56,7 +56,7 @@ export default function SolicitudDetalleDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-slate-950/45"
+      className="fixed inset-0 z-50 flex justify-end bg-night/55"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !guardando) onClose();
