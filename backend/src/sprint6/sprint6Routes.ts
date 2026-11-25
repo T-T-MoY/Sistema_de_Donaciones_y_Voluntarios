@@ -29,23 +29,23 @@ router.get('/reportes', async (req, res) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(desde) || !/^\d{4}-\d{2}-\d{2}$/.test(hasta) || desde > hasta) { error(res, 400, 'Rango de fechas inválido.'); return; }
     let result;
     if (tipo === 'donaciones') {
-      let sql = `SELECT d.id_donacion, d.codigo, d.fecha_donacion, d.tipo_donacion, d.cantidad, d.estado, d.campana_id, c.nombre AS campana, u.nombre || ' ' || u.apellido AS donante FROM donacion d JOIN usuario u ON u.id_usuario=d.donante_usuario_id LEFT JOIN campana c ON c.id_campana=d.campana_id WHERE d.fecha_donacion::date BETWEEN $1 AND $2`;
+      let sql = `SELECT to_char(d.fecha_donacion,'DD/MM/YYYY HH24:MI') AS fecha_donacion, d.id_donacion, d.codigo, d.tipo_donacion, d.cantidad, d.estado, d.campana_id, c.nombre AS campana, u.nombre || ' ' || u.apellido AS donante FROM donacion d JOIN usuario u ON u.id_usuario=d.donante_usuario_id LEFT JOIN campana c ON c.id_campana=d.campana_id WHERE d.fecha_donacion::date BETWEEN $1 AND $2`;
       const params: unknown[] = [desde, hasta];
       if (!esAdmin(req) && !esCoord(req)) { sql += ' AND d.donante_usuario_id=$3'; params.push(id); }
       if (campanaId) { params.push(campanaId); sql += ` AND d.campana_id=$${params.length}`; }
       sql += ' ORDER BY d.fecha_donacion DESC LIMIT 5000';
       result = await pool.query(sql, params);
     } else if (tipo === 'voluntariado') {
-      let sql = `SELECT p.id_participacion, a.nombre AS actividad, a.fecha, p.estado, p.asistio, p.horas_acreditadas, u.nombre || ' ' || u.apellido AS voluntario FROM participa p JOIN actividad a ON a.id_actividad=p.id_actividad JOIN usuario u ON u.id_usuario=p.id_voluntario WHERE a.fecha BETWEEN $1 AND $2`;
+      let sql = `SELECT to_char(a.fecha,'DD/MM/YYYY') AS fecha, p.id_participacion, a.nombre AS actividad, p.estado, p.asistio, p.horas_acreditadas, u.nombre || ' ' || u.apellido AS voluntario FROM participa p JOIN actividad a ON a.id_actividad=p.id_actividad JOIN usuario u ON u.id_usuario=p.id_voluntario WHERE a.fecha BETWEEN $1 AND $2`;
       const params: unknown[] = [desde, hasta];
       if (!esAdmin(req) && !esCoord(req)) { sql += ' AND p.id_voluntario=$3'; params.push(id); }
       sql += ' ORDER BY a.fecha DESC LIMIT 5000';
       result = await pool.query(sql, params);
     } else if (tipo === 'campanas') {
       if (!esAdmin(req) && !esCoord(req)) { await auditar(id, 'ACCESO_DENEGADO', 'reporte', { tipo }); error(res, 403, 'Este reporte está disponible para Administración y Coordinación.'); return; }
-      result = await pool.query(`SELECT c.id_campana,c.nombre,c.estado,c.fecha_inicio,c.fecha_fin, (SELECT COUNT(*)::int FROM donacion d WHERE d.campana_id=c.id_campana AND d.fecha_donacion::date BETWEEN $1 AND $2) AS donaciones, (SELECT COALESCE(SUM(d.cantidad),0)::numeric FROM donacion d WHERE d.campana_id=c.id_campana AND d.fecha_donacion::date BETWEEN $1 AND $2 AND d.estado <> 'ANULADA') AS total_donado, (SELECT COUNT(DISTINCT p.id_participacion)::int FROM actividad_campana ac JOIN participa p ON p.id_actividad=ac.id_actividad JOIN actividad a ON a.id_actividad=ac.id_actividad WHERE ac.id_campana=c.id_campana AND a.fecha BETWEEN $1 AND $2) AS participaciones FROM campana c WHERE c.fecha_inicio <= $2::date AND (c.fecha_fin IS NULL OR c.fecha_fin >= $1::date) ORDER BY c.fecha_inicio DESC`, [desde, hasta]);
+      result = await pool.query(`SELECT to_char(c.fecha_inicio,'DD/MM/YYYY') AS fecha_inicio,to_char(c.fecha_fin,'DD/MM/YYYY') AS fecha_fin,c.id_campana,c.nombre,c.estado,(SELECT COUNT(*)::int FROM donacion d WHERE d.campana_id=c.id_campana AND d.fecha_donacion::date BETWEEN $1 AND $2) AS donaciones, (SELECT COALESCE(SUM(d.cantidad),0)::numeric FROM donacion d WHERE d.campana_id=c.id_campana AND d.fecha_donacion::date BETWEEN $1 AND $2 AND d.estado <> 'ANULADA') AS total_donado, (SELECT COUNT(DISTINCT p.id_participacion)::int FROM actividad_campana ac JOIN participa p ON p.id_actividad=ac.id_actividad JOIN actividad a ON a.id_actividad=ac.id_actividad WHERE ac.id_campana=c.id_campana AND a.fecha BETWEEN $1 AND $2) AS participaciones FROM campana c WHERE c.fecha_inicio <= $2::date AND (c.fecha_fin IS NULL OR c.fecha_fin >= $1::date) ORDER BY c.fecha_inicio DESC`, [desde, hasta]);
     } else if (tipo === 'solicitudes') {
-      let sql = `SELECT s.id_solicitud,s.tipo_ayuda,s.prioridad,s.fecha_solicitud,s.estado,s.descripcion FROM solicitud_ayuda s WHERE s.fecha_solicitud BETWEEN $1 AND $2`;
+      let sql = `SELECT to_char(s.fecha_solicitud,'DD/MM/YYYY') AS fecha_solicitud,s.id_solicitud,s.tipo_ayuda,s.prioridad,s.estado,s.descripcion FROM solicitud_ayuda s WHERE s.fecha_solicitud BETWEEN $1 AND $2`;
       const params: unknown[] = [desde, hasta];
       if (!esAdmin(req) && !esCoord(req)) { sql += ' AND s.beneficiario_usuario_id=$3'; params.push(id); }
       sql += ' ORDER BY s.fecha_solicitud DESC LIMIT 5000';
@@ -98,7 +98,22 @@ router.post('/notificaciones', async (req, res) => {
   finally { client.release(); }
 });
 
+// Evita que el envío inmediato, el reintento y la cola procesen a la vez la misma notificación.
+const enProceso = new Set<number>();
+
 async function procesarNotificacion(id: number) {
+  if (enProceso.has(id)) return;
+  enProceso.add(id);
+  try {
+    await enviarPendientes(id);
+  } catch (e) {
+    console.error(`[Sprint6] Error procesando notificación ${id}:`, e);
+  } finally {
+    enProceso.delete(id);
+  }
+}
+
+async function enviarPendientes(id: number) {
   const n = await pool.query('SELECT * FROM sprint6_notificacion WHERE id_notificacion=$1 AND estado IN (\'PENDIENTE\',\'PROGRAMADA\')', [id]);
   if (!n.rowCount) return;
   const destinatarios = await pool.query('SELECT * FROM sprint6_notificacion_destinatario WHERE id_notificacion=$1 AND estado <> \'ENVIADA\' AND intentos < 5', [id]);
@@ -122,7 +137,7 @@ async function procesarNotificacion(id: number) {
 
 export async function procesarNotificacionesProgramadas() {
   try {
-    const r = await pool.query("SELECT id_notificacion FROM sprint6_notificacion WHERE estado IN ('PROGRAMADA','PENDIENTE') AND (programada_para IS NULL OR programada_para <= NOW()) ORDER BY creada_en LIMIT 20");
+    const r = await pool.query("SELECT id_notificacion FROM sprint6_notificacion WHERE estado IN ('PROGRAMADA','PENDIENTE') AND (programada_para IS NULL OR programada_para <= NOW()) AND EXISTS (SELECT 1 FROM sprint6_notificacion_destinatario d WHERE d.id_notificacion=sprint6_notificacion.id_notificacion AND d.estado <> 'ENVIADA' AND d.intentos < 5) ORDER BY creada_en LIMIT 20");
     for (const row of r.rows) await procesarNotificacion(Number(row.id_notificacion));
   } catch (e) { console.error('[Sprint6] Error procesando cola:', e); }
 }
