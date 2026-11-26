@@ -2,7 +2,7 @@
 -- DATOS DE PRUEBA: MÓDULO GESTIÓN DE USUARIOS
 -- =========================================================
 
--- 1. TABLA BASE: USUARIO (12 registros)
+-- 1. TABLA BASE: USUARIO (17 registros)
 INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_registro) VALUES
 -- Administradores (IDs 1 y 2)
 (1, 'Carla', 'Mamani Quispe', 'carla.admin@donacionesbo.org', '71234567', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-10 09:00:00'),
@@ -42,7 +42,7 @@ INSERT INTO administrador (id_usuario) VALUES
 (2);
 
 -- ---------- DONANTE ----------
--- Todos los que se registran nacen como donantes (IDs 3 a 12),
+-- Todos los que se registran nacen como donantes (IDs 3 a 17),
 -- los que no dieron ubicación quedan con dirección y coordenadas NULL.
 INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 (3,  NULL, NULL, NULL),
@@ -64,7 +64,8 @@ INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 -- ---------- VOLUNTARIO ----------
 -- Luis (10): coordinador, aprobado por el admin Carla (1)
 -- Valeria (11): aprobada por el coordinador Luis (10)
--- Sebastian (12): Pendiente, para probar la aprobación
+-- Sebastian (12): inicia como Pendiente y queda Aprobado automáticamente al
+--   registrar asistencia en la actividad 5 (regla de negocio del sistema)
 INSERT INTO voluntario (id_usuario, habilidades, disponibilidad, fecha_registro, es_coordinador, estado, revisado_por, fecha_revision) VALUES
 (10, ARRAY['Logistica', 'Conduccion y Transporte', 'Carga'], 'Fines de semana', '2026-02-10 08:30:00', TRUE, 'Aprobado', 1, '2026-02-10 12:00:00'),
 (11, ARRAY['Primeros Auxilios', 'Atencion Social', 'Organizacion'], 'Tardes (14:00 - 19:00)', '2026-02-11 10:15:00', FALSE, 'Aprobado', 10, '2026-02-12 09:00:00'),
@@ -174,7 +175,7 @@ INSERT INTO donacion (id_donacion, codigo, donante_usuario_id, registrado_por_us
 -- Donación orientada a Solicitud de Ayuda Familiar
 (7, 'DON-2026-0007', 6, 1, NULL, 'ALIMENTO', 'ONLINE', 25.00, 25.00, 'Canasta con víveres para apoyo a familias vulnerables', '2026-03-05 09:15:00', NULL, 'ASIGNADA_TOTAL'),
 -- Donación Campaña 5 (Yungas)
-(8, 'DON-2026-0008', 15, 1, NULL, 'ECONOMICO', 'TRANSFERENCIA', 5000.00, 5000.00, 'Aporte solidario para compra de herramientas y cemento (Campaña Yungas)', '2026-02-18 10:00:00', 5, 'REGISTRADA')
+(8, 'DON-2026-0008', 15, 1, NULL, 'ECONOMICO', 'ONLINE', 5000.00, 5000.00, 'Aporte solidario para compra de herramientas y cemento (Campaña Yungas)', '2026-02-18 10:00:00', 5, 'REGISTRADA')
 ON CONFLICT (id_donacion) DO UPDATE 
 SET codigo = EXCLUDED.codigo, campana_id = EXCLUDED.campana_id, estado = EXCLUDED.estado;
 
@@ -196,12 +197,30 @@ INSERT INTO detalle_economico (id_donacion, monto, moneda_codigo, metodo_pago, r
 (8, 5000.00, 'BOB', 'TRANSFERENCIA', 'BNB-TR-99081234')
 ON CONFLICT (id_donacion) DO NOTHING;
 
+-- Recepciones: reflejan lo efectivamente recibido en donacion.cantidad_recibida.
+-- Las recepciones de BIEN disparan fn_ingresar_donacion_a_inventario y crean
+-- las partidas del inventario central; las de DINERO no generan existencias.
+INSERT INTO donacion_recepciones
+    (id_recepcion, donacion_id, tipo_recepcion, cantidad_declarada, cantidad_aceptada,
+     metodo_pago, referencia, fecha_recepcion, recibido_por_usuario_id, estado, observaciones)
+VALUES
+    (1, 1, 'BIEN',   50.00,   50.00, NULL,          NULL,                  '2026-03-02 11:00:00', 1, 'ACEPTADA', 'Arroz verificado y pesado en almacén central.'),
+    (2, 2, 'BIEN',   30.00,   30.00, NULL,          NULL,                  '2026-03-03 15:00:00', 1, 'ACEPTADA', 'Chompas clasificadas por talla.'),
+    (3, 3, 'DINERO', 1500.00, 1500.00, 'QR',        'BCP-QR-891230491',    '2026-03-04 17:00:00', 1, 'ACEPTADA', 'Pago por QR conciliado en cuenta institucional.'),
+    (4, 4, 'DINERO', 800.00,  800.00,  'TRANSFERENCIA', 'BNB-TR-40019283', '2026-02-20 12:00:00', 1, 'ACEPTADA', 'Transferencia bancaria verificada.'),
+    (5, 5, 'BIEN',   100.00,  100.00, NULL,          NULL,                  '2026-01-25 16:30:00', 1, 'ACEPTADA', 'Paquetes escolares contados y sellados.'),
+    (6, 6, 'BIEN',   20.00,   20.00, NULL,          NULL,                  '2026-03-04 18:00:00', 1, 'ACEPTADA', 'Frazadas recibidas en la oficina de acopio.'),
+    (7, 7, 'BIEN',   25.00,   25.00, NULL,          NULL,                  '2026-03-05 10:00:00', 1, 'ACEPTADA', 'Canastas armadas y verificadas.'),
+    (8, 8, 'DINERO', 5000.00, 5000.00, 'TRANSFERENCIA', 'BNB-TR-99081234', '2026-02-18 11:00:00', 1, 'ACEPTADA', 'Aporte conciliado para la campaña de los Yungas.')
+ON CONFLICT (id_recepcion) DO NOTHING;
+
 SELECT setval('donacion_codigo_seq', COALESCE((SELECT MAX(id_donacion) FROM donacion), 8));
 
 -- Asignación de Donaciones a Beneficiarios y Solicitudes
 INSERT INTO asignacion_donacion (id_asignacion, donacion_id, beneficiario_usuario_id, solicitud_ayuda_id, cantidad, fecha_asignacion, administrador_usuario_id, estado, observaciones) VALUES
 (1, 7, 4, 1, 25.00, '2026-03-06 10:00:00', 1, 'ACTIVA', 'Asignada a la Familia Poma según solicitud de ayuda evaluada'),
-(2, 1, 5, NULL, 20.00, '2026-03-07 11:30:00', 1, 'ACTIVA', 'Entrega parcial de 20 kg de arroz para Comedor Infantil Esperanza')
+(2, 1, 5, NULL, 20.00, '2026-03-07 11:30:00', 1, 'ACTIVA', 'Entrega parcial de 20 kg de arroz para Comedor Infantil Esperanza'),
+(3, 5, 5, NULL, 100.00, '2026-02-19 09:00:00', 1, 'ACTIVA', 'Asignación total de kits escolares al Comedor Infantil Esperanza')
 ON CONFLICT (id_asignacion) DO NOTHING;
 
 -- ---------- ACTIVIDADES (Campañas, Solicitudes e Inventario) ----------

@@ -94,6 +94,7 @@ CREATE INDEX idx_beneficiario_documento ON beneficiario(documento);
 CREATE INDEX idx_beneficiario_estado    ON beneficiario(estado);
 -- (no hace falta índice en correo: UNIQUE ya lo crea)
 
+-- =========================================================
 -- MÓDULO 2: GESTIÓN DE DONACIONES
 -- =========================================================
 
@@ -384,6 +385,10 @@ BEGIN
   IF TG_OP = 'DELETE' THEN
     RAISE EXCEPTION 'No se eliminan salidas de inventario; use el estado ANULADA para conservar la trazabilidad.';
   END IF;
+  -- Una salida que nace anulada no descuenta existencias.
+  IF TG_OP = 'INSERT' AND NEW.estado = 'ANULADA' THEN
+    RETURN NEW;
+  END IF;
   IF TG_OP = 'UPDATE' THEN
     IF NEW.id_inventario <> OLD.id_inventario OR NEW.id_donacion <> OLD.id_donacion
        OR NEW.cantidad <> OLD.cantidad OR NEW.campana_id IS DISTINCT FROM OLD.campana_id
@@ -462,7 +467,7 @@ DECLARE
   v_nombre VARCHAR(120);
   v_unidad INT;
 BEGIN
-  IF NEW.tipo_recepcion <> 'BIEN' OR NEW.cantidad_aceptada <= 0 THEN
+  IF NEW.tipo_recepcion <> 'BIEN' OR NEW.cantidad_aceptada <= 0 OR NEW.estado = 'RECHAZADA' THEN
     RETURN NEW;
   END IF;
   SELECT d.tipo_donacion,
@@ -516,7 +521,9 @@ CREATE TABLE IF NOT EXISTS campana (
 DO $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'fk_donacion_campana'
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'fk_donacion_campana'
+           AND conrelid = 'donacion'::regclass
     ) THEN
         ALTER TABLE donacion
             ADD CONSTRAINT fk_donacion_campana
@@ -524,7 +531,9 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'fk_inventario_destino_campana'
+        SELECT 1 FROM pg_constraint
+         WHERE conname = 'fk_inventario_destino_campana'
+           AND conrelid = 'inventario_destino'::regclass
     ) THEN
         ALTER TABLE inventario_destino
             ADD CONSTRAINT fk_inventario_destino_campana
@@ -621,7 +630,8 @@ BEGIN
 
     SELECT max_voluntarios INTO v_max
       FROM actividad
-     WHERE id_actividad = NEW.id_actividad;
+     WHERE id_actividad = NEW.id_actividad
+       FOR UPDATE;
 
     SELECT COUNT(*) INTO v_actual
       FROM participa
@@ -659,13 +669,14 @@ BEGIN
                 ARRAY['Participación en actividades'],
                 'Fines de semana y convocatorias',
                 'Aprobado',
-                NEW.marcado_por_usuario_id,
+                -- evita violar chk_voluntario_no_autoaprobacion
+                NULLIF(NEW.marcado_por_usuario_id, NEW.id_voluntario),
                 (CURRENT_TIMESTAMP AT TIME ZONE 'America/La_Paz')
             );
         ELSE
             UPDATE voluntario
                SET estado = 'Aprobado',
-                   revisado_por = COALESCE(revisado_por, NEW.marcado_por_usuario_id),
+                   revisado_por = COALESCE(revisado_por, NULLIF(NEW.marcado_por_usuario_id, NEW.id_voluntario)),
                    fecha_revision = COALESCE(fecha_revision, (CURRENT_TIMESTAMP AT TIME ZONE 'America/La_Paz'))
              WHERE id_usuario = NEW.id_voluntario
                AND estado = 'Pendiente';
