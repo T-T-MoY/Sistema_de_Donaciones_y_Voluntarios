@@ -18,7 +18,6 @@ const ENLACES = [
   { href: '#como-funciona', label: 'Cómo funciona', enDesarrollo: false },
   { href: '#servicios', label: 'Roles y áreas', enDesarrollo: false },
   { href: '#contacto', label: 'Contacto', enDesarrollo: false },
-  { href: '#', label: 'En desarrollo', enDesarrollo: true },
 ];
 
 export const LandingNavbar = () => {
@@ -176,12 +175,6 @@ export const LandingNavbar = () => {
                       {isAdmin ? 'Panel admin' : 'Mi panel'}
                     </Link>
 
-                    <span className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-subtle dark:text-cream/35 select-none">
-                      <svg className="h-4 w-4 text-text-subtle dark:text-cream/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      En desarrollo
-                    </span>
 
                     <Link
                       to="/perfil"
@@ -214,9 +207,6 @@ export const LandingNavbar = () => {
               <Link to="/login" className={`${ctaGhost} hidden sm:inline-flex`}>
                 Ingresar
               </Link>
-              <span className={`${ctaGold} hidden opacity-60 pointer-events-none md:inline-flex`} aria-disabled="true">
-                Próximamente
-              </span>
             </>
           )}
 
@@ -284,9 +274,6 @@ export const LandingNavbar = () => {
                 >
                   {isAdmin ? 'Ir al panel admin' : 'Ir a mi panel'}
                 </Link>
-                <span className={`${badgeDesarrollo} w-full justify-center`} aria-disabled="true">
-                  En desarrollo
-                </span>
               </>
             ) : (
               <>

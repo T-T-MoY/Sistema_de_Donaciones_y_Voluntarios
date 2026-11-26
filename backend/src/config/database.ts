@@ -50,17 +50,17 @@ if (process.env.DATABASE_URL) {
     connectionTimeoutMillis: 5000,
   };
 } else {
-  const hostConfigurado = process.env.DB_HOST || 'localhost';
+  const hostConfigurado = process.env.DB_HOST;
   const host =
     !estaEnDocker && hostConfigurado === 'db' ? 'localhost' : hostConfigurado;
 
-  // 1. Configuración de credenciales del pool de conexiones
+  // 1. Configuración de credenciales del pool de conexiones (solo desde variables de entorno)
   dbConfig = {
     host,
-    port: Number(process.env.DB_PORT) || 5432,
-    user: process.env.DB_USER || 'admin',
-    password: process.env.DB_PASSWORD || '123456',
-    database: process.env.DB_NAME || 'bd_donaciones_voluntariado',
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : undefined,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     // Número máximo de clientes simultáneos en el pool
     max: 20,
     // Tiempo máximo (en milisegundos) que un cliente puede estar inactivo
