@@ -12,16 +12,12 @@ if (fs.existsSync(envRaiz)) {
 dotenv.config();
 
 export const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: Number(process.env.SMTP_PORT || 587) === 465,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    // Soluciona el error "self-signed certificate in certificate chain"
-    // que ocurre cuando un antivirus (Avast, Kaspersky, ESET, etc.), VPN o proxy local
-    // en Windows intercepta las conexiones TLS e inyecta su propio certificado CA.
-    rejectUnauthorized: false,
+    user: process.env.BREVO_SMTP_USER || process.env.EMAIL_USER,
+    pass: process.env.BREVO_SMTP_KEY || process.env.EMAIL_PASS,
   },
 });
 

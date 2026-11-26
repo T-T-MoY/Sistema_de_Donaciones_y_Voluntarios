@@ -16,7 +16,7 @@ export const emailService = {
 
     try {
       await transporter.sendMail({
-        from: `"Donaciones y Voluntariado" <${process.env.EMAIL_USER}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'Donaciones y Voluntarios'}" <${process.env.EMAIL_USER}>`,
         to: correo,
         subject: 'Recuperación de contraseña — Donaciones y Voluntariado',
         html: `

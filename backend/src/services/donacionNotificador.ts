@@ -23,13 +23,13 @@ const plantilla = (titulo: string, lineas: string[]): string => `
 const enviar = async (destinos: string[], asunto: string, html: string): Promise<void> => {
   const para = [...new Set(destinos.filter(Boolean))];
   if (para.length === 0) return;
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  if (!process.env.EMAIL_USER || !(process.env.BREVO_SMTP_KEY || process.env.EMAIL_PASS)) {
     console.warn(`✉️  [donaciones] SMTP no configurado; no se envió: "${asunto}"`);
     return;
   }
   try {
     await transporter.sendMail({
-      from: `"Donaciones y Voluntariado" <${process.env.EMAIL_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Donaciones y Voluntarios'}" <${process.env.EMAIL_USER}>`,
       to: para.join(','),
       subject: asunto,
       html,

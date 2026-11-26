@@ -120,8 +120,8 @@ async function enviarPendientes(id: number) {
   let fallos = 0;
   for (const d of destinatarios.rows) {
     try {
-      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) throw new Error('Servicio de correo no configurado');
-      await transporter.sendMail({ from: `"Donaciones y Voluntariado" <${process.env.EMAIL_USER}>`, to: d.correo, subject: n.rows[0].asunto, text: n.rows[0].mensaje });
+      if (!process.env.EMAIL_USER || !(process.env.BREVO_SMTP_KEY || process.env.EMAIL_PASS)) throw new Error('Servicio de correo no configurado');
+      await transporter.sendMail({ from: `"${process.env.EMAIL_FROM_NAME || 'Donaciones y Voluntarios'}" <${process.env.EMAIL_USER}>`, to: d.correo, subject: n.rows[0].asunto, text: n.rows[0].mensaje });
       await pool.query("UPDATE sprint6_notificacion_destinatario SET estado='ENVIADA',fecha_envio=NOW(),error=NULL WHERE id_destinatario=$1", [d.id_destinatario]);
     } catch (e) {
       fallos++;
