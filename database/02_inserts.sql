@@ -15,8 +15,8 @@ INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, e
 
 -- Donantes (IDs 6, 7, 8 y 9)
 (6, 'Diego', 'Ramirez Soto', 'diego.ramirez@gmail.com', '76002201', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-05 15:00:00', NULL),
-(7, 'Sofia', 'Paredes Rivas', 'sofia.paredes@gmail.com', '76002202', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-0２-０６ １６:３０:００', NULL),
-(8, 'Andres', 'Guzman Flores', 'andres.guzman@gmail.com', '7600２２０３', '$２a$１２$SYkWhr２bVMvKyYplaVy.VeNLKFFtＹ６tMDp６E９MmPp２Rzqb７qgM２RO', 'Activo', '２０２６-０２-０７ ０９:４５:００', NULL),
+(7, 'Sofia', 'Paredes Rivas', 'sofia.paredes@gmail.com', '76002202', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-06 16:30:00', NULL),
+(8, 'Andres', 'Guzman Flores', 'andres.guzman@gmail.com', '76002203', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-07 09:45:00', NULL),
 (9, 'Paola', 'Duran Vega', 'paola.duran@gmail.com', '76002204', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Inactivo', '2026-02-08 13:00:00', NULL), -- Cuenta inactiva para pruebas
 
 -- Voluntarios (IDs 10, 11 y 12)
@@ -26,7 +26,7 @@ INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, e
 
 -- Nuevos usuarios para casos de prueba en campañas y actividades (IDs 13 a 17)
 (13, 'Mariana', 'Rios Gomez', 'mariana.rios@gmail.com', '76004401', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-15 10:00:00', NULL),
-(14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$２a$１２$SYkWhr２bVMvKyYplaVy.VeNLKFFtＹ６tMDp６E９MmPp２Rzqb７qgM２RO', 'Activo', '２０２６-０２-１６ １１:３０:００', NULL),
+(14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-16 11:30:00', NULL),
 (15, 'Gabriela', 'Morales Quiroga', 'gabriela.morales@gmail.com', '76004403', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-17 14:00:00', NULL),
 (16, 'Fernando', 'Castro Flores', 'fernando.castro@gmail.com', '76004404', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-18 16:15:00', NULL),
 (17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00', NULL);
@@ -88,6 +88,7 @@ INSERT INTO beneficiario (id_usuario, tipo_beneficiario, documento, direccion, n
 -- 3. SINCRONIZAR SECUENCIA DE IDs EN POSTGRESQL
 -- =========================================================
 SELECT setval('usuario_id_usuario_seq', (SELECT MAX(id_usuario) FROM usuario));
+
 -- =========================================================
 -- 4. CATÁLOGOS INICIALES DE GESTIÓN DE DONACIONES
 -- Se agregan al mismo archivo de inserts; no se modifican los registros
@@ -417,6 +418,3 @@ SELECT setval('participa_id_participacion_seq', COALESCE((SELECT MAX(id_particip
 
 SELECT setval('donacion_codigo_seq', GREATEST((SELECT last_value FROM donacion_codigo_seq), COALESCE((SELECT MAX(id_donacion) FROM donacion), 1) + 10));
 SELECT setval('comprobante_donacion_seq', GREATEST((SELECT last_value FROM comprobante_donacion_seq), COALESCE((SELECT MAX(id_comprobante) FROM comprobante_donacion), 1) + 10));
-
-
-

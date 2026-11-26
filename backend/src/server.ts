@@ -20,7 +20,7 @@ import type { Server } from 'http';
 import app from './app';
 import { testDatabaseConnection, pool } from './config/database';
 import { sincronizarSecuencias } from './utils/syncSecuencias';
-import { procesarNotificacionesProgramadas } from './sprint6/sprint6Routes';
+import { procesarNotificacionesProgramadas } from './routes/sprint6Routes';
 
 // ============================================================================
 // VARIABLES DE ENTORNO
