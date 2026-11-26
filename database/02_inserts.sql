@@ -3,33 +3,33 @@
 -- =========================================================
 
 -- 1. TABLA BASE: USUARIO (17 registros)
-INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_registro) VALUES
+INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_registro, foto_url) VALUES
 -- Administradores (IDs 1 y 2)
-(1, 'Carla', 'Mamani Quispe', 'carla.admin@donacionesbo.org', '71234567', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-10 09:00:00'),
-(2, 'Jorge', 'Fernandez Rojas', 'jorge.admin@donacionesbo.org', '71234568', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-11 09:30:00'),
+(1, 'Carla', 'Mamani Quispe', 'carla.admin@donacionesbo.org', '71234567', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-10 09:00:00', '/uploads/perfiles/1795659256573.png'),
+(2, 'Jorge', 'Fernandez Rojas', 'jorge.admin@donacionesbo.org', '71234568', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-11 09:30:00', NULL),
 
 -- Beneficiarios (IDs 3, 4 y 5)
-(3, 'Rosa', 'Chambi Aguilar', 'rosa.chambi@gmail.com', '76001121', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-01 10:00:00'),
-(4, 'Hector', 'Poma Yujra', 'hector.poma@gmail.com', '76001122', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-02 11:15:00'),
-(5, 'Ana', 'Torrez Vidal', 'comedor.esperanza@gmail.com', '76001123', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-03 14:20:00'),
+(3, 'Rosa', 'Chambi Aguilar', 'rosa.chambi@gmail.com', '76001121', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-01 10:00:00', NULL),
+(4, 'Hector', 'Poma Yujra', 'hector.poma@gmail.com', '76001122', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-02 11:15:00', NULL),
+(5, 'Ana', 'Torrez Vidal', 'comedor.esperanza@gmail.com', '76001123', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-03 14:20:00', NULL),
 
 -- Donantes (IDs 6, 7, 8 y 9)
-(6, 'Diego', 'Ramirez Soto', 'diego.ramirez@gmail.com', '76002201', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-05 15:00:00'),
-(7, 'Sofia', 'Paredes Rivas', 'sofia.paredes@gmail.com', '76002202', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-06 16:30:00'),
-(8, 'Andres', 'Guzman Flores', 'andres.guzman@gmail.com', '76002203', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-07 09:45:00'),
-(9, 'Paola', 'Duran Vega', 'paola.duran@gmail.com', '76002204', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Inactivo', '2026-02-08 13:00:00'), -- Cuenta inactiva para pruebas
+(6, 'Diego', 'Ramirez Soto', 'diego.ramirez@gmail.com', '76002201', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-05 15:00:00', NULL),
+(7, 'Sofia', 'Paredes Rivas', 'sofia.paredes@gmail.com', '76002202', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-0２-０６ １６:３０:００', NULL),
+(8, 'Andres', 'Guzman Flores', 'andres.guzman@gmail.com', '7600２２０３', '$２a$１２$SYkWhr２bVMvKyYplaVy.VeNLKFFtＹ６tMDp６E９MmPp２Rzqb７qgM２RO', 'Activo', '２０２６-０２-０７ ０９:４５:００', NULL),
+(9, 'Paola', 'Duran Vega', 'paola.duran@gmail.com', '76002204', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Inactivo', '2026-02-08 13:00:00', NULL), -- Cuenta inactiva para pruebas
 
 -- Voluntarios (IDs 10, 11 y 12)
-(10, 'Luis', 'Choque Apaza', 'luis.choque@gmail.com', '76003301', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-10 08:30:00'),
-(11, 'Valeria', 'Nina Choque', 'valeria.nina@gmail.com', '76003302', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-11 10:15:00'),
-(12, 'Sebastian', 'Vega Luna', 'sebastian.vega@gmail.com', '76003303', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-12 17:00:00'),
+(10, 'Luis', 'Choque Apaza', 'luis.choque@gmail.com', '76003301', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-10 08:30:00', NULL),
+(11, 'Valeria', 'Nina Choque', 'valeria.nina@gmail.com', '76003302', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-11 10:15:00', NULL),
+(12, 'Sebastian', 'Vega Luna', 'sebastian.vega@gmail.com', '76003303', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-12 17:00:00', NULL),
 
 -- Nuevos usuarios para casos de prueba en campañas y actividades (IDs 13 a 17)
-(13, 'Mariana', 'Rios Gomez', 'mariana.rios@gmail.com', '76004401', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-15 10:00:00'),
-(14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-16 11:30:00'),
-(15, 'Gabriela', 'Morales Quiroga', 'gabriela.morales@gmail.com', '76004403', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-17 14:00:00'),
-(16, 'Fernando', 'Castro Flores', 'fernando.castro@gmail.com', '76004404', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-18 16:15:00'),
-(17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00');
+(13, 'Mariana', 'Rios Gomez', 'mariana.rios@gmail.com', '76004401', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-15 10:00:00', NULL),
+(14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$２a$１２$SYkWhr２bVMvKyYplaVy.VeNLKFFtＹ６tMDp６E９MmPp２Rzqb７qgM２RO', 'Activo', '２０２６-０２-１６ １１:３０:００', NULL),
+(15, 'Gabriela', 'Morales Quiroga', 'gabriela.morales@gmail.com', '76004403', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-17 14:00:00', NULL),
+(16, 'Fernando', 'Castro Flores', 'fernando.castro@gmail.com', '76004404', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-18 16:15:00', NULL),
+(17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00', NULL);
 
 
 -- =========================================================

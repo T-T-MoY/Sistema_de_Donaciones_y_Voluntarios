@@ -29,7 +29,7 @@ scan-sonar.ps1
 backend/sonar-project.properties
 frontend/sonar-project.properties
 
-uploads/
+
 # Fotografías privadas de donaciones (se conservan en volumen local)
 backend/storage/**
 !backend/storage/donaciones/.gitkeep
