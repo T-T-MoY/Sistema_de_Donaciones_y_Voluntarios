@@ -249,10 +249,15 @@ export default function CampanasPage() {
   const guardarActividad = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const campanaSeleccionada =
+        formActividad.tipo_actividad === 'CAMPANA' && formActividad.id_campana !== ''
+          ? Number(formActividad.id_campana)
+          : null;
+
       const payload: ActividadFormDTO = {
         ...formActividad,
         max_voluntarios: Number(formActividad.max_voluntarios),
-        id_campana: formActividad.id_campana === '' ? undefined : Number(formActividad.id_campana),
+        id_campana: campanaSeleccionada as any,
       };
 
       if (actividadEditando) {
@@ -818,7 +823,14 @@ export default function CampanasPage() {
                   {actividadesFiltradas.map((act) => {
                     const cupos = act.cupos_disponibles ?? act.max_voluntarios;
                     const sinCupos = cupos <= 0;
-                    const yaInscrito = act.mi_participacion && act.mi_participacion.estado !== 'Cancelado';
+                    const yaInscrito = Boolean(act.mi_participacion && act.mi_participacion.estado !== 'Cancelado');
+
+                    // Validación de campaña o actividad inactiva/finalizada
+                    const campanaFinalizada = act.campanas_asociadas?.find(
+                      (c) => c.estado === 'Finalizada' || c.estado === 'Cancelada'
+                    );
+                    const actividadFinalizada = act.estado === 'Finalizada' || act.estado === 'Cancelada';
+                    const bloqueoInscripcion = Boolean(campanaFinalizada || actividadFinalizada || sinCupos);
 
                     return (
                       <div
@@ -861,6 +873,11 @@ export default function CampanasPage() {
                             {act.campanas_asociadas && act.campanas_asociadas.length > 0 && (
                               <div className="text-success dark:text-success font-semibold truncate">
                                 📢 Campaña: {act.campanas_asociadas.map((c) => c.nombre).join(', ')}
+                                {campanaFinalizada && (
+                                  <span className="ml-1 text-[11px] text-error font-bold">
+                                    ({campanaFinalizada.estado})
+                                  </span>
+                                )}
                               </div>
                             )}
                             {act.tipo_actividad === 'SOLICITUD_AYUDA' && (
@@ -874,6 +891,20 @@ export default function CampanasPage() {
                               </div>
                             )}
                           </div>
+
+                          {/* Alerta de bloqueo si la campaña o actividad está finalizada */}
+                          {campanaFinalizada && (
+                            <div className="mb-3 p-2 bg-error-soft/60 dark:bg-error-soft/40 border border-error/25 rounded-xl text-[11px] font-bold text-error dark:text-error flex items-center gap-1.5">
+                              <span>⚠️</span>
+                              <span>Campaña finalizada. No se admiten nuevas inscripciones.</span>
+                            </div>
+                          )}
+                          {!campanaFinalizada && actividadFinalizada && (
+                            <div className="mb-3 p-2 bg-surface-inset dark:bg-surface-elevated border border-border rounded-xl text-[11px] font-semibold text-text-muted dark:text-text-subtle flex items-center gap-1.5">
+                              <span>🏁</span>
+                              <span>Actividad {act.estado.toLowerCase()}. Convocatoria cerrada.</span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-2 pt-2 border-t border-border dark:border-border">
@@ -881,24 +912,32 @@ export default function CampanasPage() {
                           {yaInscrito ? (
                             <div className="flex items-center justify-between bg-success-soft dark:bg-success-soft/60 border border-success/25 dark:border-success/30 p-2.5 rounded-xl">
                               <span className="text-xs font-bold text-success dark:text-success">✓ Estás inscrito</span>
-                              <button
-                                onClick={() => cancelarInscripcion(act.id_actividad)}
-                                className="text-xs text-error dark:text-error hover:underline font-semibold"
-                              >
-                                Cancelar
-                              </button>
+                              {!campanaFinalizada && !actividadFinalizada && (
+                                <button
+                                  onClick={() => cancelarInscripcion(act.id_actividad)}
+                                  className="text-xs text-error dark:text-error hover:underline font-semibold"
+                                >
+                                  Cancelar
+                                </button>
+                              )}
                             </div>
                           ) : (
                             <button
-                              disabled={sinCupos}
+                              disabled={bloqueoInscripcion}
                               onClick={() => inscribirmeActividad(act.id_actividad)}
                               className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold shadow-xs transition text-center ${
-                                sinCupos
-                                  ? 'bg-surface-inset dark:bg-surface-elevated text-text-subtle cursor-not-allowed'
+                                bloqueoInscripcion
+                                  ? 'bg-surface-inset dark:bg-surface-elevated text-text-subtle cursor-not-allowed border border-border'
                                   : 'bg-primary hover:bg-primary-hover text-white'
                               }`}
                             >
-                              {sinCupos ? 'Cupos Agotados' : 'Inscribirme como Voluntario'}
+                              {campanaFinalizada
+                                ? 'Campaña Finalizada'
+                                : actividadFinalizada
+                                ? `Actividad ${act.estado}`
+                                : sinCupos
+                                ? 'Cupos Agotados'
+                                : 'Inscribirme como Voluntario'}
                             </button>
                           )}
 

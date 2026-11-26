@@ -38,6 +38,7 @@ import SeguimientoPage from './pages/voluntarios/SeguimientoPage';
 import DisponibilidadEquipoPage from './pages/voluntarios/DisponibilidadEquipoPage';
 import AsistenciaPage from './pages/voluntarios/AsistenciaPage';
 import MiDisponibilidadPage from './pages/voluntarios/MiDisponibilidadPage';
+import ReportesNotificacionesPage from './pages/ReportesNotificacionesPage';
 
 
 function App() {
@@ -63,6 +64,10 @@ function App() {
             <Route path="/donaciones" element={<DonacionesPage />} />
             <Route path="/beneficios" element={<BeneficiariosAyudasPage />} />
             <Route path="/campanas" element={<CampanasPage />} />
+
+            <Route element={<RutasPorRol roles={['Administrador', 'Admin', 'Coordinador', 'Donante', 'Voluntario', 'Beneficiario']} />}>
+              <Route path="/reportes" element={<ReportesNotificacionesPage />} />
+            </Route>
 
             {/* SECCIÓN 5: MI DISPONIBILIDAD (Voluntario / Coordinador) */}
             <Route element={<RutasPorRol roles={['Voluntario', 'Empleado', 'Coordinador']} />}>

@@ -111,6 +111,15 @@ export const campanaService = {
     if (act.estado === 'Finalizada' || act.estado === 'Cancelada') {
       throw new AppError(`No es posible inscribirse a una actividad ${act.estado.toLowerCase()}`, 400);
     }
+    const campanaInactiva = act.campanas_asociadas?.find(
+      (c) => c.estado === 'Finalizada' || c.estado === 'Cancelada'
+    );
+    if (campanaInactiva && campanaInactiva.estado) {
+      throw new AppError(
+        `No es posible inscribirse: la campaña "${campanaInactiva.nombre}" se encuentra ${campanaInactiva.estado.toLowerCase()}`,
+        400
+      );
+    }
     if (act.cupos_disponibles !== undefined && act.cupos_disponibles <= 0) {
       throw new AppError('No hay cupos disponibles en esta actividad', 400);
     }

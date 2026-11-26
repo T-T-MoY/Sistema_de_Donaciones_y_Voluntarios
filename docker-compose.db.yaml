@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db-donaciones_y_voluntariado
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_DB: ${DB_NAME:-bd_donaciones_voluntariado}
+      TZ: America/La_Paz
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - pgdata_db_only:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-bd_donaciones_voluntariado}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_db_only:

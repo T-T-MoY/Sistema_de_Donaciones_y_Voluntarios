@@ -39,6 +39,10 @@ BEGIN
   IF TG_OP = 'DELETE' THEN
     RAISE EXCEPTION 'No se eliminan salidas de inventario; use el estado ANULADA para conservar la trazabilidad.';
   END IF;
+  -- Una salida que nace anulada no descuenta existencias.
+  IF TG_OP = 'INSERT' AND NEW.estado = 'ANULADA' THEN
+    RETURN NEW;
+  END IF;
   IF TG_OP = 'UPDATE' THEN
     IF NEW.id_inventario <> OLD.id_inventario OR NEW.id_donacion <> OLD.id_donacion
        OR NEW.cantidad <> OLD.cantidad OR NEW.campana_id IS DISTINCT FROM OLD.campana_id
