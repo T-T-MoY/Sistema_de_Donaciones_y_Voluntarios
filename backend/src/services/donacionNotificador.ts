@@ -4,7 +4,7 @@
 // Best-effort: se ejecutan DESPUÉS del commit y un fallo de correo nunca
 // revierte ni rompe la operación (solo se registra en consola).
 // ============================================================================
-import { transporter } from '../config/mailer';
+import { enviarCorreo } from '../config/mailer';
 
 const escapar = (t: string): string =>
   t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -23,13 +23,12 @@ const plantilla = (titulo: string, lineas: string[]): string => `
 const enviar = async (destinos: string[], asunto: string, html: string): Promise<void> => {
   const para = [...new Set(destinos.filter(Boolean))];
   if (para.length === 0) return;
-  if (!process.env.EMAIL_USER || !(process.env.BREVO_SMTP_KEY || process.env.EMAIL_PASS)) {
-    console.warn(`✉️  [donaciones] SMTP no configurado; no se envió: "${asunto}"`);
+  if (!process.env.EMAIL_USER || !process.env.BREVO_API_KEY) {
+    console.warn(`✉️  [donaciones] Brevo API no configurada; no se envió: "${asunto}"`);
     return;
   }
   try {
-    await transporter.sendMail({
-      from: `"${process.env.EMAIL_FROM_NAME || 'Donaciones y Voluntarios'}" <${process.env.EMAIL_USER}>`,
+    await enviarCorreo({
       to: para.join(','),
       subject: asunto,
       html,
