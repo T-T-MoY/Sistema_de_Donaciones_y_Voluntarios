@@ -6,11 +6,12 @@ Guía técnica para que los distintos equipos del proyecto integren y reutilicen
 
 ## 1. Dependencias y Entorno
 
-Ya están instaladas en `frontend/package.json` (no es necesario instalar paquetes nuevos):
+### Dependencias y Proveedor de Mapas (OpenStreetMap)
 
-- `leaflet` (`^1.9.4`)
-- `react-leaflet` (`^4.2.1`)
-- `@types/leaflet` (`^1.9.22`)
+- **Motor de mapa:** `leaflet` (`^1.9.4`) + `react-leaflet` (`^4.2.1`) + `@types/leaflet` (`^1.9.22`), ya instalados en `frontend/package.json`.
+- **Proveedor de capas (tiles):** **OpenStreetMap** (`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`) configurado dentro de `<TileLayer />` en `frontend/src/components/mapa/Mapa.tsx`.
+  - No requiere API key ni credenciales en `.env`.
+  - Incluye la atribución obligatoria de OpenStreetMap en el mapa (`&copy; OpenStreetMap contributors`), la cual debe conservarse.
 
 > **Nota sobre geolocalización:** `navigator.geolocation` requiere un contexto seguro (`HTTPS` en producción o `http://localhost` en desarrollo local).
 
