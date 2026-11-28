@@ -32,7 +32,7 @@ import ayudaRoutes from './routes/ayudaRoutes';
 
 // Seguimiento general del voluntariado
 import seguimientoRoutes from './seguimiento/seguimientoRoutes';
-import sprint6Routes from './sprint6/sprint6Routes';
+import sprint6Routes from './routes/sprint6Routes';
 
 // ============================================================================
 // IMPORTACIÓN DE MIDDLEWARES GLOBALES

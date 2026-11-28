@@ -18,7 +18,6 @@ const ENLACES = [
   { href: '#como-funciona', label: 'Cómo funciona', enDesarrollo: false },
   { href: '#servicios', label: 'Roles y áreas', enDesarrollo: false },
   { href: '#contacto', label: 'Contacto', enDesarrollo: false },
-  { href: '#', label: 'En desarrollo', enDesarrollo: true },
 ];
 
 export const LandingNavbar = () => {
@@ -69,9 +68,6 @@ export const LandingNavbar = () => {
 
   const ctaGhost =
     'press items-center justify-center rounded-xl border border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-5 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-text-muted dark:text-cream/80 hover:border-primary dark:hover:border-white/30 hover:bg-surface-sunken dark:hover:bg-white/[0.07] hover:text-text dark:hover:text-cream';
-
-  const badgeDesarrollo =
-    'inline-flex items-center gap-2 rounded-xl border border-dashed border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-subtle dark:text-cream/40 select-none';
 
   return (
     <header className="absolute inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)]">
@@ -176,12 +172,6 @@ export const LandingNavbar = () => {
                       {isAdmin ? 'Panel admin' : 'Mi panel'}
                     </Link>
 
-                    <span className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-subtle dark:text-cream/35 select-none">
-                      <svg className="h-4 w-4 text-text-subtle dark:text-cream/25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      En desarrollo
-                    </span>
 
                     <Link
                       to="/perfil"
@@ -214,9 +204,6 @@ export const LandingNavbar = () => {
               <Link to="/login" className={`${ctaGhost} hidden sm:inline-flex`}>
                 Ingresar
               </Link>
-              <span className={`${ctaGold} hidden opacity-60 pointer-events-none md:inline-flex`} aria-disabled="true">
-                Próximamente
-              </span>
             </>
           )}
 
@@ -284,15 +271,9 @@ export const LandingNavbar = () => {
                 >
                   {isAdmin ? 'Ir al panel admin' : 'Ir a mi panel'}
                 </Link>
-                <span className={`${badgeDesarrollo} w-full justify-center`} aria-disabled="true">
-                  En desarrollo
-                </span>
               </>
             ) : (
               <>
-                <span className={`${badgeDesarrollo} w-full justify-center`} aria-disabled="true">
-                  Registro próximamente
-                </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Link to="/login" onClick={() => setMenuMovil(false)} className={`${ctaGhost} flex w-full`}>
                     Ingresar

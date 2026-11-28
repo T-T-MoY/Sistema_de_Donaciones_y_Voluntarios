@@ -38,13 +38,15 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
 
   const titulosPorRuta: Record<string, string> = {
     '/dashboard': 'Inicio',
-    '/usuarios': 'Gestión de Usuarios',
-    '/beneficios': 'Beneficiarios y Ayudas',
-    '/reportes': 'Reportes y Notificaciones',
+    '/usuarios': 'Gestion',
+    '/campanas': 'Gestion',
+    '/donaciones': 'Gestion',
+    '/reportes': 'Alertas',
     '/perfil': 'Mi Perfil',
-    '/mi-disponibilidad': 'Mi Disponibilidad',
-    '/voluntarios/mi-disponibilidad': 'Mi Disponibilidad',
-    '/voluntarios/solicitudes': 'Gestión de Solicitudes de Voluntarios',
+    '/voluntarios/solicitudes': 'Gestion',
+    '/voluntarios/seguimiento': 'Gestion',
+    '/voluntarios': 'Gestión',
+    '/beneficios': 'Gestión',
   };
 
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
@@ -65,10 +67,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
         </button>
 
         <div className="min-w-0">
-          <p className="hidden text-[9px] font-bold uppercase tracking-[0.24em] text-text-subtle sm:block">
-            Panel de gestión
-          </p>
-          <h1 className="truncate font-display text-base font-bold tracking-[-0.02em] text-text md:text-lg">
+          <h1 className="hidden text-[9px] font-bold uppercase tracking-[0.24em] text-text-subtle sm:block">
             {tituloActual}
           </h1>
         </div>
@@ -76,13 +75,6 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
 
       {/* Derecha: rol + home + theme + avatar */}
       <div className="flex items-center gap-2 md:gap-3">
-
-        <div className="mr-1 hidden items-center gap-2 border-r border-border pr-4 lg:flex">
-          <span className="h-1.5 w-1.5 rounded-full bg-success" />
-          <p className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-text-muted">
-            {rolActual}
-          </p>
-        </div>
 
         <Link
           to="/"

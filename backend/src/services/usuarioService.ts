@@ -95,9 +95,11 @@ const construirRolData = (
     data.descripcion = valorDefinido(body.descripcion)
       ? String(body.descripcion).trim()
       : (actual?.descripcion ?? null);
-    // El estado solo lo modifica el flujo de revisión, nunca datos del perfil
-    // ni el payload del formulario administrativo.
-    data.estado_beneficiario = actual?.estado_beneficiario ?? 'Pendiente';
+    // El estado solo lo modifica el flujo de revisión en solicitudes propias;
+    // cuando un administrador asigna el rol directamente, queda verificado.
+    data.estado_beneficiario = permitirCamposAdmin
+      ? 'Verificado'
+      : (actual?.estado_beneficiario ?? 'Pendiente');
 
     const v = validarDatosBeneficiario({
       tipo_beneficiario: data.tipo_beneficiario || undefined,
@@ -141,9 +143,9 @@ const construirRolData = (
     : permitirCamposAdmin
       ? false
       : Boolean(actual?.es_coordinador);
-  // La aprobación se controla en la bandeja de revisión. Los formularios
-  // conservan el estado existente y nunca pueden promover la solicitud.
-  data.estado_voluntario = rol === 'Coordinador'
+  // La aprobación se controla en la bandeja de revisión para postulaciones;
+  // cuando un administrador asigna el rol directamente, queda aprobado.
+  data.estado_voluntario = rol === 'Coordinador' || permitirCamposAdmin
     ? 'Aprobado'
     : (actual?.estado_voluntario ?? 'Pendiente');
   const v = validarDatosVoluntario({
@@ -359,8 +361,8 @@ export const usuarioService = {
     const { nombre, paterno, materno, correo, telefono, contraseña, rol, estado, foto_url } = body;
 
     const rolesNormalizados = normalizarRolesUI(body.roles, rol);
-    const rolNormalizado = rolesNormalizados[0] || 'Donante';
-    if (!rolesNormalizados.length && !Array.isArray(body.roles)) {
+    const rolNormalizado = rolesNormalizados[0];
+    if (!rolNormalizado) {
       throw new AppError(`Rol inválido. Debe ser uno de: ${ROLES_VALIDOS.join(', ')}.`, 400);
     }
 

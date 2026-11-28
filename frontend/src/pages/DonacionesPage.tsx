@@ -62,7 +62,7 @@ const DonacionesPage = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 md:py-10">
+    <div className="mx-auto -mt-2 w-full max-w-6xl space-y-6 px-4 pb-6 pt-0 sm:px-6 md:-mt-4 md:pb-10">
       <header>
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-text-muted">Módulo</p>
         <h1 className="font-display text-2xl font-extrabold tracking-[-0.04em] text-text md:text-3xl">Gestión de donaciones</h1>

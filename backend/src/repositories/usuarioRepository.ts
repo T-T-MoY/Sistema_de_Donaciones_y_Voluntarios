@@ -5,6 +5,7 @@
 // ============================================================================
 import { PoolClient } from 'pg';
 import { pool } from '../config/database';
+import { AppError } from '../utils/AppError';
 import type {
   UsuarioRow,
   UsuarioResponse,
@@ -241,7 +242,8 @@ async function actualizarSubtipo(
          documento         = EXCLUDED.documento,
          direccion         = EXCLUDED.direccion,
          necesidad         = EXCLUDED.necesidad,
-         descripcion       = EXCLUDED.descripcion`,
+         descripcion       = EXCLUDED.descripcion,
+         estado            = CASE WHEN EXCLUDED.estado = 'Verificado' THEN 'Verificado' ELSE beneficiario.estado END`,
       [
         id_usuario,
         normalizarTipoBeneficiario(rolData.tipo_beneficiario),
@@ -283,7 +285,7 @@ async function actualizarSubtipo(
          habilidades    = EXCLUDED.habilidades,
          disponibilidad = EXCLUDED.disponibilidad,
          es_coordinador = EXCLUDED.es_coordinador,
-         estado         = CASE WHEN EXCLUDED.es_coordinador THEN 'Aprobado' ELSE voluntario.estado END`,
+         estado         = CASE WHEN EXCLUDED.es_coordinador OR EXCLUDED.estado = 'Aprobado' THEN 'Aprobado' ELSE voluntario.estado END`,
       [id_usuario, rolData.habilidades || [], (rolData.disponibilidad || '').trim(), esCoord, estadoVol]
     );
   }
@@ -504,7 +506,36 @@ export const usuarioRepository = {
             Voluntario: 'voluntario',
           };
           const tabla = tablaPorRol[rol];
-          if (tabla) await client.query(`DELETE FROM ${tabla} WHERE id_usuario = $1`, [id_usuario]);
+          if (tabla) {
+            await client.query('SAVEPOINT sp_remove_role');
+            try {
+              await client.query(`DELETE FROM ${tabla} WHERE id_usuario = $1`, [id_usuario]);
+              await client.query('RELEASE SAVEPOINT sp_remove_role');
+            } catch (fkError: any) {
+              await client.query('ROLLBACK TO SAVEPOINT sp_remove_role');
+              await client.query('RELEASE SAVEPOINT sp_remove_role');
+              if (fkError?.code !== '23503') throw fkError;
+
+              // Si hay registros históricos asociados, desactivamos el rol cuando es posible
+              // o informamos con un 409 claro en vez de fallar con 500.
+              if (rol === 'Voluntario') {
+                await client.query(
+                  `UPDATE voluntario SET es_coordinador = FALSE, estado = 'Rechazado' WHERE id_usuario = $1`,
+                  [id_usuario]
+                );
+              } else if (rol === 'Beneficiario') {
+                await client.query(
+                  `UPDATE beneficiario SET estado = 'Rechazado' WHERE id_usuario = $1`,
+                  [id_usuario]
+                );
+              } else {
+                throw new AppError(
+                  `No se puede quitar el rol ${rol} porque el usuario tiene registros asociados en el sistema. Podés añadirle otros roles sin quitar este.`,
+                  409
+                );
+              }
+            }
+          }
         }
       }
 

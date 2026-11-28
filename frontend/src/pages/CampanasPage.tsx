@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../context/AuthContext';
 import { campanaApi } from '../api/campana.api';
 import api from '../api/client';
@@ -28,6 +29,87 @@ interface DonacionHistorial {
   campana_nombre?: string;
   estado: string;
 }
+
+const Icono = {
+  megaphone: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+    </svg>
+  ),
+  gift: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+    </svg>
+  ),
+  calendar: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  ),
+  clock: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  pin: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  heart: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+  ),
+  list: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+  ),
+  users: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  star: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+    </svg>
+  ),
+  activity: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  ),
+  box: (
+    <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+  ),
+  close: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  ),
+  check: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  ),
+  alert: (
+    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+};
+
+const ETIQUETAS_TIPO_ACTIVIDAD: Record<string, string> = {
+  CAMPANA: 'Campaña',
+  SOLICITUD_AYUDA: 'Solicitud de Ayuda',
+  INVENTARIO: 'Almacén / Inventario',
+  GENERAL: 'General',
+};
 
 export default function CampanasPage() {
   const { usuario } = useAuth();
@@ -362,15 +444,15 @@ export default function CampanasPage() {
   return (
     <div className="space-y-6 pb-12 text-text dark:text-text">
       {/* Encabezado Principal adaptado a modo claro/oscuro */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface dark:bg-surface p-6 rounded-2xl border border-border dark:border-border shadow-xs">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface dark:bg-surface p-4 sm:p-6 rounded-2xl border border-border dark:border-border shadow-soft">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-success dark:text-success">
-            Sprint 3 · Gestión Operativa Integral
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-subtle">
+            Campañas y Voluntariado
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-text dark:text-text tracking-tight mt-1">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-text dark:text-text tracking-tight mt-1">
             Gestión de Campañas y Actividades
           </h1>
-          <p className="text-sm text-text-muted dark:text-text-subtle mt-1">
+          <p className="text-xs sm:text-sm text-text-muted dark:text-text-subtle mt-1">
             {esAdmin
               ? 'Administra campañas, coordina cuadrillas de voluntarios y gestiona el impacto social.'
               : esDonante
@@ -380,16 +462,16 @@ export default function CampanasPage() {
         </div>
 
         {esAdmin && (
-          <div className="flex flex-wrap gap-2.5">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 w-full sm:w-auto">
             <button
               onClick={abrirCrearCampana}
-              className="px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-1.5"
+              className="press min-h-[42px] px-3.5 sm:px-4 py-2.5 bg-primary hover:bg-primary-hover text-on-primary rounded-xl text-xs sm:text-sm font-semibold shadow-soft flex items-center justify-center gap-1.5"
             >
               <span>+</span> Nueva Campaña
             </button>
             <button
               onClick={() => abrirCrearActividad()}
-              className="px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center gap-1.5"
+              className="press min-h-[42px] px-3.5 sm:px-4 py-2.5 bg-surface-elevated hover:bg-surface-inset/60 text-text border border-border rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5"
             >
               <span>+</span> Nueva Actividad
             </button>
@@ -399,64 +481,74 @@ export default function CampanasPage() {
 
       {/* Alertas */}
       {mensajeExito && (
-        <div className="p-4 bg-success-soft dark:bg-success-soft/60 border border-success/25 dark:border-success/30 text-success dark:text-success rounded-2xl text-sm font-semibold flex items-center justify-between">
-          <span>✓ {mensajeExito}</span>
-          <button onClick={() => setMensajeExito(null)} className="text-success dark:text-success font-bold">✕</button>
+        <div className="anim-toast p-4 bg-success-soft dark:bg-success-soft/60 border border-success/25 dark:border-success/30 text-success dark:text-success rounded-2xl text-sm font-semibold flex items-center justify-between shadow-soft">
+          <span className="flex items-center gap-2">
+            {Icono.check}
+            <span>{mensajeExito}</span>
+          </span>
+          <button onClick={() => setMensajeExito(null)} className="press text-success dark:text-success p-1 rounded-lg hover:bg-success/10">
+            {Icono.close}
+          </button>
         </div>
       )}
       {error && (
-        <div className="p-4 bg-error-soft dark:bg-error-soft border border-error/25 dark:border-error/30 text-error dark:text-error rounded-2xl text-sm font-semibold">
-          ⚠️ {error}
+        <div className="anim-toast p-4 bg-error-soft dark:bg-error-soft border border-error/25 dark:border-error/30 text-error dark:text-error rounded-2xl text-sm font-semibold flex items-center gap-2 shadow-soft">
+          {Icono.alert}
+          <span>{error}</span>
         </div>
       )}
 
       {/* Pestañas de Navegación */}
-      <div className="flex border-b border-border dark:border-border gap-2 overflow-x-auto">
+      <div className="flex flex-wrap sm:inline-flex sm:w-auto max-w-full rounded-xl bg-surface-sunken/80 dark:bg-surface-sunken/70 p-1.5 sm:p-1 border border-border/80 gap-1.5 sm:gap-1">
         {tabs.includes('campanas') && (
           <button
             onClick={() => {
               setPestaña('campanas');
               setCampanaFiltroActividades(null);
             }}
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+            className={`press flex-1 basis-[calc(50%-0.375rem)] sm:basis-auto sm:flex-initial justify-center sm:justify-start min-h-[40px] px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 sm:gap-2 tabular-nums ${
               pestaña === 'campanas'
-                ? 'border-success text-success dark:text-success'
-                : 'border-transparent text-text-muted dark:text-text-subtle hover:text-text dark:hover:text-text'
+                ? 'bg-surface-elevated dark:bg-surface text-text shadow-soft'
+                : 'text-text-muted dark:text-text-subtle hover:text-text'
             }`}
           >
-            <span>📢</span>
-            Campañas ({campanas.length})
+            {Icono.megaphone}
+            <span>Campañas</span>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-surface-sunken/80 text-text-muted">{campanas.length}</span>
           </button>
         )}
 
         {tabs.includes('mis-donaciones') && (
           <button
             onClick={() => setPestaña('mis-donaciones')}
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+            className={`press flex-1 basis-[calc(50%-0.375rem)] sm:basis-auto sm:flex-initial justify-center sm:justify-start min-h-[40px] px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 sm:gap-2 tabular-nums ${
               pestaña === 'mis-donaciones'
-                ? 'border-success text-success dark:text-success'
-                : 'border-transparent text-text-muted dark:text-text-subtle hover:text-text dark:hover:text-text'
+                ? 'bg-surface-elevated dark:bg-surface text-text shadow-soft'
+                : 'text-text-muted dark:text-text-subtle hover:text-text'
             }`}
           >
-            <span>🎁</span>
-            Mi Historial de Donaciones ({misDonaciones.length})
+            {Icono.gift}
+            <span className="sm:hidden">Mis Donaciones</span>
+            <span className="hidden sm:inline">Mi Historial de Donaciones</span>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-surface-sunken/80 text-text-muted">{misDonaciones.length}</span>
           </button>
         )}
 
         {tabs.includes('actividades') && (
           <button
             onClick={() => setPestaña('actividades')}
-            className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+            className={`press flex-1 basis-[calc(50%-0.375rem)] sm:basis-auto sm:flex-initial justify-center sm:justify-start min-h-[40px] px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 sm:gap-2 tabular-nums ${
               pestaña === 'actividades'
-                ? 'border-primary text-primary dark:text-primary-hover'
-                : 'border-transparent text-text-muted dark:text-text-subtle hover:text-text dark:hover:text-text'
+                ? 'bg-surface-elevated dark:bg-surface text-text shadow-soft'
+                : 'text-text-muted dark:text-text-subtle hover:text-text'
             }`}
           >
-            <span>🏃</span>
-            Actividades ({actividades.length})
+            {Icono.activity}
+            <span>Actividades</span>
+            <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-surface-sunken/80 text-text-muted">{actividades.length}</span>
             {campanaFiltroActividades && (
-              <span className="ml-1 text-[11px] bg-primary-soft dark:bg-primary-soft text-primary dark:text-primary-hover px-2 py-0.5 rounded-full">
-                Filtradas por campaña
+              <span className="hidden sm:inline ml-0.5 text-[11px] bg-primary-soft text-primary dark:text-primary-hover px-2 py-0.5 rounded-full">
+                Filtradas
               </span>
             )}
           </button>
@@ -464,20 +556,22 @@ export default function CampanasPage() {
 
         <button
           onClick={() => setPestaña('mis-actividades')}
-          className={`pb-3 px-4 text-sm font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`press flex-1 basis-[calc(50%-0.375rem)] sm:basis-auto sm:flex-initial justify-center sm:justify-start min-h-[40px] px-3 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap flex items-center gap-1.5 sm:gap-2 tabular-nums ${
             pestaña === 'mis-actividades'
-              ? 'border-warning text-warning dark:text-warning'
-              : 'border-transparent text-text-muted dark:text-text-subtle hover:text-text dark:hover:text-text'
+              ? 'bg-surface-elevated dark:bg-surface text-text shadow-soft'
+              : 'text-text-muted dark:text-text-subtle hover:text-text'
           }`}
         >
-          <span>⭐</span>
-          Mis Participaciones ({misParticipaciones.length})
+          {Icono.star}
+          <span className="sm:hidden">Participaciones</span>
+          <span className="hidden sm:inline">Mis Participaciones</span>
+          <span className="text-[11px] px-1.5 py-0.5 rounded-md bg-surface-sunken/80 text-text-muted">{misParticipaciones.length}</span>
         </button>
       </div>
 
       {cargando ? (
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-success dark:border-success" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-border border-t-primary dark:border-t-success" />
         </div>
       ) : (
         <>
@@ -508,12 +602,12 @@ export default function CampanasPage() {
                     return (
                       <div
                         key={c.id_campana}
-                        className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-xs overflow-hidden flex flex-col justify-between"
+                        className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-soft hover:shadow-lift hover:border-border-strong/60 transition-[box-shadow,border-color] duration-200 overflow-hidden flex flex-col justify-between"
                       >
-                        <div className="p-6">
-                          <div className="flex items-start justify-between gap-4 mb-3">
+                        <div className="p-4 sm:p-6">
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <span
-                              className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
                                 c.estado === 'Activa'
                                   ? 'bg-success-soft text-success dark:bg-success-soft dark:text-success'
                                   : c.estado === 'Planificada'
@@ -523,35 +617,47 @@ export default function CampanasPage() {
                                   : 'bg-error-soft text-error dark:bg-error-soft dark:text-error'
                               }`}
                             >
+                              <span
+                                className={`h-1.5 w-1.5 rounded-full ${
+                                  c.estado === 'Activa'
+                                    ? 'bg-success'
+                                    : c.estado === 'Planificada'
+                                    ? 'bg-primary'
+                                    : c.estado === 'Finalizada'
+                                    ? 'bg-text-subtle'
+                                    : 'bg-error'
+                                }`}
+                              />
                               {c.estado}
                             </span>
-                            <span className="text-xs text-text-muted dark:text-text-subtle font-medium">
-                              📅 {c.fecha_inicio} {c.fecha_fin ? `al ${c.fecha_fin}` : ''}
+                            <span className="inline-flex items-center gap-1.5 text-xs text-text-muted dark:text-text-subtle font-medium tabular-nums">
+                              {Icono.calendar}
+                              <span>{c.fecha_inicio} {c.fecha_fin ? `al ${c.fecha_fin}` : ''}</span>
                             </span>
                           </div>
 
-                          <h3 className="text-xl font-bold text-text dark:text-text mb-2">{c.nombre}</h3>
-                          <p className="text-sm text-text-muted dark:text-text-subtle line-clamp-3 mb-6">
+                          <h3 className="text-lg sm:text-xl font-bold text-text dark:text-text mb-1.5">{c.nombre}</h3>
+                          <p className="text-sm text-text-muted dark:text-text-subtle line-clamp-3 mb-5 leading-relaxed">
                             {c.descripcion || 'Sin descripción detallada.'}
                           </p>
 
                           {/* Métricas clave de la campaña */}
-                          <div className="grid grid-cols-3 gap-3 p-4 bg-surface-sunken dark:bg-surface-sunken/60 rounded-xl border border-border dark:border-border mb-4">
-                            <div>
-                              <p className="text-xs text-text-muted dark:text-text-subtle font-medium">Recaudado</p>
-                              <p className="text-base font-extrabold text-text dark:text-text mt-0.5">
+                          <div className="grid grid-cols-1 min-[380px]:grid-cols-3 divide-y min-[380px]:divide-y-0 min-[380px]:divide-x divide-border/70 py-2.5 sm:py-3 px-2 bg-surface-sunken/60 dark:bg-surface-sunken/50 rounded-xl border border-border/70 dark:border-border mb-4">
+                            <div className="px-2.5 py-1.5 min-[380px]:py-0 min-w-0">
+                              <p className="text-[10.5px] uppercase tracking-[0.06em] text-text-subtle font-semibold">Recaudado</p>
+                              <p className="text-sm sm:text-base font-extrabold text-text dark:text-text mt-0.5 tabular-nums truncate">
                                 Bs. {recaudado.toLocaleString()}
                               </p>
                             </div>
-                            <div>
-                              <p className="text-xs text-text-muted dark:text-text-subtle font-medium">Actividades</p>
-                              <p className="text-base font-extrabold text-text dark:text-text mt-0.5">
+                            <div className="px-2.5 py-1.5 min-[380px]:py-0 min-w-0">
+                              <p className="text-[10.5px] uppercase tracking-[0.06em] text-text-subtle font-semibold">Actividades</p>
+                              <p className="text-sm sm:text-base font-extrabold text-text dark:text-text mt-0.5 tabular-nums">
                                 {c.total_actividades || 0}
                               </p>
                             </div>
-                            <div>
-                              <p className="text-xs text-text-muted dark:text-text-subtle font-medium">Voluntarios</p>
-                              <p className="text-base font-extrabold text-text dark:text-text mt-0.5">
+                            <div className="px-2.5 py-1.5 min-[380px]:py-0 min-w-0">
+                              <p className="text-[10.5px] uppercase tracking-[0.06em] text-text-subtle font-semibold">Voluntarios</p>
+                              <p className="text-sm sm:text-base font-extrabold text-text dark:text-text mt-0.5 tabular-nums">
                                 {c.total_voluntarios || 0}
                               </p>
                             </div>
@@ -559,13 +665,13 @@ export default function CampanasPage() {
 
                           {meta > 0 && (
                             <div>
-                              <div className="flex justify-between text-xs font-semibold text-text-muted dark:text-text-subtle mb-1">
+                              <div className="flex justify-between text-xs font-semibold text-text-muted dark:text-text-subtle mb-1.5 tabular-nums">
                                 <span>Meta: Bs. {meta.toLocaleString()}</span>
                                 <span>{porcentaje}%</span>
                               </div>
                               <div className="w-full bg-surface-inset dark:bg-surface-elevated rounded-full h-2 overflow-hidden">
                                 <div
-                                  className="bg-primary dark:bg-success h-2 rounded-full transition-all"
+                                  className="bg-primary dark:bg-success h-2 rounded-full transition-[width] duration-300 ease-out-soft"
                                   style={{ width: `${porcentaje}%` }}
                                 />
                               </div>
@@ -574,13 +680,14 @@ export default function CampanasPage() {
                         </div>
 
                         {/* Botones de acción */}
-                        <div className="px-6 py-4 bg-surface-sunken dark:bg-surface-sunken/80 border-t border-border dark:border-border flex flex-wrap items-center justify-between gap-3">
-                          <div className="flex flex-wrap gap-2">
+                        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-surface-sunken/60 dark:bg-surface-sunken/80 border-t border-border/80 dark:border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full sm:w-auto">
                             <button
                               onClick={() => navigate(`/donaciones?campanaId=${c.id_campana}`)}
-                              className="px-3.5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                              className="press min-h-[38px] px-3 py-2 bg-primary hover:bg-primary-hover text-on-primary rounded-xl text-xs font-semibold shadow-soft flex items-center justify-center gap-1.5"
                             >
-                              <span>❤️</span> Donar a esta Campaña
+                              {Icono.heart}
+                              <span className="truncate">Donar</span>
                             </button>
 
                             <button
@@ -588,30 +695,31 @@ export default function CampanasPage() {
                                 setCampanaFiltroActividades(c.id_campana);
                                 setPestaña('actividades');
                               }}
-                              className="px-3.5 py-2 bg-primary-soft dark:bg-primary-soft/60 hover:bg-primary-soft text-primary dark:text-primary-hover rounded-xl text-xs font-bold transition flex items-center gap-1"
+                              className="press min-h-[38px] px-3 py-2 bg-surface-elevated dark:bg-primary-soft/60 hover:bg-primary-soft/60 text-primary dark:text-primary-hover border border-border/80 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 tabular-nums"
                             >
-                              <span>📋</span> Ver Actividades ({c.total_actividades || 0})
+                              {Icono.list}
+                              <span className="truncate">Actividades ({c.total_actividades || 0})</span>
                             </button>
                           </div>
 
                           {esAdmin && (
-                            <div className="flex gap-2">
+                            <div className="grid grid-cols-3 sm:flex gap-2 w-full sm:w-auto">
                               <button
                                 onClick={() => abrirCrearActividad(c.id_campana)}
                                 title="Crear actividad para esta campaña"
-                                className="px-2.5 py-1.5 bg-surface-inset dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text-muted rounded-lg text-xs font-semibold transition"
+                                className="press min-h-[36px] px-2.5 py-1.5 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 text-text dark:text-text-muted rounded-lg text-xs font-semibold border border-border/70 text-center"
                               >
                                 + Actividad
                               </button>
                               <button
                                 onClick={() => abrirEditarCampana(c)}
-                                className="px-2.5 py-1.5 bg-surface-inset dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text-muted rounded-lg text-xs font-semibold transition"
+                                className="press min-h-[36px] px-2.5 py-1.5 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 text-text dark:text-text-muted rounded-lg text-xs font-semibold border border-border/70 text-center"
                               >
                                 Editar
                               </button>
                               <button
                                 onClick={() => eliminarCampana(c.id_campana)}
-                                className="px-2.5 py-1.5 bg-error-soft dark:bg-error-soft hover:bg-error-soft text-error dark:text-error rounded-lg text-xs font-semibold transition"
+                                className="press min-h-[36px] px-2.5 py-1.5 bg-error-soft dark:bg-error-soft hover:bg-error-soft/80 text-error dark:text-error rounded-lg text-xs font-semibold border border-error/20 text-center"
                               >
                                 Cancelar
                               </button>
@@ -682,11 +790,74 @@ export default function CampanasPage() {
                   </button>
                 </div>
               ) : (
-                <div className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-xs overflow-hidden">
-                  <div className="p-4 bg-surface-sunken dark:bg-surface-sunken/60 border-b border-border dark:border-border font-bold text-sm text-text dark:text-text-muted">
+                <div className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-soft overflow-hidden">
+                  <div className="p-4 bg-surface-sunken/70 dark:bg-surface-sunken/60 border-b border-border dark:border-border font-bold text-sm text-text dark:text-text-muted">
                     Desglose Completo de Donaciones Realizadas
                   </div>
-                  <div className="overflow-x-auto">
+
+                  {/* Vista móvil en tarjetas */}
+                  <div className="md:hidden divide-y divide-border/70">
+                    {misDonaciones.map((d) => {
+                      const esDeCampana = Boolean(d.campana_id);
+                      const esPresencialInventario = !d.campana_id && d.modalidad === 'PRESENCIAL';
+                      const fechaTexto = d.fecha_donacion ? d.fecha_donacion.split('T')[0] : '—';
+                      const cantidadTexto =
+                        d.tipo_donacion === 'ECONOMICO'
+                          ? `Bs. ${Number(d.cantidad).toLocaleString()}`
+                          : `${d.cantidad} ${d.unidad || ''}`;
+
+                      return (
+                        <div key={d.id_donacion} className="p-4 space-y-2.5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <span className="font-mono font-bold text-[11px] text-text-subtle">{d.codigo}</span>
+                              <h4 className="font-bold text-text dark:text-text text-sm truncate">
+                                {d.tipo_donacion} ({d.categoria || 'General'})
+                              </h4>
+                            </div>
+                            <span className="shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-success-soft text-success border border-success/25">
+                              {d.estado}
+                            </span>
+                          </div>
+
+                          <div className="text-xs text-text-muted dark:text-text-subtle">
+                            {esDeCampana ? (
+                              <span className="text-success font-semibold inline-flex items-center gap-1.5">
+                                {Icono.megaphone}
+                                <span>{d.campana_nombre ? `Campaña "${d.campana_nombre}"` : `Campaña #${d.campana_id}`}</span>
+                              </span>
+                            ) : esPresencialInventario ? (
+                              <span className="text-primary dark:text-primary-hover font-semibold inline-flex items-center gap-1.5">
+                                {Icono.box}
+                                <span>Inventario Central (Presencial)</span>
+                              </span>
+                            ) : (
+                              <span className="text-warning font-semibold inline-flex items-center gap-1.5">
+                                {Icono.heart}
+                                <span>Solicitud de Ayuda Directa</span>
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 text-xs">
+                            <div className="flex items-center gap-3 tabular-nums">
+                              <span className="font-extrabold text-text dark:text-text text-sm">{cantidadTexto}</span>
+                              <span className="text-text-subtle">{fechaTexto}</span>
+                            </div>
+                            <button
+                              onClick={() => navigate('/donaciones')}
+                              className="press text-xs font-bold text-success hover:underline"
+                            >
+                              Ver detalle →
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Vista escritorio en tabla */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-surface-sunken dark:bg-surface-sunken text-xs uppercase tracking-wider text-text-muted dark:text-text-subtle font-bold border-b border-border dark:border-border">
                         <tr>
@@ -718,18 +889,21 @@ export default function CampanasPage() {
                                 <div className="font-bold text-text dark:text-text">
                                   {d.tipo_donacion} ({d.categoria || 'General'})
                                 </div>
-                                <div className="text-xs text-text-muted dark:text-text-subtle">
+                                <div className="text-xs text-text-muted dark:text-text-subtle mt-0.5">
                                   {esDeCampana ? (
-                                    <span className="text-success dark:text-success font-semibold flex items-center gap-1">
-                                      🎯 {d.campana_nombre ? `Campaña "${d.campana_nombre}"` : `Campaña #${d.campana_id}`}
+                                    <span className="text-success dark:text-success font-semibold inline-flex items-center gap-1.5">
+                                      {Icono.megaphone}
+                                      <span>{d.campana_nombre ? `Campaña "${d.campana_nombre}"` : `Campaña #${d.campana_id}`}</span>
                                     </span>
                                   ) : esPresencialInventario ? (
-                                    <span className="text-primary dark:text-primary-hover font-semibold flex items-center gap-1">
-                                      📦 Inventario Central (Presencial en Sede)
+                                    <span className="text-primary dark:text-primary-hover font-semibold inline-flex items-center gap-1.5">
+                                      {Icono.box}
+                                      <span>Inventario Central (Presencial en Sede)</span>
                                     </span>
                                   ) : (
-                                    <span className="text-warning dark:text-warning font-semibold flex items-center gap-1">
-                                      🤝 Solicitud de Ayuda Directa
+                                    <span className="text-warning dark:text-warning font-semibold inline-flex items-center gap-1.5">
+                                      {Icono.heart}
+                                      <span>Solicitud de Ayuda Directa</span>
                                     </span>
                                   )}
                                 </div>
@@ -790,10 +964,10 @@ export default function CampanasPage() {
                     <button
                       key={btn.id}
                       onClick={() => setFiltroTipoActividad(btn.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                      className={`press px-3 py-1.5 rounded-xl text-xs font-semibold ${
                         filtroTipoActividad === btn.id
-                          ? 'bg-primary text-white shadow-xs'
-                          : 'bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text-subtle hover:bg-surface-inset dark:hover:bg-surface-elevated'
+                          ? 'bg-primary text-on-primary shadow-soft'
+                          : 'bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text-subtle hover:bg-surface-inset/60 dark:hover:bg-surface-elevated'
                       }`}
                     >
                       {btn.label}
@@ -802,13 +976,14 @@ export default function CampanasPage() {
                 </div>
 
                 {campanaFiltroActividades && (
-                  <div className="flex items-center gap-2 text-xs bg-primary-soft dark:bg-primary-soft/70 border border-primary/25 dark:border-primary/30 text-primary dark:text-primary-hover px-3 py-1.5 rounded-xl">
+                  <div className="flex items-center gap-2 text-xs bg-primary-soft dark:bg-primary-soft/70 border border-primary/25 dark:border-primary/30 text-primary dark:text-primary-hover px-3 py-1.5 rounded-xl tabular-nums">
                     <span>Filtrando por Campaña #{campanaFiltroActividades}</span>
                     <button
                       onClick={() => setCampanaFiltroActividades(null)}
-                      className="font-bold hover:underline"
+                      className="press font-bold hover:underline inline-flex items-center gap-1"
                     >
-                      ✕ Quitar filtro
+                      {Icono.close}
+                      <span>Quitar filtro</span>
                     </button>
                   </div>
                 )}
@@ -835,12 +1010,12 @@ export default function CampanasPage() {
                     return (
                       <div
                         key={act.id_actividad}
-                        className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-xs p-6 flex flex-col justify-between"
+                        className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-soft hover:shadow-lift hover:border-border-strong/60 transition-[box-shadow,border-color] duration-200 p-4 sm:p-6 flex flex-col justify-between"
                       >
                         <div>
-                          <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center justify-between gap-2 mb-2.5">
                             <span
-                              className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
+                              className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${
                                 act.tipo_actividad === 'CAMPANA'
                                   ? 'bg-success-soft text-success dark:bg-success-soft dark:text-success'
                                   : act.tipo_actividad === 'SOLICITUD_AYUDA'
@@ -848,10 +1023,10 @@ export default function CampanasPage() {
                                   : 'bg-primary-soft text-primary dark:bg-primary-soft dark:text-primary-hover'
                               }`}
                             >
-                              {act.tipo_actividad}
+                              {ETIQUETAS_TIPO_ACTIVIDAD[act.tipo_actividad] || act.tipo_actividad}
                             </span>
                             <span
-                              className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                              className={`text-xs font-bold px-2.5 py-1 rounded-full tabular-nums ${
                                 sinCupos
                                   ? 'bg-error-soft text-error dark:bg-error-soft dark:text-error'
                                   : 'bg-success-soft text-success dark:bg-success-soft dark:text-success'
@@ -862,60 +1037,77 @@ export default function CampanasPage() {
                           </div>
 
                           <h3 className="text-lg font-bold text-text dark:text-text mb-1">{act.nombre}</h3>
-                          <p className="text-xs text-text-muted dark:text-text-subtle line-clamp-2 mb-4">
+                          <p className="text-xs text-text-muted dark:text-text-subtle line-clamp-2 mb-4 leading-relaxed">
                             {act.descripcion || 'Sin descripción detallada.'}
                           </p>
 
-                          <div className="space-y-1.5 text-xs text-text dark:text-text-subtle bg-surface-sunken dark:bg-surface-sunken/60 p-3 rounded-xl mb-4 border border-border dark:border-border">
-                            <div>📅 <strong>{act.fecha}</strong></div>
-                            <div>⏰ <strong>{act.hora_inicio} - {act.hora_fin}</strong></div>
-                            <div className="truncate">📍 <strong>{act.lugar}</strong></div>
+                          <div className="space-y-2 text-xs text-text dark:text-text-subtle bg-surface-sunken/60 dark:bg-surface-sunken/50 p-3.5 rounded-xl mb-4 border border-border/70 dark:border-border">
+                            <div className="flex items-center gap-2 tabular-nums">
+                              <span className="text-text-subtle">{Icono.calendar}</span>
+                              <strong>{act.fecha}</strong>
+                            </div>
+                            <div className="flex items-center gap-2 tabular-nums">
+                              <span className="text-text-subtle">{Icono.clock}</span>
+                              <strong>{act.hora_inicio} - {act.hora_fin}</strong>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-text-subtle">{Icono.pin}</span>
+                              <strong className="truncate">{act.lugar}</strong>
+                            </div>
                             {act.campanas_asociadas && act.campanas_asociadas.length > 0 && (
-                              <div className="text-success dark:text-success font-semibold truncate">
-                                📢 Campaña: {act.campanas_asociadas.map((c) => c.nombre).join(', ')}
-                                {campanaFinalizada && (
-                                  <span className="ml-1 text-[11px] text-error font-bold">
-                                    ({campanaFinalizada.estado})
-                                  </span>
-                                )}
+                              <div className="flex items-center gap-2 text-success dark:text-success font-semibold">
+                                {Icono.megaphone}
+                                <span className="truncate">
+                                  Campaña: {act.campanas_asociadas.map((c) => c.nombre).join(', ')}
+                                  {campanaFinalizada && (
+                                    <span className="ml-1 text-[11px] text-error font-bold">
+                                      ({campanaFinalizada.estado})
+                                    </span>
+                                  )}
+                                </span>
                               </div>
                             )}
                             {act.tipo_actividad === 'SOLICITUD_AYUDA' && (
-                              <div className="text-warning dark:text-warning font-semibold truncate">
-                                🤝 Apoyo a Solicitud de Ayuda #{act.solicitud_ayuda_id || 1}
+                              <div className="flex items-center gap-2 text-warning dark:text-warning font-semibold">
+                                {Icono.heart}
+                                <span className="truncate">Apoyo a Solicitud de Ayuda #{act.solicitud_ayuda_id || 1}</span>
                               </div>
                             )}
                             {act.tipo_actividad === 'INVENTARIO' && (
-                              <div className="text-primary dark:text-primary-hover font-semibold truncate">
-                                📦 Almacén Central de Inventario
+                              <div className="flex items-center gap-2 text-primary dark:text-primary-hover font-semibold">
+                                {Icono.box}
+                                <span className="truncate">Almacén Central de Inventario</span>
                               </div>
                             )}
                           </div>
 
                           {/* Alerta de bloqueo si la campaña o actividad está finalizada */}
                           {campanaFinalizada && (
-                            <div className="mb-3 p-2 bg-error-soft/60 dark:bg-error-soft/40 border border-error/25 rounded-xl text-[11px] font-bold text-error dark:text-error flex items-center gap-1.5">
-                              <span>⚠️</span>
+                            <div className="mb-3 p-2.5 bg-error-soft/60 dark:bg-error-soft/40 border border-error/25 rounded-xl text-[11px] font-bold text-error dark:text-error flex items-center gap-2">
+                              {Icono.alert}
                               <span>Campaña finalizada. No se admiten nuevas inscripciones.</span>
                             </div>
                           )}
                           {!campanaFinalizada && actividadFinalizada && (
-                            <div className="mb-3 p-2 bg-surface-inset dark:bg-surface-elevated border border-border rounded-xl text-[11px] font-semibold text-text-muted dark:text-text-subtle flex items-center gap-1.5">
-                              <span>🏁</span>
+                            <div className="mb-3 p-2.5 bg-surface-inset/70 dark:bg-surface-elevated border border-border rounded-xl text-[11px] font-semibold text-text-muted dark:text-text-subtle flex items-center gap-2">
+                              {Icono.clock}
                               <span>Actividad {act.estado.toLowerCase()}. Convocatoria cerrada.</span>
                             </div>
                           )}
                         </div>
 
-                        <div className="space-y-2 pt-2 border-t border-border dark:border-border">
+                        <div className="space-y-2 pt-3 border-t border-border/80 dark:border-border">
                           {/* Botón de inscripción para el usuario */}
                           {yaInscrito ? (
                             <div className="flex items-center justify-between bg-success-soft dark:bg-success-soft/60 border border-success/25 dark:border-success/30 p-2.5 rounded-xl">
-                              <span className="text-xs font-bold text-success dark:text-success">✓ Estás inscrito</span>
+                              <span className="text-xs font-bold text-success dark:text-success inline-flex items-center gap-1.5">
+                                {Icono.check}
+                                <span>Estás inscrito</span>
+                              </span>
                               {!campanaFinalizada && !actividadFinalizada && (
                                 <button
                                   onClick={() => cancelarInscripcion(act.id_actividad)}
-                                  className="text-xs text-error dark:text-error hover:underline font-semibold"
+                                  className="press text-xs text-error dark:text-error hover:underline font-semibold"
                                 >
                                   Cancelar
                                 </button>
@@ -925,10 +1117,10 @@ export default function CampanasPage() {
                             <button
                               disabled={bloqueoInscripcion}
                               onClick={() => inscribirmeActividad(act.id_actividad)}
-                              className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold shadow-xs transition text-center ${
+                              className={`press w-full py-2.5 px-3 rounded-xl text-xs font-semibold shadow-soft text-center ${
                                 bloqueoInscripcion
                                   ? 'bg-surface-inset dark:bg-surface-elevated text-text-subtle cursor-not-allowed border border-border'
-                                  : 'bg-primary hover:bg-primary-hover text-white'
+                                  : 'bg-primary hover:bg-primary-hover text-on-primary'
                               }`}
                             >
                               {campanaFinalizada
@@ -946,22 +1138,23 @@ export default function CampanasPage() {
                             <div className="grid grid-cols-2 gap-2 pt-1">
                               <button
                                 onClick={() => abrirAsistencia(act)}
-                                className="py-2 px-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text rounded-lg text-xs font-bold transition text-center col-span-2 border border-border dark:border-border"
+                                className="press py-2 px-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 dark:hover:bg-surface-elevated text-text dark:text-text rounded-lg text-xs font-semibold text-center col-span-2 border border-border dark:border-border inline-flex items-center justify-center gap-1.5 tabular-nums"
                               >
-                                👥 Gestionar Voluntarios ({act.voluntarios_inscritos || 0})
+                                {Icono.users}
+                                <span>Gestionar Voluntarios ({act.voluntarios_inscritos || 0})</span>
                               </button>
 
                               {esAdmin && (
                                 <>
                                   <button
                                     onClick={() => abrirEditarActividad(act)}
-                                    className="py-1.5 px-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text-muted rounded-lg text-xs font-medium text-center"
+                                    className="press py-1.5 px-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 text-text dark:text-text-muted rounded-lg text-xs font-medium text-center border border-border/70"
                                   >
                                     Editar
                                   </button>
                                   <button
                                     onClick={() => eliminarActividad(act.id_actividad)}
-                                    className="py-1.5 px-2 bg-error-soft dark:bg-error-soft hover:bg-error-soft text-error dark:text-error rounded-lg text-xs font-medium text-center"
+                                    className="press py-1.5 px-2 bg-error-soft dark:bg-error-soft hover:bg-error-soft/80 text-error dark:text-error rounded-lg text-xs font-medium text-center border border-error/20"
                                   >
                                     Cancelar
                                   </button>
@@ -1012,8 +1205,57 @@ export default function CampanasPage() {
                   </button>
                 </div>
               ) : (
-                <div className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-xs overflow-hidden">
-                  <div className="overflow-x-auto">
+                <div className="bg-surface dark:bg-surface rounded-2xl border border-border dark:border-border shadow-soft overflow-hidden">
+                  {/* Vista móvil en tarjetas */}
+                  <div className="md:hidden divide-y divide-border/70">
+                    {misParticipaciones.map((p) => (
+                      <div key={p.id_participacion} className="p-4 space-y-2.5">
+                        <div className="flex items-start justify-between gap-3">
+                          <h4 className="font-bold text-text dark:text-text text-sm leading-snug">{p.actividad_nombre}</h4>
+                          <span
+                            className={`shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                              p.asistio
+                                ? 'bg-success-soft text-success dark:bg-success-soft dark:text-success'
+                                : p.estado === 'Cancelado'
+                                ? 'bg-surface-elevated text-text-muted dark:bg-surface-elevated dark:text-text-subtle'
+                                : 'bg-primary-soft text-primary dark:bg-primary-soft dark:text-primary-hover'
+                            }`}
+                          >
+                            {p.asistio ? 'Asistió' : p.estado}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-muted dark:text-text-subtle tabular-nums">
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="text-text-subtle">{Icono.calendar}</span>
+                            {p.actividad_fecha}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 min-w-0">
+                            <span className="text-text-subtle">{Icono.pin}</span>
+                            <span className="truncate">{p.actividad_lugar}</span>
+                          </span>
+                        </div>
+                        {p.observaciones && (
+                          <p className="text-xs text-text-muted dark:text-text-subtle italic">"{p.observaciones}"</p>
+                        )}
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="text-xs font-extrabold text-text dark:text-text tabular-nums">
+                            {p.asistio ? `${p.horas_acreditadas} hrs acreditadas` : 'Sin horas acreditadas'}
+                          </span>
+                          {!p.asistio && p.estado !== 'Cancelado' && (
+                            <button
+                              onClick={() => cancelarInscripcion(p.id_actividad)}
+                              className="press text-xs text-error dark:text-error font-semibold px-2.5 py-1 rounded-lg bg-error-soft/70"
+                            >
+                              Cancelar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Vista escritorio en tabla */}
+                  <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left text-sm text-text-muted dark:text-text-subtle">
                       <thead className="bg-surface-sunken dark:bg-surface-sunken text-xs uppercase tracking-wider text-text-muted dark:text-text-subtle font-bold border-b border-border dark:border-border">
                         <tr>
@@ -1030,8 +1272,11 @@ export default function CampanasPage() {
                           <tr key={p.id_participacion} className="hover:bg-surface-sunken/40 dark:hover:bg-surface-elevated/40 transition">
                             <td className="p-4 font-bold text-text dark:text-text">{p.actividad_nombre}</td>
                             <td className="p-4 text-xs">
-                              <div>📅 {p.actividad_fecha}</div>
-                              <div className="text-text-subtle truncate max-w-xs">{p.actividad_lugar}</div>
+                              <div className="inline-flex items-center gap-1.5 tabular-nums">
+                                <span className="text-text-subtle">{Icono.calendar}</span>
+                                <span>{p.actividad_fecha}</span>
+                              </div>
+                              <div className="text-text-subtle truncate max-w-xs mt-0.5">{p.actividad_lugar}</div>
                             </td>
                             <td className="p-4">
                               <span
@@ -1077,12 +1322,22 @@ export default function CampanasPage() {
       {/* ===================================================================== */}
       {/* MODAL: CREAR / EDITAR CAMPAÑA */}
       {/* ===================================================================== */}
-      {modalCampanaAbierto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="bg-surface dark:bg-surface rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-border dark:border-border max-h-[90vh] overflow-y-auto text-text dark:text-text">
-            <h3 className="text-xl font-bold text-text dark:text-text mb-4">
-              {campanaEditando ? 'Editar Campaña' : 'Nueva Campaña Solidaria'}
-            </h3>
+      {modalCampanaAbierto &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-night/60 p-0 sm:p-4 backdrop-blur-sm animate-[overlay-in_200ms_ease-out_both]">
+            <div className="anim-scale bg-surface dark:bg-surface rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:p-6 shadow-deep border border-border dark:border-border max-h-[92dvh] overflow-y-auto overscroll-contain text-text dark:text-text">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-text dark:text-text">
+                  {campanaEditando ? 'Editar Campaña' : 'Nueva Campaña Solidaria'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setModalCampanaAbierto(false)}
+                  className="press p-1.5 rounded-lg text-text-subtle hover:text-text hover:bg-surface-elevated"
+                >
+                  {Icono.close}
+                </button>
+              </div>
 
             <form onSubmit={guardarCampana} className="space-y-4 text-sm">
               <div>
@@ -1119,7 +1374,7 @@ export default function CampanasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Fecha de Inicio *</label>
                   <input
@@ -1141,11 +1396,12 @@ export default function CampanasPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Meta Económica (Bs.)</label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     min="0"
                     step="0.01"
                     value={formCampana.objetivo_recaudacion}
@@ -1170,35 +1426,46 @@ export default function CampanasPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-border dark:border-border">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-4 border-t border-border dark:border-border">
                 <button
                   type="button"
                   onClick={() => setModalCampanaAbierto(false)}
-                  className="px-4 py-2 text-text-muted dark:text-text-subtle hover:bg-surface-elevated dark:hover:bg-surface-elevated rounded-xl font-semibold"
+                  className="press w-full sm:w-auto min-h-[44px] px-4 py-2 text-text-muted dark:text-text-subtle hover:bg-surface-elevated dark:hover:bg-surface-elevated rounded-xl font-semibold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-sm"
+                  className="press w-full sm:w-auto min-h-[44px] px-5 py-2 bg-primary hover:bg-primary-hover text-on-primary rounded-xl font-semibold shadow-soft"
                 >
                   Guardar Campaña
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ===================================================================== */}
       {/* MODAL: CREAR / EDITAR ACTIVIDAD */}
       {/* ===================================================================== */}
-      {modalActividadAbierto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="bg-surface dark:bg-surface rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-border dark:border-border max-h-[90vh] overflow-y-auto text-text dark:text-text">
-            <h3 className="text-xl font-bold text-text dark:text-text mb-4">
-              {actividadEditando ? 'Editar Actividad' : 'Nueva Actividad'}
-            </h3>
+      {modalActividadAbierto &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-night/60 p-0 sm:p-4 backdrop-blur-sm animate-[overlay-in_200ms_ease-out_both]">
+            <div className="anim-scale bg-surface dark:bg-surface rounded-t-2xl sm:rounded-2xl max-w-lg w-full p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:p-6 shadow-deep border border-border dark:border-border max-h-[92dvh] overflow-y-auto overscroll-contain text-text dark:text-text">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-text dark:text-text">
+                  {actividadEditando ? 'Editar Actividad' : 'Nueva Actividad'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setModalActividadAbierto(false)}
+                  className="press p-1.5 rounded-lg text-text-subtle hover:text-text hover:bg-surface-elevated"
+                >
+                  {Icono.close}
+                </button>
+              </div>
 
             <form onSubmit={guardarActividad} className="space-y-4 text-sm">
               <div>
@@ -1224,7 +1491,7 @@ export default function CampanasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-2">
                 <div>
                   <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Fecha *</label>
                   <input
@@ -1232,28 +1499,30 @@ export default function CampanasPage() {
                     required
                     value={formActividad.fecha}
                     onChange={(e) => setFormActividad({ ...formActividad, fecha: e.target.value })}
-                    className="w-full px-2.5 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Hora Inicio *</label>
-                  <input
-                    type="time"
-                    required
-                    value={formActividad.hora_inicio}
-                    onChange={(e) => setFormActividad({ ...formActividad, hora_inicio: e.target.value })}
-                    className="w-full px-2.5 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Hora Fin *</label>
-                  <input
-                    type="time"
-                    required
-                    value={formActividad.hora_fin}
-                    onChange={(e) => setFormActividad({ ...formActividad, hora_fin: e.target.value })}
-                    className="w-full px-2.5 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
-                  />
+                <div className="grid grid-cols-2 sm:contents gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Hora Inicio *</label>
+                    <input
+                      type="time"
+                      required
+                      value={formActividad.hora_inicio}
+                      onChange={(e) => setFormActividad({ ...formActividad, hora_inicio: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Hora Fin *</label>
+                    <input
+                      type="time"
+                      required
+                      value={formActividad.hora_fin}
+                      onChange={(e) => setFormActividad({ ...formActividad, hora_fin: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-border dark:border-border bg-surface-elevated dark:bg-surface-elevated text-text dark:text-text text-xs focus:ring-2 focus:ring-primary focus:outline-hidden"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1269,11 +1538,12 @@ export default function CampanasPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-text dark:text-text-subtle uppercase mb-1">Cupo de Voluntarios *</label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     min="1"
                     required
                     value={formActividad.max_voluntarios}
@@ -1314,49 +1584,53 @@ export default function CampanasPage() {
                 </div>
               )}
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-border dark:border-border">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 sm:gap-3 pt-4 border-t border-border dark:border-border">
                 <button
                   type="button"
                   onClick={() => setModalActividadAbierto(false)}
-                  className="px-4 py-2 text-text-muted dark:text-text-subtle hover:bg-surface-elevated dark:hover:bg-surface-elevated rounded-xl font-semibold"
+                  className="press w-full sm:w-auto min-h-[44px] px-4 py-2 text-text-muted dark:text-text-subtle hover:bg-surface-elevated dark:hover:bg-surface-elevated rounded-xl font-semibold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-sm"
+                  className="press w-full sm:w-auto min-h-[44px] px-5 py-2 bg-primary hover:bg-primary-hover text-on-primary rounded-xl font-semibold shadow-soft"
                 >
                   Guardar Actividad
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ===================================================================== */}
       {/* MODAL: CONTROL Y MODIFICACIÓN DE ASISTENCIA DE VOLUNTARIOS */}
       {/* ===================================================================== */}
-      {modalAsistenciaActividad && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-          <div className="bg-surface dark:bg-surface rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-border dark:border-border max-h-[90vh] overflow-y-auto text-text dark:text-text">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <span className="text-xs font-bold text-primary dark:text-primary-hover uppercase tracking-wider">
-                  Control & Acreditación de Voluntarios
-                </span>
-                <h3 className="text-xl font-bold text-text dark:text-text mt-1">{modalAsistenciaActividad.nombre}</h3>
-                <p className="text-xs text-text-muted dark:text-text-subtle">
-                  📅 {modalAsistenciaActividad.fecha} • ⏰ {modalAsistenciaActividad.hora_inicio} a {modalAsistenciaActividad.hora_fin} • 📍 {modalAsistenciaActividad.lugar}
-                </p>
+      {modalAsistenciaActividad &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-night/60 p-0 sm:p-4 backdrop-blur-sm animate-[overlay-in_200ms_ease-out_both]">
+            <div className="anim-scale bg-surface dark:bg-surface rounded-t-2xl sm:rounded-2xl max-w-2xl w-full p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:p-6 shadow-deep border border-border dark:border-border max-h-[92dvh] overflow-y-auto overscroll-contain text-text dark:text-text">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <span className="text-[11px] font-bold text-primary dark:text-primary-hover uppercase tracking-wider">
+                    Control y Acreditación de Voluntarios
+                  </span>
+                  <h3 className="text-xl font-bold text-text dark:text-text mt-1">{modalAsistenciaActividad.nombre}</h3>
+                  <p className="text-xs text-text-muted dark:text-text-subtle flex flex-wrap items-center gap-3 mt-1 tabular-nums">
+                    <span className="inline-flex items-center gap-1">{Icono.calendar} {modalAsistenciaActividad.fecha}</span>
+                    <span className="inline-flex items-center gap-1">{Icono.clock} {modalAsistenciaActividad.hora_inicio} a {modalAsistenciaActividad.hora_fin}</span>
+                    <span className="inline-flex items-center gap-1">{Icono.pin} {modalAsistenciaActividad.lugar}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setModalAsistenciaActividad(null)}
+                  className="press text-text-subtle hover:text-text dark:hover:text-text p-1.5 rounded-lg hover:bg-surface-elevated"
+                >
+                  {Icono.close}
+                </button>
               </div>
-              <button
-                onClick={() => setModalAsistenciaActividad(null)}
-                className="text-text-subtle hover:text-text dark:hover:text-text p-1 rounded-lg"
-              >
-                ✕
-              </button>
-            </div>
 
             {cargandoVoluntarios ? (
               <div className="flex justify-center py-12">
@@ -1379,12 +1653,12 @@ export default function CampanasPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       {v.asistio ? (
                         <div className="flex items-center gap-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success dark:bg-success-soft dark:text-success">
+                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-success-soft text-success dark:bg-success-soft dark:text-success tabular-nums">
                             ✓ Asistió ({v.horas_acreditadas} hrs)
                           </span>
                           <button
                             onClick={() => marcarAsistenciaVoluntario(v, false)}
-                            className="px-2 py-1 text-xs text-error dark:text-error hover:underline"
+                            className="press px-2 py-1 text-xs text-error dark:text-error hover:underline"
                             title="Desmarcar o rectificar asistencia"
                           >
                             Modificar
@@ -1394,13 +1668,13 @@ export default function CampanasPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => marcarAsistenciaVoluntario(v, true)}
-                            className="px-3 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs font-bold shadow-xs transition"
+                            className="press px-3 py-1.5 bg-primary hover:bg-primary-hover text-on-primary rounded-lg text-xs font-semibold shadow-soft"
                           >
                             Marcar Asistió
                           </button>
                           <button
                             onClick={() => marcarAsistenciaVoluntario(v, false)}
-                            className="px-3 py-1.5 bg-surface-inset dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text-subtle rounded-lg text-xs font-semibold transition"
+                            className="press px-3 py-1.5 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 text-text dark:text-text-subtle rounded-lg text-xs font-semibold border border-border/70"
                           >
                             No Asistió
                           </button>
@@ -1412,17 +1686,18 @@ export default function CampanasPage() {
               </div>
             )}
 
-            <div className="mt-6 pt-4 border-t border-border dark:border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs text-text-muted dark:text-text-subtle">
+            <div className="mt-6 pt-4 border-t border-border dark:border-border flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 text-xs text-text-muted dark:text-text-subtle">
               <span>* Al confirmar asistencia, la base de datos promueve automáticamente al usuario a Voluntario Aprobado.</span>
               <button
                 onClick={() => setModalAsistenciaActividad(null)}
-                className="px-4 py-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset dark:hover:bg-surface-elevated text-text dark:text-text-muted rounded-xl font-bold"
+                className="press w-full sm:w-auto min-h-[44px] px-4 py-2 bg-surface-elevated dark:bg-surface-elevated hover:bg-surface-inset/70 text-text dark:text-text-muted rounded-xl font-semibold border border-border/70"
               >
                 Cerrar
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

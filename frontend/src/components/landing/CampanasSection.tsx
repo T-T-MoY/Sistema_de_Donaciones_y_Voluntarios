@@ -29,21 +29,33 @@ export function CampanasSection() {
   return (
     <section id="campanas" className="py-20 bg-surface dark:bg-surface border-b border-border dark:border-border transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-success-soft dark:bg-success-soft text-success dark:text-success border border-success/25 dark:border-success/30 uppercase tracking-wider mb-4">
-            Iniciativas de Alto Impacto
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-text dark:text-text tracking-tight">
-            Campañas Solidarias Activas
-          </h2>
-          <p className="mt-4 text-lg text-text-muted dark:text-text-subtle">
-            Únete a nuestras causas colectivas para brindar apoyo inmediato ante emergencias climáticas, salud y apoyo alimentario.
-          </p>
+        <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-[640px]">
+            <span className="inline-flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.26em] text-accent-text">
+              <span aria-hidden="true" className="h-px w-8 bg-accent" />
+              Iniciativas de alto impacto
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-[-0.03em] text-balance text-text sm:text-4xl lg:text-[2.9rem]">
+              Campañas solidarias activas
+            </h2>
+            <p className="mt-4 max-w-[560px] text-base leading-relaxed text-text-muted">
+              Únete a nuestras causas colectivas para brindar apoyo inmediato ante emergencias climáticas, salud y apoyo alimentario.
+            </p>
+          </div>
+
+          {campanas.length > 0 && (
+            <div className="hidden shrink-0 items-center gap-4 md:flex">
+              <span className="text-[9.5px] font-bold uppercase tracking-[0.2em] text-text-subtle">
+                {campanas.length} campañas abiertas
+              </span>
+              <span aria-hidden="true" className="h-px w-16 bg-border-strong" />
+            </div>
+          )}
         </div>
 
         {cargando ? (
           <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-success dark:border-success" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
           </div>
         ) : campanas.length === 0 ? (
           <div className="text-center py-12 bg-surface-elevated dark:bg-surface-elevated rounded-2xl border border-dashed border-border dark:border-border">
@@ -80,12 +92,17 @@ export function CampanasSection() {
                   {/* Contenido */}
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-semibold text-text-muted dark:text-text-subtle mb-2">
-                        <span>📅 Inicio: {c.fecha_inicio}</span>
-                        {c.fecha_fin && <span>• Fin: {c.fecha_fin}</span>}
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-text-muted dark:text-text-subtle mb-2">
+                        <span className="inline-flex items-center gap-1.5">
+                          <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3M4 11h16M5 21h14a1 1 0 001-1V7a1 1 0 00-1-1H5a1 1 0 00-1 1v13a1 1 0 001 1z" />
+                          </svg>
+                          Inicio: {c.fecha_inicio}
+                        </span>
+                        {c.fecha_fin && <span>Fin: {c.fecha_fin}</span>}
                       </div>
 
-                      <h3 className="text-xl font-bold text-text dark:text-text group-hover:text-success dark:group-hover:text-success transition-colors line-clamp-2">
+                      <h3 className="text-xl font-bold text-text dark:text-text group-hover:text-primary dark:group-hover:text-primary-hover transition-colors line-clamp-2">
                         {c.nombre}
                       </h3>
 
@@ -103,7 +120,7 @@ export function CampanasSection() {
                           </div>
                           <div className="w-full bg-surface-inset dark:bg-surface-elevated rounded-full h-2.5 overflow-hidden">
                             <div
-                              className="bg-primary dark:bg-success h-2.5 rounded-full transition-all duration-500"
+                              className="bg-primary h-2.5 rounded-full transition-all duration-500"
                               style={{ width: `${porcentaje}%` }}
                             />
                           </div>

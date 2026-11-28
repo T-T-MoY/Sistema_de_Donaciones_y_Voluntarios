@@ -3,7 +3,7 @@
 // CAPA: Negocio / Infraestructura de mensajería.
 // Encapsula las plantillas y el envío de correos electrónicos.
 // ============================================================================
-import { transporter } from '../config/mailer';
+import { enviarCorreo } from '../config/mailer';
 
 export const emailService = {
   async enviarRecuperacionPassword(
@@ -15,8 +15,7 @@ export const emailService = {
     const link = `${frontendUrl}/reset-password?token=${token}`;
 
     try {
-      await transporter.sendMail({
-        from: `"Donaciones y Voluntariado" <${process.env.EMAIL_USER}>`,
+      await enviarCorreo({
         to: correo,
         subject: 'Recuperación de contraseña — Donaciones y Voluntariado',
         html: `

@@ -57,13 +57,14 @@ const claseSelect =
 // COMPONENTE
 // =====================================================
 // El selector y la API usan los roles canónicos.
-const rolBackendAFormulario = (rol?: string | null): Rol => {
+const rolBackendAFormulario = (rol?: string | null): Rol | null => {
     const r = (rol || '').toLowerCase().trim();
     if (r === 'administrador' || r === 'admin') return 'Administrador';
     if (r === 'coordinador') return 'Coordinador';
     if (r === 'voluntario' || r === 'empleado') return 'Voluntario';
     if (r === 'beneficiario') return 'Beneficiario';
-    return 'Donante';
+    if (r === 'donante' || r === 'cliente') return 'Donante';
+    return null;
 };
 
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
@@ -78,8 +79,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         correo: '',
         telefono: '',
         contraseña: '',
-        rol: 'Donante',
-        roles: ['Donante'],
+        rol: '',
+        roles: [],
         estado: 'Activo',
         ci_nit: '',
         fecha_nacimiento: '',
@@ -108,6 +109,9 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const esDonante = rolesNorm.includes('donante');
     const esVoluntario = rolesNorm.includes('voluntario') || rolesNorm.includes('coordinador');
     const esBeneficiario = rolesNorm.includes('beneficiario');
+    const esAdministrador = rolesNorm.includes('administrador');
+    // Máximo de roles combinables: Donante + (Voluntario o Coordinador) + Beneficiario.
+    const rolesCompletos = !esAdministrador && formData.roles.length >= 3;
 
     // =====================================================
     // BLOQUEAR SCROLL DEL BODY MIENTRAS EL MODAL ESTÁ ABIERTO
@@ -157,6 +161,14 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             try {
                 const res = await api.get(`/usuarios/${usuarioId}`);
                 const d = res.data;
+                const rolesCargados = (Array.isArray(d.roles) && d.roles.length ? d.roles : [d.rol])
+                    .map(rolBackendAFormulario)
+                    .filter((rol: Rol | null): rol is Rol => Boolean(rol));
+                const rolesNormalizados = rolesCargados.includes('Administrador')
+                    ? (['Administrador'] as Rol[])
+                    : rolesCargados.includes('Coordinador')
+                        ? rolesCargados.filter((rol: Rol) => rol !== 'Voluntario')
+                        : rolesCargados;
                 setFormData({
                     nombre: d.nombre || '',
                     paterno: d.paterno || '',
@@ -164,11 +176,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     correo: d.correo || '',
                     telefono: d.telefono || '',
                     contraseña: '',
-                    rol: rolBackendAFormulario(d.rol),
-                    roles: (() => {
-                        const roles = (Array.isArray(d.roles) && d.roles.length ? d.roles : [d.rol]).map(rolBackendAFormulario);
-                        return roles.includes('Coordinador') ? roles.filter((rol: Rol) => rol !== 'Voluntario') : roles;
-                    })(),
+                    rol: rolesNormalizados[0] || '',
+                    roles: rolesNormalizados,
                     estado: d.estado_cuenta || 'Activo',
                     ci_nit: d.ci_nit ? String(d.ci_nit) : '',
                     fecha_nacimiento: d.fecha_nacimiento
@@ -229,19 +238,26 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const handleRolChange = (e: ChangeEvent<HTMLSelectElement>): void => {
         const nuevoRol = e.target.value as Rol;
         if (!nuevoRol) return;
-        setFormData((prev) => ({
-            ...prev,
-            rol: prev.roles[0] || nuevoRol,
-            roles: prev.roles.includes(nuevoRol) ? prev.roles : [...prev.roles, nuevoRol],
-        }));
+        setFormData((prev) => {
+            // El rol Administrador es exclusivo: no se combina con otros roles.
+            if (nuevoRol === 'Administrador') {
+                return { ...prev, rol: 'Administrador', roles: ['Administrador'], estado: 'Activo' };
+            }
+            if (prev.roles.includes('Administrador')) return prev;
+            const roles = prev.roles.includes(nuevoRol) ? prev.roles : [...prev.roles, nuevoRol];
+            return {
+                ...prev,
+                rol: prev.roles[0] || nuevoRol,
+                roles,
+            };
+        });
         e.target.value = '';
     };
 
     const handleQuitarRol = (rolQuitar: Rol): void => {
         setFormData((prev) => {
             const roles = prev.roles.filter((rol) => rol !== rolQuitar);
-            if (rolQuitar === 'Coordinador') roles.push('Voluntario');
-            return { ...prev, roles, rol: roles[0] || prev.rol };
+            return { ...prev, roles, rol: roles[0] ?? '' };
         });
     };
 
@@ -252,8 +268,12 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         e.preventDefault();
         setError('');
 
-        if (!modoEdicion && formData.roles.length === 0) {
-            setError('Asigná al menos un rol para crear el usuario.');
+        if (formData.roles.length === 0) {
+            setError(
+                modoEdicion
+                    ? 'Asigná al menos un rol para guardar el usuario.'
+                    : 'Asigná al menos un rol para crear el usuario.'
+            );
             return;
         }
 
@@ -281,7 +301,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                 telefono: String(formData.telefono).trim(),
                 rol: formData.rol,
                 roles: formData.roles,
-                estado: formData.estado
+                estado: esAdministrador ? 'Activo' : formData.estado
             };
 
             if (esDonante) {
@@ -467,52 +487,22 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                        <div className="md:col-span-2">
-                            <label htmlFor="modal-rol" className={etiquetaCampo}>Roles asignados</label>
-                            <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Roles asignados">
-                                {formData.roles.map((rol) => (
-                                    <span key={rol} className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-bold text-text">
-                                        {rol === 'Coordinador' ? 'Coord.' : rol}
-                                        <button
-                                            type="button"
-                                            onClick={() => handleQuitarRol(rol)}
-                                            aria-label={`Quitar rol ${rol}`}
-                                            title={`Quitar ${rol}`}
-                                            className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-error/15 hover:text-error focus:outline-none focus:ring-2 focus:ring-error/30"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {!esAdministrador && (
+                            <div>
+                                <label htmlFor="modal-estado" className={etiquetaCampo}>Estado</label>
+                                <select
+                                    id="modal-estado"
+                                    name="estado"
+                                    value={formData.estado}
+                                    onChange={handleChange}
+                                    className={claseSelect}
+                                >
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
                             </div>
-                            <select
-                                id="modal-rol"
-                                value=""
-                                onChange={handleRolChange}
-                                className={claseSelect}
-                            >
-                                <option value="">Añadir nuevo rol</option>
-                                <option value="Donante" disabled={formData.roles.includes('Donante')}>Donante</option>
-                                <option value="Voluntario" disabled={formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
-                                <option value="Coordinador" disabled={formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
-                                <option value="Beneficiario" disabled={formData.roles.includes('Beneficiario')}>Beneficiario</option>
-                                <option value="Administrador" disabled={formData.roles.includes('Administrador')}>Administrador</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="modal-estado" className={etiquetaCampo}>Estado</label>
-                            <select
-                                id="modal-estado"
-                                name="estado"
-                                value={formData.estado}
-                                onChange={handleChange}
-                                className={claseSelect}
-                            >
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                            </select>
-                        </div>
+                        )}
                         <div>
                             <label htmlFor="modal-password" className={etiquetaCampo}>
                                 Contraseña {modoEdicion ? '(opcional)' : '*'}
@@ -540,6 +530,57 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             </div>
                             <FieldError error={errores.contraseña} touched={touched.contraseña} />
                         </div>
+                    </div>
+
+                    <div className="pt-2">
+                        <label htmlFor="modal-rol" className={etiquetaCampo}>Roles asignados</label>
+                        {formData.roles.length === 0 ? (
+                            <p className="mb-2 text-xs font-medium text-text-subtle">
+                                Sin rol asignado. Elegí al menos uno para continuar.
+                            </p>
+                        ) : (
+                            <div className="mb-2 flex flex-wrap gap-1.5" aria-label="Roles asignados">
+                                {formData.roles.map((rol) => (
+                                    <span key={rol} className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-bold text-text">
+                                        {rol === 'Coordinador' ? 'Coord.' : rol}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleQuitarRol(rol)}
+                                            aria-label={`Quitar rol ${rol}`}
+                                            title={`Quitar ${rol}`}
+                                            className="ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-error/15 hover:text-error focus:outline-none focus:ring-2 focus:ring-error/30"
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                        {!esAdministrador && !rolesCompletos && (
+                            <select
+                                id="modal-rol"
+                                value=""
+                                onChange={handleRolChange}
+                                className={claseSelect}
+                            >
+                                <option value="">Añadir nuevo rol</option>
+                                <option value="Donante" disabled={formData.roles.includes('Donante')}>Donante</option>
+                                <option value="Voluntario" disabled={formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
+                                <option value="Coordinador" disabled={formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
+                                <option value="Beneficiario" disabled={formData.roles.includes('Beneficiario')}>Beneficiario</option>
+                                <option value="Administrador" disabled={formData.roles.length > 0}>Administrador</option>
+                            </select>
+                        )}
+                        {esAdministrador && (
+                            <p className="mt-2 text-[11px] font-medium text-text-muted">
+                                El rol Administrador es exclusivo: no se combina con otros roles y siempre es un usuario activo.
+                            </p>
+                        )}
+                        {rolesCompletos && (
+                            <p className="mt-2 text-[11px] font-medium text-text-muted">
+                                Ya asignaste todos los roles disponibles.
+                            </p>
+                        )}
                     </div>
 
                     {/* === DATOS PERSONALES (SOLO CLIENTE) === */}

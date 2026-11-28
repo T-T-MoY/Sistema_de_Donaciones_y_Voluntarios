@@ -57,7 +57,7 @@ export interface UsuarioFormData {
   correo: string;
   telefono: string;
   contraseña: string;
-  rol: Rol;
+  rol: Rol | '';
   roles: Rol[];
   estado: Estado;
   ci_nit: string;

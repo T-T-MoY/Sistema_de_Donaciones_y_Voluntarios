@@ -59,7 +59,7 @@ const SolicitarRecuperacion = () => {
         setCargando(true);
         try {
             await axios.post(
-                `${import.meta.env.VITE_API_URL}/auth/solicitar-recuperacion`,
+                `${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/auth/solicitar-recuperacion`,
                 { correo: correo.toLowerCase().trim() }
             );
             setExito(true);

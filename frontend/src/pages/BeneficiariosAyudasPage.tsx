@@ -97,7 +97,7 @@ export default function BeneficiariosAyudasPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-text-muted">
-            Módulo · Iteración 5
+            Módulo
           </p>
           <h1 className="mt-1 font-display text-2xl font-extrabold tracking-[-0.04em] text-text md:text-3xl">
             Gestión de beneficiarios y ayudas
