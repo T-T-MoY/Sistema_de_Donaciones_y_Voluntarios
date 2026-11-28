@@ -558,7 +558,7 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                             <option value="Voluntario" disabled={esAdministrador || formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
                             <option value="Coordinador" disabled={esAdministrador || formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
                             <option value="Beneficiario" disabled={esAdministrador || formData.roles.includes('Beneficiario')}>Beneficiario</option>
-                            <option value="Administrador" disabled={formData.roles.length > 0}>Administrador (exclusivo)</option>
+                            <option value="Administrador" disabled={formData.roles.length > 0}>Administrador</option>
                         </select>
                         {esAdministrador && (
                             <p className="mt-2 text-[11px] font-medium text-text-muted">
