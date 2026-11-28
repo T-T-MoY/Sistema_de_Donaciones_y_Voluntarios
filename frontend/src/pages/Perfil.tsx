@@ -178,12 +178,6 @@ const Perfil = () => {
     });
     const apiUrl = API_URL;
 
-    useEffect(() => {
-        return () => {
-            if (previewFoto?.startsWith('blob:')) URL.revokeObjectURL(previewFoto);
-        };
-    }, [previewFoto]);
-
     // =====================================================
     // FLAGS DE ROL
     // =====================================================
@@ -267,7 +261,13 @@ const Perfil = () => {
             return;
         }
         setArchivoFoto(file);
-        setPreviewFoto(URL.createObjectURL(file));
+        const reader = new FileReader();
+        reader.onload = () => {
+            if (typeof reader.result === 'string') {
+                setPreviewFoto(reader.result);
+            }
+        };
+        reader.readAsDataURL(file);
         setMensaje({ texto: 'Foto seleccionada. Guardá los cambios para actualizar tu perfil.', tipo: 'exito' });
     };
 
@@ -398,12 +398,29 @@ const Perfil = () => {
             }
 
             const fotoGuardada = respuesta.data.perfil?.foto_url;
+            let nuevaFotoUrl = previewFoto;
             if (typeof fotoGuardada === 'string' && fotoGuardada) {
                 const baseUrl = apiUrl.replace(/\/api\/?$/, '');
-                setPreviewFoto(/^https?:\/\//i.test(fotoGuardada) ? fotoGuardada : `${baseUrl}${fotoGuardada}`);
+                nuevaFotoUrl = /^https?:\/\//i.test(fotoGuardada) ? fotoGuardada : `${baseUrl}${fotoGuardada}`;
+                setPreviewFoto(nuevaFotoUrl);
                 setArchivoFoto(null);
                 if (inputFotoRef.current) inputFotoRef.current.value = '';
             }
+            if (perfilInicialRef.current) {
+                perfilInicialRef.current = {
+                    ...perfilInicialRef.current,
+                    formData: {
+                        ...formData,
+                        passwordActual: '',
+                        passwordNueva: '',
+                        passwordConfirmar: '',
+                    },
+                    datosRol: { ...datosRol },
+                    coords,
+                    previewFoto: nuevaFotoUrl,
+                };
+            }
+            window.dispatchEvent(new Event('perfil-foto-actualizada'));
 
             setFormData(prev => ({
                 ...prev,

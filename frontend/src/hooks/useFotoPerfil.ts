@@ -50,8 +50,14 @@ export const useFotoPerfil = (): string | null => {
 
     void fetchFoto();
 
+    const onFotoActualizada = () => {
+      void fetchFoto();
+    };
+    window.addEventListener('perfil-foto-actualizada', onFotoActualizada);
+
     return () => {
       cancelado = true;
+      window.removeEventListener('perfil-foto-actualizada', onFotoActualizada);
     };
   }, [token, location.pathname]);
 
