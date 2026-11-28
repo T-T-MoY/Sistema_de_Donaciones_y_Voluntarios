@@ -2,7 +2,7 @@
 -- DATOS DE PRUEBA: MÓDULO GESTIÓN DE USUARIOS
 -- =========================================================
 
--- 1. TABLA BASE: USUARIO (17 registros)
+-- 1. TABLA BASE: USUARIO (19 registros)
 INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, estado, fecha_registro, foto_url) VALUES
 -- Administradores (IDs 1 y 2)
 (1, 'Carla', 'Mamani Quispe', 'carla.admin@donacionesbo.org', '71234567', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-01-10 09:00:00', '/uploads/perfiles/1795659256573.png'),
@@ -29,7 +29,11 @@ INSERT INTO usuario (id_usuario, nombre, apellido, correo, telefono, password, e
 (14, 'Rodrigo', 'Mendez Paz', 'rodrigo.mendez@gmail.com', '76004402', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-16 11:30:00', NULL),
 (15, 'Gabriela', 'Morales Quiroga', 'gabriela.morales@gmail.com', '76004403', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-17 14:00:00', NULL),
 (16, 'Fernando', 'Castro Flores', 'fernando.castro@gmail.com', '76004404', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-18 16:15:00', NULL),
-(17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00', NULL);
+(17, 'Lucia', 'Fernandez Prado', 'lucia.fernandez@gmail.com', '76004405', '$2a$12$SYkWhr2bVMvKyYplaVy.VeNLKFFtY6tMDp6E9MmPp2Rzqb7qgM2RO', 'Activo', '2026-02-19 09:20:00', NULL),
+
+-- Usuarios adicionales registrados (IDs 18 y 19)
+(18, 'Limbert Moises', 'Perez Herrera', 'moy734110@gmail.com', '68024443', '$2b$10$HJSfSsd.uhU3gRlMGs6B3OHpuDSqtR.dJhg6MSPx6AHiVusEHMJoi', 'Activo', '2026-11-26 03:54:34.895854', '/uploads/perfiles/1795842886537.jpeg'),
+(19, 'Adrian Joel', 'Apaza Conde', 'adrian1101apz@gmail.com', '76211753', '$2b$10$nwxbpD.ID1BGeqxmPNDcE.pdsvFnaV2jQNVKdupWiauF27yxK1E02', 'Activo', '2026-11-28 02:58:07.676628', '/uploads/perfiles/1795834750349.jpg');
 
 
 -- =========================================================
@@ -42,7 +46,7 @@ INSERT INTO administrador (id_usuario) VALUES
 (2);
 
 -- ---------- DONANTE ----------
--- Todos los que se registran nacen como donantes (IDs 3 a 17),
+-- Todos los que se registran nacen como donantes (IDs 3 a 19),
 -- los que no dieron ubicación quedan con dirección y coordenadas NULL.
 INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 (3,  NULL, NULL, NULL),
@@ -59,7 +63,9 @@ INSERT INTO donante (id_usuario, direccion, ubi_latitud, ubi_longitud) VALUES
 (14, NULL, NULL, NULL),
 (15, 'Calle 21 de Calacoto #450, La Paz', -16.53812000, -68.08234000),
 (16, NULL, NULL, NULL),
-(17, NULL, NULL, NULL);
+(17, NULL, NULL, NULL),
+(18, NULL, NULL, NULL),
+(19, NULL, NULL, NULL);
 
 -- ---------- VOLUNTARIO ----------
 -- Luis (10): coordinador, aprobado por el admin Carla (1)

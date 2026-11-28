@@ -57,13 +57,14 @@ const claseSelect =
 // COMPONENTE
 // =====================================================
 // El selector y la API usan los roles canónicos.
-const rolBackendAFormulario = (rol?: string | null): Rol => {
+const rolBackendAFormulario = (rol?: string | null): Rol | null => {
     const r = (rol || '').toLowerCase().trim();
     if (r === 'administrador' || r === 'admin') return 'Administrador';
     if (r === 'coordinador') return 'Coordinador';
     if (r === 'voluntario' || r === 'empleado') return 'Voluntario';
     if (r === 'beneficiario') return 'Beneficiario';
-    return 'Donante';
+    if (r === 'donante' || r === 'cliente') return 'Donante';
+    return null;
 };
 
 const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModalProps) => {
@@ -160,6 +161,14 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
             try {
                 const res = await api.get(`/usuarios/${usuarioId}`);
                 const d = res.data;
+                const rolesCargados = (Array.isArray(d.roles) && d.roles.length ? d.roles : [d.rol])
+                    .map(rolBackendAFormulario)
+                    .filter((rol: Rol | null): rol is Rol => Boolean(rol));
+                const rolesNormalizados = rolesCargados.includes('Administrador')
+                    ? (['Administrador'] as Rol[])
+                    : rolesCargados.includes('Coordinador')
+                        ? rolesCargados.filter((rol: Rol) => rol !== 'Voluntario')
+                        : rolesCargados;
                 setFormData({
                     nombre: d.nombre || '',
                     paterno: d.paterno || '',
@@ -167,13 +176,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                     correo: d.correo || '',
                     telefono: d.telefono || '',
                     contraseña: '',
-                    rol: rolBackendAFormulario(d.rol),
-                    roles: (() => {
-                        const roles = (Array.isArray(d.roles) && d.roles.length ? d.roles : [d.rol]).map(rolBackendAFormulario);
-                        // El rol Administrador es exclusivo.
-                        if (roles.includes('Administrador')) return ['Administrador'];
-                        return roles.includes('Coordinador') ? roles.filter((rol: Rol) => rol !== 'Voluntario') : roles;
-                    })(),
+                    rol: rolesNormalizados[0] || '',
+                    roles: rolesNormalizados,
                     estado: d.estado_cuenta || 'Activo',
                     ci_nit: d.ci_nit ? String(d.ci_nit) : '',
                     fecha_nacimiento: d.fecha_nacimiento
@@ -253,7 +257,6 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const handleQuitarRol = (rolQuitar: Rol): void => {
         setFormData((prev) => {
             const roles = prev.roles.filter((rol) => rol !== rolQuitar);
-            if (rolQuitar === 'Coordinador') roles.push('Voluntario');
             return { ...prev, roles, rol: roles[0] ?? '' };
         });
     };
@@ -265,8 +268,12 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
         e.preventDefault();
         setError('');
 
-        if (!modoEdicion && formData.roles.length === 0) {
-            setError('Asigná al menos un rol para crear el usuario.');
+        if (formData.roles.length === 0) {
+            setError(
+                modoEdicion
+                    ? 'Asigná al menos un rol para guardar el usuario.'
+                    : 'Asigná al menos un rol para crear el usuario.'
+            );
             return;
         }
 
