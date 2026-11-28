@@ -69,9 +69,6 @@ export const LandingNavbar = () => {
   const ctaGhost =
     'press items-center justify-center rounded-xl border border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-5 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.12em] text-text-muted dark:text-cream/80 hover:border-primary dark:hover:border-white/30 hover:bg-surface-sunken dark:hover:bg-white/[0.07] hover:text-text dark:hover:text-cream';
 
-  const badgeDesarrollo =
-    'inline-flex items-center gap-2 rounded-xl border border-dashed border-border-strong dark:border-white/15 bg-surface dark:bg-white/[0.03] px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-subtle dark:text-cream/40 select-none';
-
   return (
     <header className="absolute inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between gap-3 pl-[max(1.25rem,env(safe-area-inset-left,0px))] pr-[max(1.25rem,env(safe-area-inset-right,0px))] sm:h-[76px] md:gap-4 md:pl-[max(2rem,env(safe-area-inset-left,0px))] md:pr-[max(2rem,env(safe-area-inset-right,0px))]">
@@ -277,9 +274,6 @@ export const LandingNavbar = () => {
               </>
             ) : (
               <>
-                <span className={`${badgeDesarrollo} w-full justify-center`} aria-disabled="true">
-                  Registro próximamente
-                </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   <Link to="/login" onClick={() => setMenuMovil(false)} className={`${ctaGhost} flex w-full`}>
                     Ingresar

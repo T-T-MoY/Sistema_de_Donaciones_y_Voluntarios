@@ -38,14 +38,15 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
 
   const titulosPorRuta: Record<string, string> = {
     '/dashboard': 'Inicio',
-    '/usuarios': 'Gestión de Usuarios',
-    '/campanas': 'Gestión de Campañas y Actividades',
-    '/donaciones': 'Gestión de donaciones',
-    '/reportes': 'Reportes y Notificaciones',
+    '/usuarios': 'Gestion',
+    '/campanas': 'Gestion',
+    '/donaciones': 'Gestion',
+    '/reportes': 'Alertas',
     '/perfil': 'Mi Perfil',
-    '/mi-disponibilidad': 'Mi Disponibilidad',
-    '/voluntarios': 'Gestión de Solicitudes de Voluntarios',
-    '/beneficios': 'Gestión de beneficiarios y ayudas',
+    '/voluntarios/solicitudes': 'Gestion',
+    '/voluntarios/seguimiento': 'Gestion',
+    '/voluntarios': 'Gestión',
+    '/beneficios': 'Gestión',
   };
 
   const tituloActual = titulosPorRuta[location.pathname] || 'Donaciones y Voluntariados';
@@ -66,10 +67,7 @@ const Header = ({ onAbrirMenu }: HeaderProps) => {
         </button>
 
         <div className="min-w-0">
-          <p className="hidden text-[9px] font-bold uppercase tracking-[0.24em] text-text-subtle sm:block">
-            Panel de gestión
-          </p>
-          <h1 className="truncate font-display text-base font-bold tracking-[-0.02em] text-text md:text-lg">
+          <h1 className="hidden text-[9px] font-bold uppercase tracking-[0.24em] text-text-subtle sm:block">
             {tituloActual}
           </h1>
         </div>

@@ -67,16 +67,28 @@ export function VoluntariadoSection() {
   return (
     <section id="voluntariado" className="py-20 bg-surface dark:bg-surface border-b border-border dark:border-border transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-primary-soft dark:bg-primary-soft/70 text-primary dark:text-primary-hover border border-primary/25 dark:border-primary/30 uppercase tracking-wider mb-4">
-            Participa en Terreno
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-text dark:text-text tracking-tight">
-            Actividades de Voluntariado Abiertas
-          </h2>
-          <p className="mt-4 text-lg text-text-muted dark:text-text-subtle">
-            Pon tus manos y corazón al servicio. Elige una actividad, inscríbete y colabora en acopio, logística o distribución.
-          </p>
+        <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-[640px]">
+            <span className="inline-flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.26em] text-accent-text">
+              <span aria-hidden="true" className="h-px w-8 bg-accent" />
+              Participa en terreno
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-[-0.03em] text-balance text-text sm:text-4xl lg:text-[2.9rem]">
+              Actividades de voluntariado abiertas
+            </h2>
+            <p className="mt-4 max-w-[560px] text-base leading-relaxed text-text-muted">
+              Pon tus manos y corazón al servicio. Elige una actividad, inscríbete y colabora en acopio, logística o distribución.
+            </p>
+          </div>
+
+          {actividades.length > 0 && (
+            <div className="hidden shrink-0 items-center gap-4 md:flex">
+              <span className="text-[9.5px] font-bold uppercase tracking-[0.2em] text-text-subtle">
+                {actividades.length} actividades abiertas
+              </span>
+              <span aria-hidden="true" className="h-px w-16 bg-border-strong" />
+            </div>
+          )}
         </div>
 
         {cargando ? (
@@ -121,15 +133,23 @@ export function VoluntariadoSection() {
 
                     <div className="space-y-2 text-xs font-medium text-text dark:text-text-subtle bg-surface dark:bg-surface p-3.5 rounded-xl border border-border dark:border-border mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-text-subtle">📅</span>
+                        <svg aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3M4 11h16M5 21h14a1 1 0 001-1V7a1 1 0 00-1-1H5a1 1 0 00-1 1v13a1 1 0 001 1z" />
+                        </svg>
                         <span>Fecha: <strong className="text-text dark:text-text">{act.fecha}</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-text-subtle">⏰</span>
+                        <svg aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <circle cx="12" cy="12" r="9" strokeWidth={1.8} />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 7v5l3 2" />
+                        </svg>
                         <span>Horario: <strong className="text-text dark:text-text">{act.hora_inicio} - {act.hora_fin}</strong></span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-text-subtle">📍</span>
+                        <svg aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-text-subtle" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" />
+                          <circle cx="12" cy="10" r="2.5" strokeWidth={1.8} />
+                        </svg>
                         <span className="truncate">Lugar: <strong className="text-text dark:text-text">{act.lugar}</strong></span>
                       </div>
                     </div>
@@ -166,9 +186,12 @@ export function VoluntariadoSection() {
                 </div>
                 <button
                   onClick={() => setActividadSeleccionada(null)}
+                  aria-label="Cerrar"
                   className="text-text-subtle hover:text-text dark:hover:text-text p-1 rounded-lg"
                 >
-                  ✕
+                  <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 

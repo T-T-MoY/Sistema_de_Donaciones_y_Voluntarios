@@ -50,14 +50,6 @@ export const Hero: React.FC = () => {
             MENSAJE
             ===================================================== */}
         <div>
-          <span className="anim-rise inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-full border border-border-strong bg-surface-elevated px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-text-muted backdrop-blur-sm dark:border-cream/15 dark:bg-cream/[0.06] dark:text-cream/80 sm:text-[10px] sm:tracking-[0.22em]">
-            <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-              <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 dark:bg-gold" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent dark:bg-gold" />
-            </span>
-            Plataforma solidaria activa · 2026
-          </span>
-
           <h1 className="anim-rise mt-6 font-display text-[2.35rem] font-extrabold leading-[0.96] tracking-[-0.035em] text-balance text-text sm:mt-7 sm:text-6xl dark:text-cream lg:text-[4.5rem] [animation-delay:70ms]">
             Tu ayuda.
             <br />

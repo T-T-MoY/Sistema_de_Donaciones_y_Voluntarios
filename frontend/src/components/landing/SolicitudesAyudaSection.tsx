@@ -6,19 +6,20 @@ export function SolicitudesAyudaSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warning-soft dark:bg-warning-soft text-warning dark:text-warning border border-warning/25 dark:border-warning/30 uppercase tracking-wider mb-4">
-              Atención Directa a la Comunidad
+            <span className="inline-flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.26em] text-accent-text">
+              <span aria-hidden="true" className="h-px w-8 bg-accent" />
+              Atención directa a la comunidad
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-text dark:text-text tracking-tight leading-tight">
-              Solicitudes de Ayuda para Familias e Instituciones
+            <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1.02] tracking-[-0.03em] text-balance text-text sm:text-4xl lg:text-[2.9rem]">
+              Solicitudes de ayuda para familias e instituciones
             </h2>
-            <p className="mt-4 text-lg text-text-muted dark:text-text-subtle leading-relaxed">
+            <p className="mt-4 max-w-[560px] text-base leading-relaxed text-text-muted">
               Cualquier persona en situación de necesidad, familia afectada o comedor popular puede solicitar apoyo directo. Cada solicitud pasa por una rigurosa evaluación social para garantizar que la ayuda llegue a quienes verdaderamente lo necesitan.
             </p>
 
             <div className="mt-8 space-y-4">
               <div className="flex items-start gap-4 p-4 bg-surface-elevated dark:bg-surface-elevated rounded-xl border border-border dark:border-border">
-                <div className="w-10 h-10 rounded-lg bg-warning-soft dark:bg-warning-soft text-warning dark:text-warning flex items-center justify-center font-bold text-lg shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-accent-soft dark:bg-accent-soft text-accent-text dark:text-accent-text flex items-center justify-center font-bold text-lg shrink-0">
                   1
                 </div>
                 <div>
@@ -30,7 +31,7 @@ export function SolicitudesAyudaSection() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-surface-elevated dark:bg-surface-elevated rounded-xl border border-border dark:border-border">
-                <div className="w-10 h-10 rounded-lg bg-warning-soft dark:bg-warning-soft text-warning dark:text-warning flex items-center justify-center font-bold text-lg shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-accent-soft dark:bg-accent-soft text-accent-text dark:text-accent-text flex items-center justify-center font-bold text-lg shrink-0">
                   2
                 </div>
                 <div>
@@ -42,7 +43,7 @@ export function SolicitudesAyudaSection() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-surface-elevated dark:bg-surface-elevated rounded-xl border border-border dark:border-border">
-                <div className="w-10 h-10 rounded-lg bg-warning-soft dark:bg-warning-soft text-warning dark:text-warning flex items-center justify-center font-bold text-lg shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-accent-soft dark:bg-accent-soft text-accent-text dark:text-accent-text flex items-center justify-center font-bold text-lg shrink-0">
                   3
                 </div>
                 <div>
@@ -80,8 +81,10 @@ export function SolicitudesAyudaSection() {
             </div>
             <div className="absolute -bottom-6 -left-6 bg-surface dark:bg-surface-elevated p-6 rounded-2xl shadow-xl border border-border dark:border-border max-w-xs">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-success-soft dark:bg-success-soft text-success dark:text-success flex items-center justify-center font-black text-xl">
-                  ✓
+                <div className="w-12 h-12 rounded-full bg-success-soft dark:bg-success-soft text-success dark:text-success flex items-center justify-center">
+                  <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
                 <div>
                   <p className="text-xs font-bold text-text-muted dark:text-text-subtle uppercase">100% Verificado</p>
