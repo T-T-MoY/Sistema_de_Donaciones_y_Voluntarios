@@ -109,6 +109,8 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
     const esVoluntario = rolesNorm.includes('voluntario') || rolesNorm.includes('coordinador');
     const esBeneficiario = rolesNorm.includes('beneficiario');
     const esAdministrador = rolesNorm.includes('administrador');
+    // Máximo de roles combinables: Donante + (Voluntario o Coordinador) + Beneficiario.
+    const rolesCompletos = !esAdministrador && formData.roles.length >= 3;
 
     // =====================================================
     // BLOQUEAR SCROLL DEL BODY MIENTRAS EL MODAL ESTÁ ABIERTO
@@ -547,22 +549,29 @@ const UsuarioModal = ({ isOpen, onClose, onSave, usuarioId = null }: UsuarioModa
                                 ))}
                             </div>
                         )}
-                        <select
-                            id="modal-rol"
-                            value=""
-                            onChange={handleRolChange}
-                            className={claseSelect}
-                        >
-                            <option value="">Añadir nuevo rol</option>
-                            <option value="Donante" disabled={esAdministrador || formData.roles.includes('Donante')}>Donante</option>
-                            <option value="Voluntario" disabled={esAdministrador || formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
-                            <option value="Coordinador" disabled={esAdministrador || formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
-                            <option value="Beneficiario" disabled={esAdministrador || formData.roles.includes('Beneficiario')}>Beneficiario</option>
-                            <option value="Administrador" disabled={formData.roles.length > 0}>Administrador</option>
-                        </select>
+                        {!esAdministrador && !rolesCompletos && (
+                            <select
+                                id="modal-rol"
+                                value=""
+                                onChange={handleRolChange}
+                                className={claseSelect}
+                            >
+                                <option value="">Añadir nuevo rol</option>
+                                <option value="Donante" disabled={formData.roles.includes('Donante')}>Donante</option>
+                                <option value="Voluntario" disabled={formData.roles.includes('Voluntario') || formData.roles.includes('Coordinador')}>Voluntario</option>
+                                <option value="Coordinador" disabled={formData.roles.includes('Coordinador') || formData.roles.includes('Voluntario')}>Coordinador de voluntarios</option>
+                                <option value="Beneficiario" disabled={formData.roles.includes('Beneficiario')}>Beneficiario</option>
+                                <option value="Administrador" disabled={formData.roles.length > 0}>Administrador</option>
+                            </select>
+                        )}
                         {esAdministrador && (
                             <p className="mt-2 text-[11px] font-medium text-text-muted">
                                 El rol Administrador es exclusivo: no se combina con otros roles y siempre es un usuario activo.
+                            </p>
+                        )}
+                        {rolesCompletos && (
+                            <p className="mt-2 text-[11px] font-medium text-text-muted">
+                                Ya asignaste todos los roles disponibles.
                             </p>
                         )}
                     </div>
